@@ -1,0 +1,368 @@
+packages:
+  base: !include common/base.yaml
+  base_global: !include common/base_global.yaml
+  
+substitutions:
+  device_name: nexxtender
+  friendly_name: Nexxtender
+  device_name_short: nexxtender
+  update_interval: 60s
+  update_interval_sensor: 10s
+  ble_uuid_prefix: fd47416a-95fb-4206-88b5-b4a8045f75
+  ble_uuid_receive_service: ${ble_uuid_prefix}c1
+  ble_uuid_grid_characteristic: ${ble_uuid_prefix}d0
+  ble_uuid_charging_basic_data: ${ble_uuid_prefix}cf
+  ble_uuid_charging_advanced_data: ${ble_uuid_prefix}db
+  ble_uuid_device_info_service: '180a'
+  ble_uuid_device_info_firmware_characteristic: '2a26'
+  device_prefix: Device
+  device_id_prefix: device
+  grid_prefix: Grid
+  grid_id_prefix: grid
+  charging_basic_data_prefix: Charging Data
+  charging_basic_data_id_prefix: charging_data
+  charging_advanced_data_prefix: Charging Advanced Data
+  charging_advanced_data_id_prefix: charging_advanced_data
+
+esp32:
+  board: az-delivery-devkit-v4
+  framework:
+    type: arduino
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  #platform: ESP32
+  #board: esp32dev
+
+esp32_ble:
+  io_capability: keyboard_only
+
+esp32_ble_tracker:
+  #scan_parameters:
+    #interval: 320ms
+    #window: 60ms
+    #active: false
+
+ble_client:
+  - mac_address: !secret nexxtender_mac
+    id: ${device_name}_ble_client_id
+    on_connect:
+      then:
+        - lambda: |-
+            ESP_LOGD("ble_client_lambda", "Connected to BLE device");
+            id(${device_name}_ble_client_id)->pair();
+            id(ble_client_connectivity).publish_state("1");
+    on_disconnect:
+      then:
+        - lambda: |-
+            ESP_LOGD("ble_client_lambda", "Disconnected from BLE device");
+            id(ble_client_connectivity).publish_state("0");
+    on_passkey_notification:
+      then:
+        - logger.log:
+            format: "Enter this passkey on your BLE device: %06d"
+            args: [ passkey ]
+    on_passkey_request:
+      then:
+        - logger.log: "Authenticating with passkey"
+        - ble_client.passkey_reply:
+            id: ${device_name}_ble_client_id
+            passkey: !secret nexxtender_passkey
+
+# Enable logging
+logger:
+  #logs:
+    #esp32_ble_tracker: DEBUG        # DEBUG to show discovered devices
+    #sensor: INFO                   # DEBUG to show sensor value updates to HA
+    #template.sensor: NONE          # CRITICAL to list sensors after WiFi connect
+    #template.binary_sensor: NONE   # CRITICAL to list sensors after WiFi connect
+    #esp32_ble_client_id: DEBUG         # WARN to not show service UUIDs
+    #esp32_ble_client_id.service: DEBUG # INFO to list ensto characteristics
+    #ble_client.automation: DEBUG   # DEBUG to show connections
+    #ble_sensor: DEBUG              # INFO to show connected characteristics
+    #homeassistant.sensor: DEBUG    # INFO to not show updates from external temperature sensor
+
+binary_sensor:
+  - platform: template
+    name: "BLE Client"
+    id: ble_client_connectivity
+    device_class: connectivity
+    icon: mdi:check-network-outline
+    publish_initial_state: False
+  - platform: template
+    name: "Available"
+    id: available
+    device_class: occupancy
+    icon: mdi:parking
+
+sensor:
+  - platform: template
+    name: "${grid_prefix} Timestamp"
+    id: ${grid_id_prefix}_timestamp
+    icon: mdi:clock-time-eight
+    device_class: timestamp
+  - platform: template
+    name: "${grid_prefix} L1"
+    id: ${grid_id_prefix}_l1
+    icon: mdi:home-floor-1
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    #accuracy_decimals: 0
+  - platform: template
+    name: "${grid_prefix} L2"
+    id: ${grid_id_prefix}_l2
+    icon: mdi:home-floor-2
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    #accuracy_decimals: 0
+  - platform: template
+    name: "${grid_prefix} L3"
+    id: ${grid_id_prefix}_l3
+    icon: mdi:home-floor-3
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    #accuracy_decimals: 0
+  - platform: template
+    name: "${grid_prefix} Consumed"
+    id: ${grid_id_prefix}_consumed
+    icon: mdi:sigma
+    device_class: power
+    unit_of_measurement: W
+    state_class: measurement
+    #accuracy_decimals: 0
+  - platform: template
+    name: "${grid_prefix} Interval"
+    id: ${grid_id_prefix}_interval
+    icon: mdi:camera-timer
+    #accuracy_decimals: 0
+  - platform: template
+    name: "${grid_prefix} CRC"
+    id: ${grid_id_prefix}_crc
+    icon: mdi:alpha-c
+    #accuracy_decimals: 0
+  - platform: template
+    name: "${charging_advanced_data_prefix} Grid Power"
+    id: ${charging_advanced_data_id_prefix}_grid_power
+    icon: mdi:flash
+    device_class: power
+    unit_of_measurement: W
+    state_class: measurement
+    #accuracy_decimals: 0
+  - platform: template
+    name: "${charging_advanced_data_prefix} Car Power"
+    id: ${charging_advanced_data_id_prefix}_car_power
+    icon: mdi:flash
+    device_class: power
+    unit_of_measurement: W
+    state_class: measurement
+    #accuracy_decimals: 0
+  - platform: template
+    name: "${charging_basic_data_prefix} Seconds"
+    id: ${charging_basic_data_id_prefix}_seconds
+    icon: mdi:timelapse
+    device_class: duration
+    unit_of_measurement: s
+    state_class: measurement
+  - platform: template
+    name: "${charging_basic_data_prefix} Energy"
+    id: ${charging_basic_data_id_prefix}_energy
+    icon: mdi:flash
+    device_class: energy
+    unit_of_measurement: Wh
+    state_class: measurement
+    #accuracy_decimals: 0
+  - platform: template
+    name: "${charging_basic_data_prefix} Phase Count"
+    id: ${charging_basic_data_id_prefix}_phase_count
+    icon: mdi:counter
+    state_class: measurement
+    #accuracy_decimals: 0
+
+text_sensor:
+  - platform: template
+    name: "${device_prefix} Firmware"
+    id: ${device_id_prefix}_firmware
+    icon: mdi:book-information-variant
+
+  - platform: template
+    name: "${grid_prefix} RAW"
+    id: ${grid_id_prefix}_raw
+    icon: mdi:raw
+    entity_category: diagnostic
+
+  - platform: template
+    name: "${charging_basic_data_prefix} RAW"
+    id: ${charging_basic_data_id_prefix}_raw
+    icon: mdi:raw
+    entity_category: diagnostic
+
+  - platform: template
+    name: "${charging_basic_data_prefix} Discriminator"
+    id: ${charging_basic_data_id_prefix}_discriminator
+    icon: mdi:help
+
+  - platform: template
+    name: "${charging_basic_data_prefix} Status"
+    id: ${charging_basic_data_id_prefix}_status
+    icon: mdi:help
+
+  - platform: template
+    name: "${charging_advanced_data_prefix} RAW"
+    id: ${charging_advanced_data_id_prefix}_raw
+    icon: mdi:raw
+    entity_category: diagnostic
+
+  - platform: ble_client
+    id: ${device_name}_firmware
+    internal: true
+    ble_client_id: ${device_name}_ble_client_id
+    service_uuid: ${ble_uuid_device_info_service}
+    characteristic_uuid: ${ble_uuid_device_info_firmware_characteristic}
+    update_interval: 60s
+    notify: true
+    on_notify:
+      then:
+        lambda: |-
+            ESP_LOGD("${device_name}_firmware", "%s", x);
+            id(${device_id_prefix}_firmware).publish_state(x.c_str());
+
+  - platform: ble_client
+    id: ${device_name}_grid_data
+    internal: true
+    ble_client_id: ${device_name}_ble_client_id
+    service_uuid: ${ble_uuid_receive_service}
+    characteristic_uuid: ${ble_uuid_grid_characteristic}
+    notify: true
+    update_interval: never
+    on_notify:
+      then:
+        lambda: |-
+            auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+            ESP_LOGD("${device_name}_charging_basic_data", "%s", hex_data.c_str());
+            id(${grid_id_prefix}_raw).publish_state(hex_data);
+
+            // Parsing timestamp from the received data (assuming little-endian byte order)
+            uint32_t timestamp = (uint32_t(x[3]) << 24) | (uint32_t(x[2]) << 16) | (uint32_t(x[1]) << 8) | uint32_t(x[0]);
+            id(${grid_id_prefix}_timestamp).publish_state(timestamp);
+
+            // Parsing other data fields
+            int16_t l1 = (int16_t(x[5]) << 8) | int16_t(x[4]);
+            id(${grid_id_prefix}_l1).publish_state(l1);
+
+            int16_t l2 = (int16_t(x[7]) << 8) | int16_t(x[6]);
+            id(${grid_id_prefix}_l2).publish_state(l2);
+
+            int16_t l3 = (int16_t(x[9]) << 8) | int16_t(x[8]);
+            id(${grid_id_prefix}_l3).publish_state(l3);
+
+            int16_t consumed = (int16_t(x[11]) << 8) | int16_t(x[10]);
+            id(${grid_id_prefix}_consumed).publish_state(consumed);
+
+            int16_t interval = (int16_t(x[13]) << 8) | int16_t(x[12]);
+            id(${grid_id_prefix}_interval).publish_state(interval);
+
+            int16_t crc = (int16_t(x[15]) << 8) | int16_t(x[14]);
+            id(${grid_id_prefix}_crc).publish_state(crc);
+
+  - platform: ble_client
+    id: ${device_name}_charging_basic_data
+    internal: true
+    ble_client_id: ${device_name}_ble_client_id
+    service_uuid: ${ble_uuid_receive_service}
+    characteristic_uuid: ${ble_uuid_charging_basic_data}
+    notify: true
+    update_interval: never
+    on_notify:
+      then:
+        lambda: |-
+            auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+            ESP_LOGD("${device_name}_charging_basic_data", "%s", hex_data.c_str());
+            id(${charging_basic_data_id_prefix}_raw).publish_state(hex_data);
+
+            int16_t seconds = (int16_t(x[1]) << 8) | int16_t(x[0]);
+            id(${charging_basic_data_id_prefix}_seconds).publish_state(seconds);
+
+            // Extract the discriminator value
+            int discriminator = x[2] & 0xFF;
+            ESP_LOGD("discriminator", "Value at index 2: %d", discriminator);
+
+            // Publish the discriminator state
+            String discriminator_state;
+            switch (discriminator) {
+                case 1:
+                    discriminator_state = "started";
+                    break;
+                case 2:
+                    discriminator_state = "charging";
+                    break;
+                case 3:
+                    discriminator_state = "stopped";
+                    break;
+                default:
+                    discriminator_state = "unknown";
+            }
+            id(${charging_basic_data_id_prefix}_discriminator).publish_state(discriminator_state.c_str());
+
+            // Extract the status value
+            int status = x[3] & 0xFF;
+            ESP_LOGD("status", "Value at index 3: %d", status);
+
+            // Publish the status state
+            String status_state;
+            switch (static_cast<char>(status)) {
+                case 'B':
+                    status_state = "plugged";
+                    break;
+                case 'C':
+                case 'D':
+                    status_state = "charging";
+                    break;
+                case 'E':
+                    status_state = "fault";
+                    break;
+                default:
+                    status_state = "unplugged";
+            }
+            id(${charging_basic_data_id_prefix}_status).publish_state(status_state.c_str());
+
+            uint32_t energy = (uint32_t(x[11]) << 24) | (uint32_t(x[10]) << 16) | (uint32_t(x[9]) << 8) | uint32_t(x[8]);
+            id(${charging_basic_data_id_prefix}_energy).publish_state(energy);
+
+            // Extract the phase_count value
+            int phase_count = x[13] & 0xFF;
+            ESP_LOGD("phase_count", "Value at index 13: %d", phase_count);
+            id(${charging_basic_data_id_prefix}_phase_count).publish_state(phase_count);
+
+
+  - platform: ble_client
+    id: ${device_name}_charging_advanced_data
+    internal: true
+    ble_client_id: ${device_name}_ble_client_id
+    service_uuid: ${ble_uuid_receive_service}
+    characteristic_uuid: ${ble_uuid_charging_advanced_data}
+    notify: true
+    update_interval: never
+    on_notify:
+      then:
+        lambda: |-
+            auto tempvar = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+            ESP_LOGD("${device_name}_charging_advanced_data", "%s", format_hex_pretty((uint8_t *) x.c_str(), x.size()).c_str());
+            id(${charging_advanced_data_id_prefix}_raw).publish_state(tempvar);
+
+            // Log the values of x[4] and x[5]
+            ESP_LOGD("${device_name}_x4_x5", "x[4]: %02X, x[5]: %02X", x[4], x[5]);
+
+            int16_t is_available = (int16_t(x[5]) << 8) | int16_t(x[4]);
+            id(available).publish_state(is_available);
+            // Log the int16_t value
+            ESP_LOGD("${device_name}_is_available", "is_available: %d", is_available);
+
+            uint32_t grid_power = (uint32_t(x[9]) << 24) | (uint32_t(x[8]) << 16) | (uint32_t(x[7]) << 8) | uint32_t(x[6]);
+            id(${charging_advanced_data_id_prefix}_grid_power).publish_state(grid_power);
+
+            uint32_t car_power = (uint32_t(x[13]) << 24) | (uint32_t(x[12]) << 16) | (uint32_t(x[11]) << 8) | uint32_t(x[10]);
+            id(${charging_advanced_data_id_prefix}_car_power).publish_state(car_power);
