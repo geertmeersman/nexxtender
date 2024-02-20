@@ -6,47 +6,13 @@ globals:
     type: int
     restore_value: yes
     initial_value: "0"
-  - id: daily_value
-    type: float
-    restore_value: yes
-    initial_value: "0.0"
-  - id: hour_value
-    type: float
-    restore_value: yes
-    initial_value: "0.0"
-
-web_server:
-  port: 80
-  auth:
-    username: admin
-    password: !secret esphome_admin_password
-
-ota:
-  password: !secret esphome_admin_password
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: ${device_name_short} - FB
-    password: !secret esphome_admin_password
-
-captive_portal:
-
-logger:
-
-api:
-  encryption:
-    key: !secret esphome_api_key
-  id: espapi
-  reboot_timeout: 5min
 
 ## ---------------------------------------------------
 ## binary sensors
 ## ---------------------------------------------------
 binary_sensor:
   - platform: status
-    name: ${friendly_name} - Status
+    name: Status
     entity_category: diagnostic
 
 ## ---------------------------------------------------
@@ -69,7 +35,6 @@ switch:
 ## all default sensors
 ## ---------------------------------------------------
 sensor:
-
   - platform: template
     name: Boot counter
     id: bootcounter
@@ -81,7 +46,7 @@ sensor:
   - platform: uptime
     name: Uptime Sensor
     id: uptime_sensor
-    icon: "mdi:clock-start"
+    icon: mdi:clock-start
     update_interval: ${update_interval}
     entity_category: diagnostic
     on_raw_value:
@@ -104,27 +69,26 @@ sensor:
               ).c_str();
 
   - platform: wifi_signal
-    id: wifisignal
-    name: WiFi Signal
-    update_interval: 60s
+    id: wifi_signal_strength
+    name: WiFi Signal Strength
+    update_interval: ${update_interval}
     entity_category: diagnostic
 
   - platform: template
     id: sensor_wifi_signal_percentage
-    name: "WiFi Signal Percentage"
-    icon: "mdi:wifi"
+    name: WiFi Signal Percentage
+    icon: mdi:wifi
     unit_of_measurement: "%"
-    update_interval: 60s
+    update_interval: ${update_interval}
     accuracy_decimals: 0
     entity_category: diagnostic
     lambda: |-
-        if (id(wifisignal).state < -92.0)
+        if (id(wifi_signal_strength).state < -92.0)
           return 100.0;
-        if (id(wifisignal).state > -21.0)
+        if (id(wifi_signal_strength).state > -21.0)
           return 1.0;
         else
-          return round(( -0.0154 * id(wifisignal).state * id(wifisignal).state ) - ( 0.3794 * id(wifisignal).state ) + 98.182 );
-
+          return round(( -0.0154 * id(wifi_signal_strength).state * id(wifi_signal_strength).state ) - ( 0.3794 * id(wifi_signal_strength).state ) + 98.182 );
 
 ## ---------------------------------------------------
 ## all text sensors
@@ -132,7 +96,6 @@ sensor:
 text_sensor:
   - platform: version
     name: Esphome Version
-    id: appver
     entity_category: diagnostic
 
   - platform: template
@@ -144,23 +107,18 @@ text_sensor:
   - platform: wifi_info
     ip_address:
       name: IP
-      id: wifiip
       icon: mdi:ip-network
     ssid:
       name: SSID
-      id: wifiip_ssid
       icon: mdi:wifi
     bssid:
       name: BSSID
-      id: wifiip_bssid
       icon: mdi:wifi
     mac_address:
-      name: Mac Wifi Address
-      id: wifimac_address
+      name: Wifi Mac Address
       icon: mdi:wifi
   - platform: template
     name: Timestamp
-    id: systime
     entity_category: diagnostic
     lambda: char str[20];
       time_t currTime = id(sntp_time).now().timestamp;
@@ -168,6 +126,8 @@ text_sensor:
       return (std::string) str;
   - platform: template
     name: Uptime (formatted)
+    icon: mdi:clock-start
+    update_interval: 15s
     entity_category: diagnostic
     lambda: |-
       int seconds = (id(uptime_sensor).state);
@@ -186,6 +146,3 @@ text_sensor:
       } else {
         return { (String(seconds) +"s").c_str() };
       }
-    icon: mdi:clock-start
-    update_interval: 15s
-

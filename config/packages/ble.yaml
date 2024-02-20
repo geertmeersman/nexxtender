@@ -1,0 +1,46 @@
+substitutions:
+  ble_uuid_prefix: fd47416a-95fb-4206-88b5-b4a8045f75
+  ble_uuid_receive_service: ${ble_uuid_prefix}c1
+
+esp32_ble:
+  io_capability: keyboard_only
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 320ms
+    window: 60ms
+    active: false
+
+ble_client:
+  - mac_address: !secret nexxtender_mac
+    id: ${device_name}_ble_client_id
+    on_connect:
+      then:
+        - lambda: |-
+            ESP_LOGD("ble_client_lambda", "Connected to BLE device");
+            id(${device_name}_ble_client_id)->pair();
+            id(ble_client_connectivity).publish_state("1");
+    on_disconnect:
+      then:
+        - lambda: |-
+            ESP_LOGD("ble_client_lambda", "Disconnected from BLE device");
+            id(ble_client_connectivity).publish_state("0");
+    on_passkey_notification:
+      then:
+        - logger.log:
+            format: "Enter this passkey on your BLE device: %06d"
+            args: [ passkey ]
+    on_passkey_request:
+      then:
+        - logger.log: "Authenticating with passkey"
+        - ble_client.passkey_reply:
+            id: ${device_name}_ble_client_id
+            passkey: !secret nexxtender_passkey
+
+binary_sensor:
+  - platform: template
+    name: "BLE Client"
+    id: ble_client_connectivity
+    device_class: connectivity
+    icon: mdi:check-network-outline
+    publish_initial_state: False

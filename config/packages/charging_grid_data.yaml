@@ -1,0 +1,104 @@
+substitutions:
+  ble_uuid_grid_characteristic: ${ble_uuid_prefix}d0
+  grid_prefix: Grid
+  grid_id_prefix: grid
+
+sensor:
+  - platform: template
+    name: "${grid_prefix} Timestamp"
+    id: ${grid_id_prefix}_timestamp
+    icon: mdi:clock-time-eight
+    device_class: timestamp
+    accuracy_decimals: 0
+  - platform: template
+    name: "${grid_prefix} L1"
+    id: ${grid_id_prefix}_l1
+    icon: mdi:home-floor-1
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+  - platform: template
+    name: "${grid_prefix} L2"
+    id: ${grid_id_prefix}_l2
+    icon: mdi:home-floor-2
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+  - platform: template
+    name: "${grid_prefix} L3"
+    id: ${grid_id_prefix}_l3
+    icon: mdi:home-floor-3
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+  - platform: template
+    name: "${grid_prefix} Consumed"
+    id: ${grid_id_prefix}_consumed
+    icon: mdi:sigma
+    device_class: power
+    unit_of_measurement: W
+    state_class: measurement
+    accuracy_decimals: 0
+  - platform: template
+    name: "${grid_prefix} Interval"
+    id: ${grid_id_prefix}_interval
+    icon: mdi:camera-timer
+    accuracy_decimals: 0
+
+text_sensor:
+  - platform: ble_client
+    id: ${device_name}_grid_data
+    internal: true
+    ble_client_id: ${device_name}_ble_client_id
+    service_uuid: ${ble_uuid_receive_service}
+    characteristic_uuid: ${ble_uuid_grid_characteristic}
+    notify: true
+    update_interval: never
+    on_notify:
+      then:
+        lambda: |-
+            auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+            ESP_LOGD("${device_name}_charging_basic_data", "%s", hex_data.c_str());
+
+            // Parsing timestamp from the received data (assuming little-endian byte order)
+            uint32_t timestamp = (uint32_t(x[3]) << 24) | (uint32_t(x[2]) << 16) | (uint32_t(x[1]) << 8) | uint32_t(x[0]);
+            id(${grid_id_prefix}_timestamp).publish_state(timestamp);
+
+            // Parsing other data fields
+            int16_t l1 = (int16_t(x[5]) << 8) | int16_t(x[4]);
+            id(${grid_id_prefix}_l1).publish_state(l1/10);
+
+            int16_t l2 = (int16_t(x[7]) << 8) | int16_t(x[6]);
+            id(${grid_id_prefix}_l2).publish_state(l2/10);
+
+            int16_t l3 = (int16_t(x[9]) << 8) | int16_t(x[8]);
+            id(${grid_id_prefix}_l3).publish_state(l3/10);
+
+            int16_t consumed = (int16_t(x[11]) << 8) | int16_t(x[10]);
+            id(${grid_id_prefix}_consumed).publish_state(consumed);
+
+            // Interval is a counter that goes from 0->900 (15 minutes)
+            int16_t interval = (int16_t(x[13]) << 8) | int16_t(x[12]);
+            id(${grid_id_prefix}_interval).publish_state(interval);
+
+            int16_t crc_received = (int16_t(x[15]) << 8) | int16_t(x[14]);
+            int16_t crc_calculated = 0xFFFF;
+
+            for (size_t i = 0; i < (x.size()-2); ++i) {
+                crc_calculated ^= x[i];
+                for (int j = 0; j < 8; ++j) {
+                    if (crc_calculated & 0x0001) {
+                        crc_calculated = (crc_calculated >> 1) ^ 0xA001;
+                    } else {
+                        crc_calculated = crc_calculated >> 1;
+                    }
+                }
+            }
+            int16_t crc_calculated_short = static_cast<int16_t>(crc_calculated);
+
+            #id(${grid_id_prefix}_crc).publish_state(crc_received);
+
+            if (crc_received != crc_calculated_short) {
+                ESP_LOGW("${device_name}_charging_basic_data", "CRC check failed. Received CRC: %d, Calculated CRC: %d", crc_received, crc_calculated_short);
+                // Handle CRC mismatch here, such as logging an error or taking corrective action
+            }
