@@ -3,6 +3,7 @@ packages:
   time: !include packages/time.yaml
   ble: !include packages/ble.yaml # secrets nexxtender_mac & nexxtender_passkey required
   charging_grid_data: !include packages/charging_grid_data.yaml
+  charging_basic_data: !include packages/charging_basic_data.yaml
   generic_data: !include packages/generic_data.yaml
   #diagnostics: !include packages/diagnostics.yaml
   

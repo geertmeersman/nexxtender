@@ -27,7 +27,7 @@ text_sensor:
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_generic_data_characteristic}
     notify: true
-    update_interval: never
+    update_interval: 60s
     on_notify:
       then:
         lambda: |-
