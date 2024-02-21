@@ -16,7 +16,8 @@ substitutions:
 esp32:
   board: az-delivery-devkit-v4
   framework:
-    type: arduino
+    type: esp-idf
+    version: recommended
 
 esphome:
   name: ${device_name}

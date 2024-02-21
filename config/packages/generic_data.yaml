@@ -100,78 +100,109 @@ text_sensor:
     on_notify:
       then:
         lambda: |-
-            auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
-            ESP_LOGD("${device_name}_generic_data", "%s", hex_data.c_str());
-            id(g_${generic_data_id_prefix}_raw) = x.c_str();
-            if (x.size() == 51) {
-              //Flag the config read as true
-              id(g_${generic_data_id_prefix}_config_read_bool) = true;
-              // Extract the charge_mode
-              int charge_mode = x[10] & 0xFF;
-              // Publish the charge mode
-              String charge_mode_string;
-              switch (charge_mode) {
-                  case 0:
-                      charge_mode_string = "Eco Private";
-                      break;
-                  case 1:
-                      charge_mode_string = "Max Private";
-                      break;
-                  case 4:
-                      charge_mode_string = "Eco Open";
-                      break;
-                  case 5:
-                      charge_mode_string = "Max Open";
-                      break;
-                  default:
-                      charge_mode_string = "unknown";
+          auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+          ESP_LOGD("${device_name}_generic_data", "%s", hex_data.c_str());
+          id(g_${generic_data_id_prefix}_raw) = x.c_str();
+
+          //Flag the config read as true
+          id(g_${generic_data_id_prefix}_config_read_bool) = true;
+          size_t index = 0;
+          bool found_b2 = false;
+
+          // Declare variables outside the switch-case block
+          String charge_mode_string;
+          String network_type_string;
+    
+              while (index < x.size() - 1) {
+              if (x[index] == 0xB2) {
+                  found_b2 = true;
+                  index++; // Move to the next byte after B2
+
+                  // Process the B2 map x
+                  while (index < x.size()) {
+                      uint8_t key = x[index++];
+                      uint8_t initial_byte = x[index++];
+                      uint8_t major_type = initial_byte >> 5;
+                      uint8_t additional_info = initial_byte & 0x1F;
+                      uint64_t value = 0;
+
+                      if (additional_info < 25) {
+                        value = initial_byte;
+                        ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
+                      } else if (additional_info == 25) {
+                        value = (x[index+1] << 8) | x[index+2];
+                        index += 2;
+                        ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
+                      }
+                      switch (key) {
+                          case 1: // Charge Mode
+                              switch (value) {
+                                  case 0:
+                                      charge_mode_string = "Eco Private";
+                                      break;
+                                  case 1:
+                                      charge_mode_string = "Max Private";
+                                      break;
+                                  case 4:
+                                      charge_mode_string = "Eco Open";
+                                      break;
+                                  case 5:
+                                      charge_mode_string = "Max Open";
+                                      break;
+                                  default:
+                                      charge_mode_string = "unknown";
+                              }
+                              id(g_${generic_data_id_prefix}_charge_mode) = charge_mode_string.c_str();
+                              break;
+                          case 4:
+                              id(g_${generic_data_id_prefix}_i_max) = value;
+                              break;
+                          case 5:
+                              id(g_${generic_data_id_prefix}_i_evse_max) = value;
+                              break;
+                          case 6:
+                              id(g_${generic_data_id_prefix}_i_evse_min) = value;
+                              break;
+                          case 7:
+                              switch (value) {
+                                  case 0:
+                                      id(app_as_key).turn_on();
+                                      break;
+                                  default:
+                                      id(app_as_key).turn_off();
+                                      break;
+                              }
+                              break;
+                          case 9:
+                              switch (value) {
+                                  case 0:
+                                      network_type_string = "Mono/Tri+N";
+                                      break;
+                                  case 3:
+                                      network_type_string = "Tri";
+                                      break;
+                                  default:
+                                      network_type_string = "unknown";
+                              }
+                              id(g_${generic_data_id_prefix}_connection_type) = network_type_string.c_str();
+                              break;
+                          case 10:
+                              id(g_${generic_data_id_prefix}_charging_phases) = value;
+                              break;
+                          default:
+                              break;
+                      }                      
+                  }
+                  break; // Exit the loop once B2 map is found
+              } else {
+                  index++; // Move to the next byte
               }
-              id(g_${generic_data_id_prefix}_charge_mode) = charge_mode_string.c_str();
+          }
 
-              // Extract the network_type
-              int network_type = x[26] & 0xFF;
-              ESP_LOGD("network_type", "Value at index 26: %d", network_type);
+          if (!found_b2) {
+              ESP_LOGD("${device_name}_generic_data", "B2 map not found in the CBOR data.");
+          }
 
-              // Publish the charge mode
-              String network_type_string;
-              switch (network_type) {
-                  case 0:
-                      network_type_string = "Mono/Tri+N";
-                      break;
-                  case 3:
-                      network_type_string = "Tri";
-                      break;
-                  default:
-                      network_type_string = "unknown";
-              }
-              id(g_${generic_data_id_prefix}_connection_type) = network_type_string.c_str();
-
-              // Extract the app_as_key
-              int app_as_key_int = x[22] & 0xFF;
-              ESP_LOGD("app_as_key_int", "Value at index 22: %d", app_as_key_int);
-
-              switch (app_as_key_int) {
-                  case 0:
-                      id(app_as_key).turn_on();
-                      break;
-                  default:
-                      id(app_as_key).turn_off();
-                      break;
-              }
-
-              int16_t charging_phases_int = x[28] & 0xFF;
-              id(g_${generic_data_id_prefix}_charging_phases) = charging_phases_int;
-
-              int16_t i_max_int = x[16] & 0xFF;
-              id(g_${generic_data_id_prefix}_i_max) = i_max_int;
-
-              int16_t i_evse_max_int = x[18] & 0xFF;
-              id(g_${generic_data_id_prefix}_i_evse_max) = i_evse_max_int;
-
-              int16_t i_evse_min_int = x[20] & 0xFF;
-              id(g_${generic_data_id_prefix}_i_evse_min) = i_evse_min_int;
-
-            }
 switch:
   - platform: template
     name: "App as key"
