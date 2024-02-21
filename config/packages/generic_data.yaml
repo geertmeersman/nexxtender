@@ -3,23 +3,92 @@ substitutions:
   ble_uuid_generic_command_characteristic: ${ble_uuid_prefix}dd
   generic_data_prefix: Generic Data
   generic_data_id_prefix: generic_data
+  generic_data_update_interval: 60s
 
 globals:
-  - id: g_generic_data_raw
+  - id: g_${generic_data_id_prefix}_raw
     type: std::string
     restore_value: no
+  - id: g_${generic_data_id_prefix}_config_read_bool
+    type: bool
+  - id: g_${generic_data_id_prefix}_charge_mode
+    type: std::string
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_connection_type
+    type: std::string
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_charging_phases
+    type: int
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_i_max
+    type: int
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_i_evse_max
+    type: int
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_i_evse_min
+    type: int
+    restore_value: yes
+
+sensor:
+  - platform: template
+    name: "Charging Phases"
+    id: ${generic_data_id_prefix}_charging_phases
+    icon: mdi:counter
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_charging_phases);
+  - platform: template
+    name: "Maximum available capacity"
+    id: ${generic_data_id_prefix}_i_max
+    icon: mdi:current-ac
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_i_max);
+  - platform: template
+    name: "Peak consumption limit"
+    id: ${generic_data_id_prefix}_i_evse_max
+    icon: mdi:current-ac
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_i_evse_max);
+  - platform: template
+    name: "Offloading minimum"
+    id: ${generic_data_id_prefix}_i_evse_min
+    icon: mdi:current-ac
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_i_evse_min);
 
 text_sensor:
   - platform: template
     name: "Mode"
     id: ${generic_data_id_prefix}_charge_mode
     icon: mdi:speedometer
-    update_interval: 60s
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_charge_mode);
   - platform: template
-    name: "Network Type"
-    id: ${generic_data_id_prefix}_network_type
+    name: "Connection type"
+    id: ${generic_data_id_prefix}_connection_type
     icon: mdi:transmission-tower
-    update_interval: 60s
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_connection_type);
   - platform: ble_client
     id: ${device_name}_generic_data
     internal: true
@@ -27,15 +96,16 @@ text_sensor:
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_generic_data_characteristic}
     notify: true
-    update_interval: 60s
+    update_interval: ${generic_data_update_interval}
     on_notify:
       then:
         lambda: |-
             auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
             ESP_LOGD("${device_name}_generic_data", "%s", hex_data.c_str());
             id(g_${generic_data_id_prefix}_raw) = x.c_str();
-
             if (x.size() == 51) {
+              //Flag the config read as true
+              id(g_${generic_data_id_prefix}_config_read_bool) = true;
               // Extract the charge_mode
               int charge_mode = x[10] & 0xFF;
               // Publish the charge mode
@@ -56,7 +126,7 @@ text_sensor:
                   default:
                       charge_mode_string = "unknown";
               }
-              id(${generic_data_id_prefix}_charge_mode).publish_state(charge_mode_string.c_str());
+              id(g_${generic_data_id_prefix}_charge_mode) = charge_mode_string.c_str();
 
               // Extract the network_type
               int network_type = x[26] & 0xFF;
@@ -74,7 +144,7 @@ text_sensor:
                   default:
                       network_type_string = "unknown";
               }
-              id(${generic_data_id_prefix}_network_type).publish_state(network_type_string.c_str());
+              id(g_${generic_data_id_prefix}_connection_type) = network_type_string.c_str();
 
               // Extract the app_as_key
               int app_as_key_int = x[22] & 0xFF;
@@ -88,6 +158,19 @@ text_sensor:
                       id(app_as_key).turn_off();
                       break;
               }
+
+              int16_t charging_phases_int = x[28] & 0xFF;
+              id(g_${generic_data_id_prefix}_charging_phases) = charging_phases_int;
+
+              int16_t i_max_int = x[16] & 0xFF;
+              id(g_${generic_data_id_prefix}_i_max) = i_max_int;
+
+              int16_t i_evse_max_int = x[18] & 0xFF;
+              id(g_${generic_data_id_prefix}_i_evse_max) = i_evse_max_int;
+
+              int16_t i_evse_min_int = x[20] & 0xFF;
+              id(g_${generic_data_id_prefix}_i_evse_min) = i_evse_min_int;
+
             }
 switch:
   - platform: template

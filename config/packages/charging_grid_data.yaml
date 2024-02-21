@@ -2,6 +2,27 @@ substitutions:
   ble_uuid_grid_characteristic: ${ble_uuid_prefix}d0
   grid_prefix: Grid
   grid_id_prefix: grid
+  grid_update_interval: 60s
+
+globals:
+  - id: g_${grid_id_prefix}_consumed
+    type: int
+    restore_value: yes
+  - id: g_${grid_id_prefix}_interval
+    type: int
+    restore_value: yes
+  - id: g_${grid_id_prefix}_timestamp
+    type: int
+    restore_value: yes
+  - id: g_${grid_id_prefix}_l1
+    type: int
+    restore_value: yes
+  - id: g_${grid_id_prefix}_l2
+    type: int
+    restore_value: yes
+  - id: g_${grid_id_prefix}_l3
+    type: int
+    restore_value: yes
 
 sensor:
   - platform: template
@@ -10,6 +31,9 @@ sensor:
     icon: mdi:clock-time-eight
     device_class: timestamp
     accuracy_decimals: 0
+    update_interval: ${grid_update_interval}
+    lambda: |-
+      return id(g_${grid_id_prefix}_timestamp);
   - platform: template
     name: "${grid_prefix} L1"
     id: ${grid_id_prefix}_l1
@@ -17,6 +41,9 @@ sensor:
     device_class: current
     unit_of_measurement: A
     state_class: measurement
+    update_interval: ${grid_update_interval}
+    lambda: |-
+      return id(g_${grid_id_prefix}_l1);
   - platform: template
     name: "${grid_prefix} L2"
     id: ${grid_id_prefix}_l2
@@ -24,6 +51,9 @@ sensor:
     device_class: current
     unit_of_measurement: A
     state_class: measurement
+    update_interval: ${grid_update_interval}
+    lambda: |-
+      return id(g_${grid_id_prefix}_l2);
   - platform: template
     name: "${grid_prefix} L3"
     id: ${grid_id_prefix}_l3
@@ -31,6 +61,9 @@ sensor:
     device_class: current
     unit_of_measurement: A
     state_class: measurement
+    update_interval: ${grid_update_interval}
+    lambda: |-
+      return id(g_${grid_id_prefix}_l3);
   - platform: template
     name: "${grid_prefix} Consumed"
     id: ${grid_id_prefix}_consumed
@@ -39,13 +72,19 @@ sensor:
     unit_of_measurement: W
     state_class: measurement
     accuracy_decimals: 0
+    update_interval: ${grid_update_interval}
+    lambda: |-
+      return id(g_${grid_id_prefix}_consumed);
   - platform: template
     name: "${grid_prefix} Interval"
     id: ${grid_id_prefix}_interval
     icon: mdi:camera-timer
     accuracy_decimals: 0
     entity_category: diagnostic
-    disabled_by_default: true
+    #disabled_by_default: true
+    update_interval: ${grid_update_interval}
+    lambda: |-
+      return id(g_${grid_id_prefix}_interval);
 
 text_sensor:
   - platform: ble_client
@@ -54,34 +93,36 @@ text_sensor:
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_grid_characteristic}
-    update_interval: 60s
+    update_interval: ${grid_update_interval}
     notify: true
     on_notify:
       then:
         lambda: |-
-            auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
-            ESP_LOGD("${device_name}_charging_grid_data", "%s", hex_data.c_str());
+            //auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+            //ESP_LOGD("${device_name}_charging_grid_data", "%s", hex_data.c_str());
+
+            // Check if we have read the config
+            if (id(g_${generic_data_id_prefix}_config_read_bool) == false) {
+              id(read_config_button).press();
+            }
 
             // Parsing timestamp from the received data (assuming little-endian byte order)
             uint32_t timestamp = (uint32_t(x[3]) << 24) | (uint32_t(x[2]) << 16) | (uint32_t(x[1]) << 8) | uint32_t(x[0]);
-            id(${grid_id_prefix}_timestamp).publish_state(timestamp);
+            id(g_${grid_id_prefix}_timestamp) = timestamp;
 
             // Parsing other data fields
             int16_t l1 = (int16_t(x[5]) << 8) | int16_t(x[4]);
-            id(${grid_id_prefix}_l1).publish_state(l1/10);
-
+            id(g_${grid_id_prefix}_l1) = l1/10;
             int16_t l2 = (int16_t(x[7]) << 8) | int16_t(x[6]);
-            id(${grid_id_prefix}_l2).publish_state(l2/10);
-
+            id(g_${grid_id_prefix}_l2) = l2/10;
             int16_t l3 = (int16_t(x[9]) << 8) | int16_t(x[8]);
-            id(${grid_id_prefix}_l3).publish_state(l3/10);
-
+            id(g_${grid_id_prefix}_l3) = l3/10;
             int16_t consumed = (int16_t(x[11]) << 8) | int16_t(x[10]);
-            id(${grid_id_prefix}_consumed).publish_state(consumed);
+            id(g_${grid_id_prefix}_consumed) = consumed;
 
             // Interval is a counter that goes from 0->900 (15 minutes)
             int16_t interval = (int16_t(x[13]) << 8) | int16_t(x[12]);
-            id(${grid_id_prefix}_interval).publish_state(interval);
+            id(g_${grid_id_prefix}_interval) = interval;
 
             int16_t crc_received = (int16_t(x[15]) << 8) | int16_t(x[14]);
             int16_t crc_calculated = 0xFFFF;

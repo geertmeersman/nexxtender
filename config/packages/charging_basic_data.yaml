@@ -2,6 +2,24 @@ substitutions:
   ble_uuid_charging_basic_characteristic: ${ble_uuid_prefix}cf
   charging_basic_prefix: Charging Basic
   charging_basic_id_prefix: charging_basic
+  charging_basic_update_interval: 60s
+
+globals:
+  - id: g_${charging_basic_id_prefix}_seconds
+    type: int
+    restore_value: yes
+  - id: g_${charging_basic_id_prefix}_energy
+    type: int
+    restore_value: yes
+  - id: g_${charging_basic_id_prefix}_phase_count
+    type: int
+    restore_value: yes
+  - id: g_${charging_basic_id_prefix}_discriminator
+    type: std::string
+    restore_value: yes
+  - id: g_${charging_basic_id_prefix}_status
+    type: std::string
+    restore_value: yes
 
 sensor:
   - platform: template
@@ -12,6 +30,9 @@ sensor:
     unit_of_measurement: s
     state_class: measurement
     accuracy_decimals: 0
+    update_interval: ${charging_basic_update_interval}
+    lambda: |-
+      return id(g_${charging_basic_id_prefix}_seconds);
   - platform: template
     name: "${charging_basic_prefix} Energy"
     id: ${charging_basic_id_prefix}_energy
@@ -20,22 +41,34 @@ sensor:
     unit_of_measurement: kWh
     state_class: measurement
     accuracy_decimals: 2
+    update_interval: ${charging_basic_update_interval}
+    lambda: |-
+      return id(g_${charging_basic_id_prefix}_energy);
   - platform: template
     name: "${charging_basic_prefix} Phase Count"
     id: ${charging_basic_id_prefix}_phase_count
     icon: mdi:counter
     state_class: measurement
     accuracy_decimals: 0
+    update_interval: ${charging_basic_update_interval}
+    lambda: |-
+      return id(g_${charging_basic_id_prefix}_phase_count);
 
 text_sensor:
   - platform: template
     name: "${charging_basic_prefix} Discriminator"
     id: ${charging_basic_id_prefix}_discriminator
     icon: mdi:battery-charging-100
+    update_interval: ${charging_basic_update_interval}
+    lambda: |-
+      return id(g_${charging_basic_id_prefix}_discriminator);
   - platform: template
     name: "${charging_basic_prefix} Status"
     id: ${charging_basic_id_prefix}_status
     icon: mdi:ev-station
+    update_interval: ${charging_basic_update_interval}
+    lambda: |-
+      return id(g_${charging_basic_id_prefix}_status);
   - platform: ble_client
     id: ${device_name}_charging_basic_data
     internal: true
@@ -47,16 +80,14 @@ text_sensor:
     on_notify:
       then:
         lambda: |-
-            auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
-            ESP_LOGD("${device_name}_charging_basic_data", "%s", hex_data.c_str());
+            //auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+            //ESP_LOGD("${device_name}_charging_basic_data", "%s", hex_data.c_str());
 
             int16_t seconds = (int16_t(x[1]) << 8) | int16_t(x[0]);
-            id(${charging_basic_id_prefix}_seconds).publish_state(seconds);
+            id(g_${charging_basic_id_prefix}_seconds) = seconds;
 
             // Extract the discriminator value
             int discriminator = x[2] & 0xFF;
-            ESP_LOGD("discriminator", "Value at index 2: %d", discriminator);
-
             // Publish the discriminator state
             String discriminator_state;
             switch (discriminator) {
@@ -72,12 +103,10 @@ text_sensor:
                 default:
                     discriminator_state = "unknown";
             }
-            id(${charging_basic_id_prefix}_discriminator).publish_state(discriminator_state.c_str());
+            id(g_${charging_basic_id_prefix}_discriminator) = discriminator_state.c_str();;
 
             // Extract the status value
             int status = x[3] & 0xFF;
-            ESP_LOGD("status", "Value at index 3: %d", status);
-
             // Publish the status state
             String status_state;
             switch (static_cast<char>(status)) {
@@ -94,12 +123,12 @@ text_sensor:
                 default:
                     status_state = "unplugged";
             }
-            id(${charging_basic_id_prefix}_status).publish_state(status_state.c_str());
+            id(g_${charging_basic_id_prefix}_status) = status_state.c_str();
 
             uint32_t energy = (uint32_t(x[11]) << 24) | (uint32_t(x[10]) << 16) | (uint32_t(x[9]) << 8) | uint32_t(x[8]);
-            id(${charging_basic_id_prefix}_energy).publish_state(energy/1000);
+            id(g_${charging_basic_id_prefix}_energy) = energy/1000;
 
             // Extract the phase_count value
-            int phase_count = x[13] & 0xFF;
-            ESP_LOGD("phase_count", "Value at index 13: %d", phase_count);
-            id(${charging_basic_id_prefix}_phase_count).publish_state(phase_count);
+            int16_t phase_count = x[13] & 0xFF;
+            //ESP_LOGD("phase_count", "Value at index 13: %d", phase_count);
+            id(g_${charging_basic_id_prefix}_phase_count) = phase_count;
