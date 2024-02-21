@@ -1,4 +1,5 @@
 packages:
+  #webserver: !include packages/webserver.yaml # secret esphome_admin_password required
   api: !include packages/api.yaml # secrets esphome_admin_password, wifi_ssid, wifi_password & esphome_api_key required
   time: !include packages/time.yaml
   ble: !include packages/ble.yaml # secrets nexxtender_mac & nexxtender_passkey required
