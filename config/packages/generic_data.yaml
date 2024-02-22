@@ -111,7 +111,7 @@ text_sensor:
     characteristic_uuid: ${ble_uuid_generic_data_characteristic}
     notify: ${notify_ble}
     update_interval: ${generic_data_update_interval}
-    on_notify:
+    on_value:
       then:
         lambda: |-
           auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());

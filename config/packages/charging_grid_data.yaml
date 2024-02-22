@@ -95,7 +95,7 @@ text_sensor:
     characteristic_uuid: ${ble_uuid_grid_characteristic}
     update_interval: ${grid_update_interval}
     notify: ${notify_ble}
-    on_notify:
+    on_value:
       then:
         lambda: |-
             //auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
