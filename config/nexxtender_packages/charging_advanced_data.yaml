@@ -1,0 +1,83 @@
+substitutions:
+  ble_uuid_charging_advanced_characteristic: ${ble_uuid_prefix}db
+  charging_advanced_prefix: Charging Advanced
+  charging_advanced_id_prefix: charging_advanced
+  charging_advanced_update_interval: 60s
+
+globals:
+  - id: g_${charging_advanced_id_prefix}_timestamp
+    type: int
+    restore_value: yes
+  - id: g_${charging_advanced_id_prefix}_i_available
+    type: int
+    restore_value: yes
+  - id: g_${charging_advanced_id_prefix}_grid_power
+    type: int
+    restore_value: yes
+  - id: g_${charging_advanced_id_prefix}_car_power
+    type: int
+    restore_value: yes
+
+sensor:
+  - platform: template
+    name: "${charging_advanced_prefix} Timestamp"
+    id: ${charging_advanced_id_prefix}_timestamp
+    icon: mdi:clock-time-eight
+    device_class: timestamp
+    accuracy_decimals: 0
+    update_interval: ${grid_update_interval}
+    lambda: |-
+      return id(g_${charging_advanced_id_prefix}_timestamp);
+  - platform: template
+    name: "Available capacity"
+    id: ${generic_data_id_prefix}_i_available
+    icon: mdi:current-ac
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${charging_advanced_id_prefix}_i_available);
+  - platform: template
+    name: "${charging_advanced_prefix} Grid Power"
+    id: ${charging_advanced_id_prefix}_grid_power
+    icon: mdi:sigma
+    device_class: power
+    unit_of_measurement: W
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${grid_update_interval}
+    lambda: |-
+      return id(g_${charging_advanced_id_prefix}_grid_power);
+  - platform: template
+    name: "${charging_advanced_prefix} Car Power"
+    id: ${charging_advanced_id_prefix}_car_power
+    icon: mdi:sigma
+    device_class: power
+    unit_of_measurement: W
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${grid_update_interval}
+    lambda: |-
+      return id(g_${charging_advanced_id_prefix}_car_power);
+
+text_sensor:
+  - platform: ble_client
+    id: ${device_name}_charging_advanced_data
+    internal: true
+    ble_client_id: ${device_name}_ble_client_id
+    service_uuid: ${ble_uuid_receive_service}
+    characteristic_uuid: ${ble_uuid_charging_advanced_characteristic}
+    update_interval: 60s
+    notify: ${notify_ble}
+    on_value:
+      then:
+        lambda: |-
+            auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+            ESP_LOGD("${device_name}_charging_advanced_data", "%s", hex_data.c_str());
+
+            id(g_${charging_advanced_id_prefix}_timestamp) = getInt(x, 0);
+            id(g_${charging_advanced_id_prefix}_i_available) = getShort(x, 4);
+            id(g_${charging_advanced_id_prefix}_grid_power) = getInt(x, 6);
+            id(g_${charging_advanced_id_prefix}_car_power) = getInt(x, 10);

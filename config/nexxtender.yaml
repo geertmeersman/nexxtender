@@ -7,6 +7,7 @@ packages:
   generic_data: !include nexxtender_packages/generic_data.yaml
   charging_grid_data: !include nexxtender_packages/charging_grid_data.yaml
   charging_basic_data: !include nexxtender_packages/charging_basic_data.yaml
+  charging_advanced_data: !include nexxtender_packages/charging_advanced_data.yaml
   #diagnostics: !include nexxtender_packages/diagnostics.yaml
   
 substitutions:

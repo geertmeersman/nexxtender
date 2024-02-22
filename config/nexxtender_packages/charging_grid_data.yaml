@@ -123,23 +123,3 @@ text_sensor:
             // Interval is a counter that goes from 0->900 (15 minutes)
             int16_t interval = (int16_t(x[13]) << 8) | int16_t(x[12]);
             id(g_${grid_id_prefix}_interval) = interval;
-
-            int16_t crc_received = (int16_t(x[15]) << 8) | int16_t(x[14]);
-            int16_t crc_calculated = 0xFFFF;
-
-            for (size_t i = 0; i < (x.size()-2); ++i) {
-                crc_calculated ^= x[i];
-                for (int j = 0; j < 8; ++j) {
-                    if (crc_calculated & 0x0001) {
-                        crc_calculated = (crc_calculated >> 1) ^ 0xA001;
-                    } else {
-                        crc_calculated = crc_calculated >> 1;
-                    }
-                }
-            }
-            int16_t crc_calculated_short = static_cast<int16_t>(crc_calculated);
-
-            if (crc_received != crc_calculated_short) {
-                ESP_LOGW("${device_name}_charging_grid_data", "CRC check failed. Received CRC: %d, Calculated CRC: %d", crc_received, crc_calculated_short);
-                // Handle CRC mismatch here, such as logging an error or taking corrective action
-            }
