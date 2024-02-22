@@ -1,0 +1,365 @@
+substitutions:
+  ble_uuid_generic_data_characteristic: ${ble_uuid_prefix}df
+  ble_uuid_generic_command_characteristic: ${ble_uuid_prefix}dd
+  generic_data_prefix: Generic Data
+  generic_data_id_prefix: generic_data
+  generic_data_update_interval: 60s
+
+globals:
+  - id: g_${generic_data_id_prefix}_raw
+    type: std::string
+    restore_value: no
+  - id: g_${generic_data_id_prefix}_config_read_bool
+    type: bool
+  - id: g_${generic_data_id_prefix}_charge_mode
+    type: std::string
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_connection_type
+    type: std::string
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_charging_phases
+    type: int
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_i_max
+    type: int
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_i_evse_max
+    type: int
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_i_evse_min
+    type: int
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_i_capacity
+    type: int
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_week_start
+    type: std::string
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_week_end
+    type: std::string
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_weekend_start
+    type: std::string
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_weekend_end
+    type: std::string
+    restore_value: yes
+
+sensor:
+  - platform: template
+    name: "Charging Phases"
+    id: ${generic_data_id_prefix}_charging_phases
+    icon: mdi:counter
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_charging_phases);
+  - platform: template
+    name: "Maximum available capacity"
+    id: ${generic_data_id_prefix}_i_max
+    icon: mdi:current-ac
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_i_max);
+  - platform: template
+    name: "Maximum car charging speed"
+    id: ${generic_data_id_prefix}_i_evse_max
+    icon: mdi:current-ac
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_i_evse_max);
+  - platform: template
+    name: "Minimum car charging speed"
+    id: ${generic_data_id_prefix}_i_evse_min
+    icon: mdi:current-ac
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_i_evse_min);
+  - platform: template
+    name: "Peak consumption limit"
+    id: ${generic_data_id_prefix}_i_capacity
+    icon: mdi:current-ac
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_i_capacity);
+
+text_sensor:
+  - platform: template
+    name: "Mode"
+    id: ${generic_data_id_prefix}_charge_mode
+    icon: mdi:speedometer
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_charge_mode);
+  - platform: template
+    name: "Connection type"
+    id: ${generic_data_id_prefix}_connection_type
+    icon: mdi:transmission-tower
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_connection_type);
+  - platform: template
+    name: "Week schema"
+    id: ${generic_data_id_prefix}_week_schema
+    icon: mdi:calendar
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      char time_string[20];
+      sprintf(time_string, "%s - %s", id(g_${generic_data_id_prefix}_week_start).c_str(), id(g_${generic_data_id_prefix}_week_end).c_str());
+      return optional<String>(time_string);
+  - platform: template
+    name: "Weekend schema"
+    id: ${generic_data_id_prefix}_weekend_schema
+    icon: mdi:calendar
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      char time_string[20];
+      sprintf(time_string, "%s - %s", id(g_${generic_data_id_prefix}_weekend_start).c_str(), id(g_${generic_data_id_prefix}_weekend_end).c_str());
+      return optional<String>(time_string);
+  - platform: ble_client
+    id: ${device_name}_generic_data
+    internal: true
+    ble_client_id: ${device_name}_ble_client_id
+    service_uuid: ${ble_uuid_receive_service}
+    characteristic_uuid: ${ble_uuid_generic_data_characteristic}
+    notify: true
+    update_interval: never
+    on_notify:
+      then:
+        lambda: |-
+          auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+          ESP_LOGD("${device_name}_generic_data", "%s", hex_data.c_str());
+          id(g_${generic_data_id_prefix}_raw) = x.c_str();
+
+          //Flag the config read as true
+          id(g_${generic_data_id_prefix}_config_read_bool) = true;
+          size_t index = 0;
+          bool found_b2 = false;
+
+          // Declare variables outside the switch-case block
+          String charge_mode_string;
+          String network_type_string;
+          char time_string[10];
+          int hours;
+          int remaining_minutes;
+    
+          while (index < x.size() - 1) {
+            if (x[index] == 0xB2) {
+                found_b2 = true;
+                index++; // Move to the next byte after B2
+
+                // Process the B2 map x
+                while (index < x.size()) {
+                  uint8_t key = x[index++];
+                  uint8_t initial_byte = x[index++];
+                  uint8_t major_type = initial_byte >> 5;
+                  uint8_t additional_info = initial_byte & 0x1F;
+                  uint64_t value = 0;
+
+                  if (additional_info < 24) {
+                    value = initial_byte;
+                    ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
+                  } else if (additional_info == 24) {
+                    value = x[index];
+                    index += 1;
+                    ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
+                  } else if (additional_info == 25) {
+                    value = (x[index] << 8) | x[index+1];
+                    index += 2;
+                    ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
+                  }
+
+                  //chargeMode(1),
+                  //modbusSlaveAddress(2),
+                  //cycleRate(3),
+                  //iMax(4), 16 (max beschikbare capaciteit)
+                  //iEvseMax(5), 16 (maximale laadsnelheid auto)
+                  //iEvseMin(6), 6 (minimale laadsnelheid auto)
+                  //iLevel1(7), 6 (offloading minimum?)
+                  //solarMode(8), 0
+                  //phaseSeq(9), 0
+                  //chargingPhases(10), 3
+                  //blePin(11),
+                  //touWeekStart(12), 10253
+                  //touWeekStop(13), 10254
+                  //touWeekendStart(14), 0
+                  //touWeekendStop(15), 0
+                  //timezone(16), 0
+                  //relayOffPeriod(17), 5
+                  //externalRegulation(18), 0
+                  //iCapacity(19); 16/15
+
+                  switch (key) {
+                    case 1: // Charge Mode
+                        switch (value) {
+                            case 0:
+                                charge_mode_string = "Eco Private";
+                                break;
+                            case 1:
+                                charge_mode_string = "Max Private";
+                                break;
+                            case 4:
+                                charge_mode_string = "Eco Open";
+                                break;
+                            case 5:
+                                charge_mode_string = "Max Open";
+                                break;
+                            default:
+                                charge_mode_string = "unknown";
+                        }
+                        id(g_${generic_data_id_prefix}_charge_mode) = charge_mode_string.c_str();
+                        break;
+                    case 4:
+                        id(g_${generic_data_id_prefix}_i_max) = value;
+                        break;
+                    case 5:
+                        id(g_${generic_data_id_prefix}_i_evse_max) = value;
+                        break;
+                    case 6:
+                        id(g_${generic_data_id_prefix}_i_evse_min) = value;
+                        break;
+                    case 7:
+                        switch (value) {
+                            case 0:
+                                id(app_as_key).turn_on();
+                                break;
+                            default:
+                                id(app_as_key).turn_off();
+                                break;
+                        }
+                        break;
+                    case 9:
+                        switch (value) {
+                            case 0:
+                                network_type_string = "Mono/Tri+N";
+                                break;
+                            case 3:
+                                network_type_string = "Tri";
+                                break;
+                            default:
+                                network_type_string = "unknown";
+                        }
+                        id(g_${generic_data_id_prefix}_connection_type) = network_type_string.c_str();
+                        break;
+                    case 10:
+                        id(g_${generic_data_id_prefix}_charging_phases) = value;
+                        break;
+                    case 12:
+                        value += 60;
+                        hours = value / 60;
+                        remaining_minutes = value % 60;
+                        sprintf(time_string, "%dh%02d", hours, remaining_minutes);
+                        id(g_${generic_data_id_prefix}_week_start) = time_string;
+                        break;
+                    case 13:
+                        value += 60;
+                        hours = value / 60;
+                        remaining_minutes = value % 60;
+                        sprintf(time_string, "%dh%02d", hours, remaining_minutes);
+                        id(g_${generic_data_id_prefix}_week_end) = time_string;
+                        break;
+                    case 14:
+                        value += 60;
+                        hours = value / 60;
+                        remaining_minutes = value % 60;
+                        sprintf(time_string, "%dh%02d", hours, remaining_minutes);
+                        id(g_${generic_data_id_prefix}_weekend_start) = time_string;
+                        break;
+                    case 15:
+                        value += 60;
+                        hours = value / 60;
+                        remaining_minutes = value % 60;
+                        sprintf(time_string, "%dh%02d", hours, remaining_minutes);
+                        id(g_${generic_data_id_prefix}_weekend_end) = time_string;
+                        break;
+                    case 19:
+                        id(g_${generic_data_id_prefix}_i_capacity) = value;
+                    default:
+                        break;
+                  }                      
+              }
+                break; // Exit the loop once B2 map is found
+            } else {
+                index++; // Move to the next byte
+            }
+          }
+
+          if (!found_b2) {
+              ESP_LOGD("${device_name}_generic_data", "B2 map not found in the CBOR data.");
+          }
+
+switch:
+  - platform: template
+    name: "App as key"
+    id: app_as_key
+    icon: mdi:cellphone-key
+    turn_on_action:
+      - logger.log: "App as key turned On!" #TODO Write change
+
+button:
+  - platform: template
+    name: "Read config"
+    id: read_config_button
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          value: [0x04, 0x50]
+  - platform: template
+    name: "Start Charge Default"
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          value: [0x01, 0x00]
+  - platform: template
+    name: "Start Charge Max"
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          value: [0x02, 0x00]
+  - platform: template
+    name: "Start Charge Auto"
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          value: [0x03, 0x00]
+  - platform: template
+    name: "Start Charge Eco"
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          value: [0x04, 0x00]
+  - platform: template
+    name: "Start Charge Stop"
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          value: [0x06, 0x00]

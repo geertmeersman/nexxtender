@@ -1,13 +1,13 @@
 packages:
-  esp: !include packages/esp.yaml
-  #webserver: !include packages/webserver.yaml # secret esphome_admin_password required
-  api: !include packages/api.yaml # secrets esphome_admin_password, wifi_ssid, wifi_password & esphome_api_key required
-  time: !include packages/time.yaml
-  ble: !include packages/ble.yaml # secrets nexxtender_mac & nexxtender_passkey required
-  generic_data: !include packages/generic_data.yaml
-  charging_grid_data: !include packages/charging_grid_data.yaml
-  charging_basic_data: !include packages/charging_basic_data.yaml
-  #diagnostics: !include packages/diagnostics.yaml
+  esp: !include nexxtender_packages/esp.yaml
+  #webserver: !include nexxtender_packages/webserver.yaml # secret esphome_admin_password required
+  api: !include nexxtender_packages/api.yaml # secrets esphome_admin_password, wifi_ssid, wifi_password & esphome_api_key required
+  time: !include nexxtender_packages/time.yaml
+  ble: !include nexxtender_packages/ble.yaml # secrets nexxtender_mac & nexxtender_passkey required
+  generic_data: !include nexxtender_packages/generic_data.yaml
+  charging_grid_data: !include nexxtender_packages/charging_grid_data.yaml
+  charging_basic_data: !include nexxtender_packages/charging_basic_data.yaml
+  #diagnostics: !include nexxtender_packages/diagnostics.yaml
   
 substitutions:
   device_name: nexxtender
