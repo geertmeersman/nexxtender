@@ -17,11 +17,13 @@ ble_client:
             ESP_LOGD("ble_client_lambda", "Connected to BLE device");
             id(${device_name}_ble_client_id)->pair();
             id(ble_client_connectivity).publish_state("1");
+        - esp32_ble_tracker.stop_scan:
     on_disconnect:
       then:
         - lambda: |-
             ESP_LOGD("ble_client_lambda", "Disconnected from BLE device");
             id(ble_client_connectivity).publish_state("0");
+        - esp32_ble_tracker.start_scan:
     on_passkey_notification:
       then:
         - logger.log:
