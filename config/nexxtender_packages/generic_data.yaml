@@ -8,22 +8,6 @@ substitutions:
 globals:
   - id: g_${generic_data_id_prefix}_config_read_bool
     type: bool
-  - id: g_${generic_data_id_prefix}_charge_mode
-    type: std::string
-  - id: g_${generic_data_id_prefix}_connection_type
-    type: std::string
-  - id: g_${generic_data_id_prefix}_charging_phases
-    type: int
-  - id: g_${generic_data_id_prefix}_i_max
-    type: int
-  - id: g_${generic_data_id_prefix}_i_min
-    type: int
-  - id: g_${generic_data_id_prefix}_i_evse_max
-    type: int
-  - id: g_${generic_data_id_prefix}_i_evse_min
-    type: int
-  - id: g_${generic_data_id_prefix}_i_capacity
-    type: int
   - id: g_${generic_data_id_prefix}_week_start
     type: std::string
   - id: g_${generic_data_id_prefix}_week_end
@@ -41,8 +25,6 @@ sensor:
     state_class: measurement
     accuracy_decimals: 0
     update_interval: ${generic_data_update_interval}
-    lambda: |-
-      return id(g_${generic_data_id_prefix}_charging_phases);
   - platform: template
     name: "Maximum available capacity"
     id: ${generic_data_id_prefix}_i_max
@@ -52,8 +34,6 @@ sensor:
     state_class: measurement
     accuracy_decimals: 0
     update_interval: ${generic_data_update_interval}
-    lambda: |-
-      return id(g_${generic_data_id_prefix}_i_max);
   - platform: template
     name: "Offloading minimum"
     id: ${generic_data_id_prefix}_i_min
@@ -63,8 +43,6 @@ sensor:
     state_class: measurement
     accuracy_decimals: 0
     update_interval: ${generic_data_update_interval}
-    lambda: |-
-      return id(g_${generic_data_id_prefix}_i_min);
   - platform: template
     name: "Maximum car charging speed"
     id: ${generic_data_id_prefix}_i_evse_max
@@ -74,8 +52,6 @@ sensor:
     state_class: measurement
     accuracy_decimals: 0
     update_interval: ${generic_data_update_interval}
-    lambda: |-
-      return id(g_${generic_data_id_prefix}_i_evse_max);
   - platform: template
     name: "Minimum car charging speed"
     id: ${generic_data_id_prefix}_i_evse_min
@@ -85,8 +61,6 @@ sensor:
     state_class: measurement
     accuracy_decimals: 0
     update_interval: ${generic_data_update_interval}
-    lambda: |-
-      return id(g_${generic_data_id_prefix}_i_evse_min);
   - platform: template
     name: "Peak consumption limit"
     id: ${generic_data_id_prefix}_i_capacity
@@ -96,8 +70,6 @@ sensor:
     state_class: measurement
     accuracy_decimals: 0
     update_interval: ${generic_data_update_interval}
-    lambda: |-
-      return id(g_${generic_data_id_prefix}_i_capacity);
 
 text_sensor:
   - platform: template
@@ -105,15 +77,11 @@ text_sensor:
     id: ${generic_data_id_prefix}_charge_mode
     icon: mdi:speedometer
     update_interval: ${generic_data_update_interval}
-    lambda: |-
-      return id(g_${generic_data_id_prefix}_charge_mode);
   - platform: template
     name: "Connection type"
     id: ${generic_data_id_prefix}_connection_type
     icon: mdi:transmission-tower
     update_interval: ${generic_data_update_interval}
-    lambda: |-
-      return id(g_${generic_data_id_prefix}_connection_type);
   - platform: template
     name: "Week schema"
     id: ${generic_data_id_prefix}_week_schema
@@ -197,7 +165,6 @@ text_sensor:
                             default:
                                 value_string = "unknown";
                         }
-                        id(g_${generic_data_id_prefix}_charge_mode) = value_string.c_str();
                         id(${generic_data_id_prefix}_charge_mode).publish_state(value_string.c_str());
                         break;
                     case 2: //modbusSlaveAddress(2)
@@ -205,19 +172,15 @@ text_sensor:
                     case 3: //cycleRate(3)
                         break;
                     case 4: //iMax(4), 16 (max beschikbare capaciteit)
-                        id(g_${generic_data_id_prefix}_i_max) = value;
                         id(${generic_data_id_prefix}_i_max).publish_state(value);
                         break;
                     case 5: //iEvseMax(5), 16 (maximale laadsnelheid auto)
-                        id(g_${generic_data_id_prefix}_i_evse_max) = value;
                         id(${generic_data_id_prefix}_i_evse_max).publish_state(value);
                         break;
                     case 6: //iEvseMin(6), 6 (minimale laadsnelheid auto)
-                        id(g_${generic_data_id_prefix}_i_evse_min) = value;
                         id(${generic_data_id_prefix}_i_evse_min).publish_state(value);
                         break;
                     case 7: //iLevel1(7), 6 (offloading minimum?)
-                        id(g_${generic_data_id_prefix}_i_min) = value;
                         id(${generic_data_id_prefix}_i_min).publish_state(value);
                         break;
                     case 8: //solarMode(8), 0
@@ -233,11 +196,9 @@ text_sensor:
                             default:
                                 value_string = "unknown";
                         }
-                        id(g_${generic_data_id_prefix}_connection_type) = value_string.c_str();
                         id(${generic_data_id_prefix}_connection_type).publish_state(value_string.c_str());
                         break;
                     case 10: //chargingPhases(10), 3
-                        id(g_${generic_data_id_prefix}_charging_phases) = value;
                         id(${generic_data_id_prefix}_charging_phases).publish_state(value);
                         break;
                     case 11: //blePin(11),
@@ -261,7 +222,6 @@ text_sensor:
                     case 18: //externalRegulation(18), 0
                         break;
                     case 19: //iCapacity(19); 16/15
-                        id(g_${generic_data_id_prefix}_i_capacity) = value;
                         id(${generic_data_id_prefix}_i_capacity).publish_state(value);
                     default:
                         break;
