@@ -10,40 +10,28 @@ globals:
     type: bool
   - id: g_${generic_data_id_prefix}_charge_mode
     type: std::string
-    restore_value: yes
   - id: g_${generic_data_id_prefix}_connection_type
     type: std::string
-    restore_value: yes
   - id: g_${generic_data_id_prefix}_charging_phases
     type: int
-    restore_value: yes
   - id: g_${generic_data_id_prefix}_i_max
     type: int
-    restore_value: yes
   - id: g_${generic_data_id_prefix}_i_min
     type: int
-    restore_value: yes
   - id: g_${generic_data_id_prefix}_i_evse_max
     type: int
-    restore_value: yes
   - id: g_${generic_data_id_prefix}_i_evse_min
     type: int
-    restore_value: yes
   - id: g_${generic_data_id_prefix}_i_capacity
     type: int
-    restore_value: yes
   - id: g_${generic_data_id_prefix}_week_start
     type: std::string
-    restore_value: yes
   - id: g_${generic_data_id_prefix}_week_end
     type: std::string
-    restore_value: yes
   - id: g_${generic_data_id_prefix}_weekend_start
     type: std::string
-    restore_value: yes
   - id: g_${generic_data_id_prefix}_weekend_end
     type: std::string
-    restore_value: yes
 
 sensor:
   - platform: template

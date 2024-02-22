@@ -7,16 +7,12 @@ substitutions:
 globals:
   - id: g_${charging_advanced_id_prefix}_timestamp
     type: int
-    restore_value: yes
   - id: g_${charging_advanced_id_prefix}_i_available
     type: int
-    restore_value: yes
   - id: g_${charging_advanced_id_prefix}_grid_power
     type: int
-    restore_value: yes
   - id: g_${charging_advanced_id_prefix}_car_power
     type: int
-    restore_value: yes
 
 sensor:
   - platform: template

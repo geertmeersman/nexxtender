@@ -7,22 +7,16 @@ substitutions:
 globals:
   - id: g_${grid_id_prefix}_consumed
     type: int
-    restore_value: yes
   - id: g_${grid_id_prefix}_interval
     type: int
-    restore_value: yes
   - id: g_${grid_id_prefix}_timestamp
     type: int
-    restore_value: yes
   - id: g_${grid_id_prefix}_l1
     type: int
-    restore_value: yes
   - id: g_${grid_id_prefix}_l2
     type: int
-    restore_value: yes
   - id: g_${grid_id_prefix}_l3
     type: int
-    restore_value: yes
 
 sensor:
   - platform: template
