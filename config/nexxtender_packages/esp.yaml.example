@@ -7,3 +7,5 @@ esp32:
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
+  includes:
+    - nexxtender_packages/nexxtender.h
