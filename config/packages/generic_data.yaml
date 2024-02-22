@@ -29,6 +29,9 @@ globals:
   - id: g_${generic_data_id_prefix}_i_evse_min
     type: int
     restore_value: yes
+  - id: g_${generic_data_id_prefix}_i_capacity
+    type: int
+    restore_value: yes
 
 sensor:
   - platform: template
@@ -52,7 +55,7 @@ sensor:
     lambda: |-
       return id(g_${generic_data_id_prefix}_i_max);
   - platform: template
-    name: "Peak consumption limit"
+    name: "Maximum car charging speed"
     id: ${generic_data_id_prefix}_i_evse_max
     icon: mdi:current-ac
     device_class: current
@@ -63,7 +66,7 @@ sensor:
     lambda: |-
       return id(g_${generic_data_id_prefix}_i_evse_max);
   - platform: template
-    name: "Offloading minimum"
+    name: "Minimum car charging speed"
     id: ${generic_data_id_prefix}_i_evse_min
     icon: mdi:current-ac
     device_class: current
@@ -73,6 +76,17 @@ sensor:
     update_interval: ${generic_data_update_interval}
     lambda: |-
       return id(g_${generic_data_id_prefix}_i_evse_min);
+  - platform: template
+    name: "Peak consumption limit"
+    id: ${generic_data_id_prefix}_i_capacity
+    icon: mdi:current-ac
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_i_capacity);
 
 text_sensor:
   - platform: template
@@ -95,7 +109,7 @@ text_sensor:
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_generic_data_characteristic}
-    notify: true
+    notify: ${notify_ble}
     update_interval: ${generic_data_update_interval}
     on_notify:
       then:
@@ -126,14 +140,39 @@ text_sensor:
                       uint8_t additional_info = initial_byte & 0x1F;
                       uint64_t value = 0;
 
-                      if (additional_info < 25) {
+                      if (additional_info < 24) {
                         value = initial_byte;
+                        ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
+                      } else if (additional_info == 24) {
+                        value = x[index];
+                        index += 1;
                         ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
                       } else if (additional_info == 25) {
                         value = (x[index+1] << 8) | x[index+2];
                         index += 2;
                         ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
                       }
+
+                      //chargeMode(1),
+                      //modbusSlaveAddress(2),
+                      //cycleRate(3),
+                      //iMax(4), 16 (max beschikbare capaciteit)
+                      //iEvseMax(5), 16 (maximale laadsnelheid auto)
+                      //iEvseMin(6), 6 (minimale laadsnelheid auto)
+                      //iLevel1(7), 6 (offloading minimum?)
+                      //solarMode(8), 0
+                      //phaseSeq(9), 0
+                      //chargingPhases(10), 3
+                      //blePin(11),
+                      //touWeekStart(12), 10253
+                      //touWeekStop(13), 10254
+                      //touWeekendStart(14), 0
+                      //touWeekendStop(15), 0
+                      //timezone(16), 0
+                      //relayOffPeriod(17), 5
+                      //externalRegulation(18), 0
+                      //iCapacity(19); 16/15
+
                       switch (key) {
                           case 1: // Charge Mode
                               switch (value) {
@@ -189,6 +228,8 @@ text_sensor:
                           case 10:
                               id(g_${generic_data_id_prefix}_charging_phases) = value;
                               break;
+                          case 19:
+                              id(g_${generic_data_id_prefix}_i_capacity) = value;
                           default:
                               break;
                       }                      

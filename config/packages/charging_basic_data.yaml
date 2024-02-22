@@ -76,12 +76,12 @@ text_sensor:
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_charging_basic_characteristic}
     update_interval: 60s
-    notify: true
-    on_notify:
+    notify: ${notify_ble}
+    on_value:
       then:
         lambda: |-
-            //auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
-            //ESP_LOGD("${device_name}_charging_basic_data", "%s", hex_data.c_str());
+            auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+            ESP_LOGD("${device_name}_charging_basic_data", "%s", hex_data.c_str());
 
             int16_t seconds = (int16_t(x[1]) << 8) | int16_t(x[0]);
             id(g_${charging_basic_id_prefix}_seconds) = seconds;
