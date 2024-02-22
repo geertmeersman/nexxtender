@@ -94,32 +94,22 @@ text_sensor:
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_grid_characteristic}
     update_interval: ${grid_update_interval}
-    notify: ${notify_ble}
-    on_value:
+    notify: true
+    on_notify:
       then:
         lambda: |-
-            //auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
-            //ESP_LOGD("${device_name}_charging_grid_data", "%s", hex_data.c_str());
+          logd_x("${device_name}_charging_grid_data", x);
 
-            // Check if we have read the config
-            if (id(g_${generic_data_id_prefix}_config_read_bool) == false) {
-              id(read_config_button).press();
-            }
+          // Check if we have read the config
+          if (id(g_${generic_data_id_prefix}_config_read_bool) == false) {
+            id(read_config_button).press();
+          }
 
-            // Parsing timestamp from the received data (assuming little-endian byte order)
-            uint32_t timestamp = (uint32_t(x[3]) << 24) | (uint32_t(x[2]) << 16) | (uint32_t(x[1]) << 8) | uint32_t(x[0]);
-            id(g_${grid_id_prefix}_timestamp) = timestamp;
+          id(g_${grid_id_prefix}_timestamp) = getInt(x, 0);
+          id(g_${grid_id_prefix}_l1) = getShort(x, 4)/10;
+          id(g_${grid_id_prefix}_l2) = getShort(x, 6)/10;
+          id(g_${grid_id_prefix}_l3) = getShort(x, 8)/10;
+          id(g_${grid_id_prefix}_consumed) = getShort(x, 10);
 
-            // Parsing other data fields
-            int16_t l1 = (int16_t(x[5]) << 8) | int16_t(x[4]);
-            id(g_${grid_id_prefix}_l1) = l1/10;
-            int16_t l2 = (int16_t(x[7]) << 8) | int16_t(x[6]);
-            id(g_${grid_id_prefix}_l2) = l2/10;
-            int16_t l3 = (int16_t(x[9]) << 8) | int16_t(x[8]);
-            id(g_${grid_id_prefix}_l3) = l3/10;
-            int16_t consumed = (int16_t(x[11]) << 8) | int16_t(x[10]);
-            id(g_${grid_id_prefix}_consumed) = consumed;
-
-            // Interval is a counter that goes from 0->900 (15 minutes)
-            int16_t interval = (int16_t(x[13]) << 8) | int16_t(x[12]);
-            id(g_${grid_id_prefix}_interval) = interval;
+          // Interval is a counter that goes from 0->900 (15 minutes)
+          id(g_${grid_id_prefix}_interval) = getShort(x, 12);

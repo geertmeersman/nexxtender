@@ -6,9 +6,6 @@ substitutions:
   generic_data_update_interval: 60s
 
 globals:
-  - id: g_${generic_data_id_prefix}_raw
-    type: std::string
-    restore_value: no
   - id: g_${generic_data_id_prefix}_config_read_bool
     type: bool
   - id: g_${generic_data_id_prefix}_charge_mode
@@ -21,6 +18,9 @@ globals:
     type: int
     restore_value: yes
   - id: g_${generic_data_id_prefix}_i_max
+    type: int
+    restore_value: yes
+  - id: g_${generic_data_id_prefix}_i_min
     type: int
     restore_value: yes
   - id: g_${generic_data_id_prefix}_i_evse_max
@@ -66,6 +66,17 @@ sensor:
     update_interval: ${generic_data_update_interval}
     lambda: |-
       return id(g_${generic_data_id_prefix}_i_max);
+  - platform: template
+    name: "Offloading minimum"
+    id: ${generic_data_id_prefix}_i_min
+    icon: mdi:current-ac
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: ${generic_data_update_interval}
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_i_min);
   - platform: template
     name: "Maximum car charging speed"
     id: ${generic_data_id_prefix}_i_evse_max
@@ -144,9 +155,7 @@ text_sensor:
     on_notify:
       then:
         lambda: |-
-          auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
-          ESP_LOGD("${device_name}_generic_data", "%s", hex_data.c_str());
-          id(g_${generic_data_id_prefix}_raw) = x.c_str();
+          logd_x("${device_name}_generic_data", x);
 
           //Flag the config read as true
           id(g_${generic_data_id_prefix}_config_read_bool) = true;
@@ -154,11 +163,7 @@ text_sensor:
           bool found_b2 = false;
 
           // Declare variables outside the switch-case block
-          String charge_mode_string;
-          String network_type_string;
-          char time_string[10];
-          int hours;
-          int remaining_minutes;
+          String value_string;
     
           while (index < x.size() - 1) {
             if (x[index] == 0xB2) {
@@ -186,111 +191,90 @@ text_sensor:
                     ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
                   }
 
-                  //chargeMode(1),
-                  //modbusSlaveAddress(2),
-                  //cycleRate(3),
-                  //iMax(4), 16 (max beschikbare capaciteit)
-                  //iEvseMax(5), 16 (maximale laadsnelheid auto)
-                  //iEvseMin(6), 6 (minimale laadsnelheid auto)
-                  //iLevel1(7), 6 (offloading minimum?)
-                  //solarMode(8), 0
-                  //phaseSeq(9), 0
-                  //chargingPhases(10), 3
-                  //blePin(11),
-                  //touWeekStart(12), 10253
-                  //touWeekStop(13), 10254
-                  //touWeekendStart(14), 0
-                  //touWeekendStop(15), 0
-                  //timezone(16), 0
-                  //relayOffPeriod(17), 5
-                  //externalRegulation(18), 0
-                  //iCapacity(19); 16/15
-
                   switch (key) {
                     case 1: // Charge Mode
                         switch (value) {
                             case 0:
-                                charge_mode_string = "Eco Private";
+                                value_string = "Eco Private";
                                 break;
                             case 1:
-                                charge_mode_string = "Max Private";
+                                value_string = "Max Private";
                                 break;
                             case 4:
-                                charge_mode_string = "Eco Open";
+                                value_string = "Eco Open";
                                 break;
                             case 5:
-                                charge_mode_string = "Max Open";
+                                value_string = "Max Open";
                                 break;
                             default:
-                                charge_mode_string = "unknown";
+                                value_string = "unknown";
                         }
-                        id(g_${generic_data_id_prefix}_charge_mode) = charge_mode_string.c_str();
+                        id(g_${generic_data_id_prefix}_charge_mode) = value_string.c_str();
+                        id(${generic_data_id_prefix}_charge_mode).publish_state(value_string.c_str());
                         break;
-                    case 4:
+                    case 2: //modbusSlaveAddress(2)
+                        break;
+                    case 3: //cycleRate(3)
+                        break;
+                    case 4: //iMax(4), 16 (max beschikbare capaciteit)
                         id(g_${generic_data_id_prefix}_i_max) = value;
+                        id(${generic_data_id_prefix}_i_max).publish_state(value);
                         break;
-                    case 5:
+                    case 5: //iEvseMax(5), 16 (maximale laadsnelheid auto)
                         id(g_${generic_data_id_prefix}_i_evse_max) = value;
+                        id(${generic_data_id_prefix}_i_evse_max).publish_state(value);
                         break;
-                    case 6:
+                    case 6: //iEvseMin(6), 6 (minimale laadsnelheid auto)
                         id(g_${generic_data_id_prefix}_i_evse_min) = value;
+                        id(${generic_data_id_prefix}_i_evse_min).publish_state(value);
                         break;
-                    case 7:
+                    case 7: //iLevel1(7), 6 (offloading minimum?)
+                        id(g_${generic_data_id_prefix}_i_min) = value;
+                        id(${generic_data_id_prefix}_i_min).publish_state(value);
+                        break;
+                    case 8: //solarMode(8), 0
+                        break;
+                    case 9: //phaseSeq(9), 0
                         switch (value) {
                             case 0:
-                                id(app_as_key).turn_on();
-                                break;
-                            default:
-                                id(app_as_key).turn_off();
-                                break;
-                        }
-                        break;
-                    case 9:
-                        switch (value) {
-                            case 0:
-                                network_type_string = "Mono/Tri+N";
+                                value_string = "Mono/Tri+N";
                                 break;
                             case 3:
-                                network_type_string = "Tri";
+                                value_string = "Tri";
                                 break;
                             default:
-                                network_type_string = "unknown";
+                                value_string = "unknown";
                         }
-                        id(g_${generic_data_id_prefix}_connection_type) = network_type_string.c_str();
+                        id(g_${generic_data_id_prefix}_connection_type) = value_string.c_str();
+                        id(${generic_data_id_prefix}_connection_type).publish_state(value_string.c_str());
                         break;
-                    case 10:
+                    case 10: //chargingPhases(10), 3
                         id(g_${generic_data_id_prefix}_charging_phases) = value;
+                        id(${generic_data_id_prefix}_charging_phases).publish_state(value);
                         break;
-                    case 12:
-                        value += 60;
-                        hours = value / 60;
-                        remaining_minutes = value % 60;
-                        sprintf(time_string, "%dh%02d", hours, remaining_minutes);
-                        id(g_${generic_data_id_prefix}_week_start) = time_string;
+                    case 11: //blePin(11),
                         break;
-                    case 13:
-                        value += 60;
-                        hours = value / 60;
-                        remaining_minutes = value % 60;
-                        sprintf(time_string, "%dh%02d", hours, remaining_minutes);
-                        id(g_${generic_data_id_prefix}_week_end) = time_string;
+                    case 12: //touWeekStart(12)
+                        id(g_${generic_data_id_prefix}_week_start) = getTimeString(value);
                         break;
-                    case 14:
-                        value += 60;
-                        hours = value / 60;
-                        remaining_minutes = value % 60;
-                        sprintf(time_string, "%dh%02d", hours, remaining_minutes);
-                        id(g_${generic_data_id_prefix}_weekend_start) = time_string;
+                    case 13: //touWeekStop(13)
+                        id(g_${generic_data_id_prefix}_week_end) = getTimeString(value);
                         break;
-                    case 15:
-                        value += 60;
-                        hours = value / 60;
-                        remaining_minutes = value % 60;
-                        sprintf(time_string, "%dh%02d", hours, remaining_minutes);
-                        id(g_${generic_data_id_prefix}_weekend_end) = time_string;
+                    case 14: //touWeekendStart(14), 0
+                        id(g_${generic_data_id_prefix}_weekend_start) = getTimeString(value);
                         break;
-                    case 19:
+                    case 15: //touWeekendStop(15), 0
+                        id(g_${generic_data_id_prefix}_weekend_end) = getTimeString(value);
+                        break;
+                    case 16: //timezone(16), 0
+                        break;
+                    case 17: //relayOffPeriod(17), 5
+                        break;
+                    case 18: //externalRegulation(18), 0
+                        break;
+                    case 19: //iCapacity(19); 16/15
                         id(g_${generic_data_id_prefix}_i_capacity) = value;
+                        id(${generic_data_id_prefix}_i_capacity).publish_state(value);
                     default:
                         break;
                   }                      

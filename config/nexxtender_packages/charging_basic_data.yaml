@@ -76,59 +76,56 @@ text_sensor:
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_charging_basic_characteristic}
     update_interval: 60s
-    notify: ${notify_ble}
-    on_value:
+    notify: true
+    on_notify:
       then:
         lambda: |-
-            auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
-            ESP_LOGD("${device_name}_charging_basic_data", "%s", hex_data.c_str());
+          logd_x("${device_name}_charging_basic_data", x);
 
-            int16_t seconds = (int16_t(x[1]) << 8) | int16_t(x[0]);
-            id(g_${charging_basic_id_prefix}_seconds) = seconds;
+          // Declare variables outside the switch-case block
+          String value_string;
+          int value;
 
-            // Extract the discriminator value
-            int discriminator = x[2] & 0xFF;
-            // Publish the discriminator state
-            String discriminator_state;
-            switch (discriminator) {
-                case 1:
-                    discriminator_state = "started";
-                    break;
-                case 2:
-                    discriminator_state = "charging";
-                    break;
-                case 3:
-                    discriminator_state = "stopped";
-                    break;
-                default:
-                    discriminator_state = "unknown";
-            }
-            id(g_${charging_basic_id_prefix}_discriminator) = discriminator_state.c_str();;
+          id(g_${charging_basic_id_prefix}_seconds) = getShort(x, 0);;
 
-            // Extract the status value
-            int status = x[3] & 0xFF;
-            // Publish the status state
-            String status_state;
-            switch (static_cast<char>(status)) {
-                case 'B':
-                    status_state = "plugged";
-                    break;
-                case 'C':
-                case 'D':
-                    status_state = "charging";
-                    break;
-                case 'E':
-                    status_state = "fault";
-                    break;
-                default:
-                    status_state = "unplugged";
-            }
-            id(g_${charging_basic_id_prefix}_status) = status_state.c_str();
+          // Publish the discriminator state
+          switch (getByte(x, 2)) {
+              case 1:
+                  value_string = "started";
+                  break;
+              case 2:
+                  value_string = "charging";
+                  break;
+              case 3:
+                  value_string = "stopped";
+                  break;
+              default:
+                  value_string = "unknown";
+          }
+          id(g_${charging_basic_id_prefix}_discriminator) = value_string.c_str();;
+          id(${charging_basic_id_prefix}_discriminator).publish_state(value_string.c_str());
 
-            uint32_t energy = (uint32_t(x[11]) << 24) | (uint32_t(x[10]) << 16) | (uint32_t(x[9]) << 8) | uint32_t(x[8]);
-            id(g_${charging_basic_id_prefix}_energy) = energy/1000;
+          switch (static_cast<char>(getByte(x, 2))) {
+              case 'B':
+                  value_string = "plugged";
+                  break;
+              case 'C':
+              case 'D':
+                  value_string = "charging";
+                  break;
+              case 'E':
+                  value_string = "fault";
+                  break;
+              default:
+                  value_string = "unplugged";
+          }
+          id(g_${charging_basic_id_prefix}_status) = value_string.c_str();
+          id(${charging_basic_id_prefix}_status).publish_state(value_string.c_str());
 
-            // Extract the phase_count value
-            int16_t phase_count = x[13] & 0xFF;
-            //ESP_LOGD("phase_count", "Value at index 13: %d", phase_count);
-            id(g_${charging_basic_id_prefix}_phase_count) = phase_count;
+          value = getInt(x, 8)/1000;
+          id(g_${charging_basic_id_prefix}_energy) = value;
+          id(${charging_basic_id_prefix}_energy).publish_state(value);
+          
+          value = getByte(x, 13);
+          id(g_${charging_basic_id_prefix}_phase_count) = value;
+          id(${charging_basic_id_prefix}_phase_count).publish_state(value);

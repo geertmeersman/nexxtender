@@ -74,10 +74,9 @@ text_sensor:
     on_value:
       then:
         lambda: |-
-            auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
-            ESP_LOGD("${device_name}_charging_advanced_data", "%s", hex_data.c_str());
+          logd_x("${device_name}_charging_advanced_data", x);
 
-            id(g_${charging_advanced_id_prefix}_timestamp) = getInt(x, 0);
-            id(g_${charging_advanced_id_prefix}_i_available) = getShort(x, 4);
-            id(g_${charging_advanced_id_prefix}_grid_power) = getInt(x, 6);
-            id(g_${charging_advanced_id_prefix}_car_power) = getInt(x, 10);
+          id(g_${charging_advanced_id_prefix}_timestamp) = getInt(x, 0);
+          id(g_${charging_advanced_id_prefix}_i_available) = getShort(x, 4);
+          id(g_${charging_advanced_id_prefix}_grid_power) = getInt(x, 6);
+          id(g_${charging_advanced_id_prefix}_car_power) = getInt(x, 10);
