@@ -148,7 +148,7 @@ text_sensor:
                         index += 1;
                         ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
                       } else if (additional_info == 25) {
-                        value = (x[index+1] << 8) | x[index+2];
+                        value = (x[index] << 8) | x[index+1];
                         index += 2;
                         ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
                       }
@@ -227,6 +227,9 @@ text_sensor:
                               break;
                           case 10:
                               id(g_${generic_data_id_prefix}_charging_phases) = value;
+                              break;
+                          case 12:
+
                               break;
                           case 19:
                               id(g_${generic_data_id_prefix}_i_capacity) = value;
