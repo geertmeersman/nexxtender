@@ -109,9 +109,9 @@ text_sensor:
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_generic_data_characteristic}
-    notify: ${notify_ble}
-    update_interval: ${generic_data_update_interval}
-    on_value:
+    notify: true
+    update_interval: never
+    on_notify:
       then:
         lambda: |-
           auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
