@@ -1,0 +1,46 @@
+substitutions:
+  ble_uuid_transactions_command: ${ble_uuid_prefix}c2
+  ble_uuid_transactions_status: ${ble_uuid_prefix}c3
+  ble_uuid_transactions_record: ${ble_uuid_prefix}c4
+  transactions_prefix: Transactions
+  transactions_id_prefix: transactions
+  transactions_update_interval: 60s
+
+globals:
+
+text_sensor:
+  - platform: ble_client
+    id: ${device_name}_transactions_record
+    internal: true
+    ble_client_id: ${device_name}_ble_client_id
+    service_uuid: ${ble_uuid_receive_service}
+    characteristic_uuid: ${ble_uuid_transactions_record}
+    update_interval: ${transactions_update_interval}
+    notify: true
+    on_notify:
+      then:
+        lambda: |-
+          logd_x("${device_name}_${transactions_id_prefix}_record", x);
+  - platform: ble_client
+    id: ${device_name}_transactions_status
+    internal: true
+    ble_client_id: ${device_name}_ble_client_id
+    service_uuid: ${ble_uuid_receive_service}
+    characteristic_uuid: ${ble_uuid_transactions_status}
+    update_interval: ${transactions_update_interval}
+    notify: true
+    on_notify:
+      then:
+        lambda: |-
+          logd_x("${device_name}_${transactions_id_prefix}_status", x);
+
+button:
+  - platform: template
+    name: "Read transactions"
+    id: read_transactions_button
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_transactions_command}
+          value: [0x01]

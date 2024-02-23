@@ -44,20 +44,8 @@ binary_sensor:
     icon: mdi:check-network-outline
     publish_initial_state: False
 
-#switch:
-  #- platform: ble_client
-    #ble_client_id: ${device_name}_ble_client_id
-    #name: ${friendly_name} BLE Client
-    #icon: mdi:bluetooth-transfer
-  #- platform: template
-    #name: ${friendly_name} BLE Client
-    #lambda: |-
-      #if (id(ble_client_connectivity).state) {
-        #return true;
-      #} else {
-        #return false;
-      #}
-    #turn_on_action:
-      #- ble_client.connect: ${device_name}_ble_client_id
-    #turn_off_action:
-      #- ble_client.disconnect: ${device_name}_ble_client_id
+switch:
+  - platform: ble_client
+    ble_client_id: ${device_name}_ble_client_id
+    name: ${friendly_name} BLE Client
+    icon: mdi:bluetooth-transfer

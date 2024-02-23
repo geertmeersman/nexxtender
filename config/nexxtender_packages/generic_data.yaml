@@ -1,6 +1,7 @@
 substitutions:
-  ble_uuid_generic_data_characteristic: ${ble_uuid_prefix}df
-  ble_uuid_generic_command_characteristic: ${ble_uuid_prefix}dd
+  ble_uuid_generic_data: ${ble_uuid_prefix}df
+  ble_uuid_generic_command: ${ble_uuid_prefix}dd
+  ble_uuid_generic_status: ${ble_uuid_prefix}de
   generic_data_prefix: Generic Data
   generic_data_id_prefix: generic_data
   generic_data_update_interval: 60s
@@ -101,11 +102,23 @@ text_sensor:
       sprintf(time_string, "%s - %s", id(g_${generic_data_id_prefix}_weekend_start).c_str(), id(g_${generic_data_id_prefix}_weekend_end).c_str());
       return optional<String>(time_string);
   - platform: ble_client
+    id: ${device_name}_generic_status
+    internal: true
+    ble_client_id: ${device_name}_ble_client_id
+    service_uuid: ${ble_uuid_receive_service}
+    characteristic_uuid: ${ble_uuid_generic_status}
+    update_interval: ${generic_data_update_interval}
+    notify: true
+    on_notify:
+      then:
+        lambda: |-
+          logd_x("${device_name}_${generic_data_id_prefix}_status", x);
+  - platform: ble_client
     id: ${device_name}_generic_data
     internal: true
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_receive_service}
-    characteristic_uuid: ${ble_uuid_generic_data_characteristic}
+    characteristic_uuid: ${ble_uuid_generic_data}
     notify: true
     update_interval: never
     on_notify:
@@ -253,7 +266,7 @@ button:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
-          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x04, 0x50]
   - platform: template
     name: "Start Charge Default"
@@ -261,7 +274,7 @@ button:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
-          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x01, 0x00]
   - platform: template
     name: "Start Charge Max"
@@ -269,7 +282,7 @@ button:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
-          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x02, 0x00]
   - platform: template
     name: "Start Charge Auto"
@@ -277,7 +290,7 @@ button:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
-          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x03, 0x00]
   - platform: template
     name: "Start Charge Eco"
@@ -285,7 +298,7 @@ button:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
-          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x04, 0x00]
   - platform: template
     name: "Start Charge Stop"
@@ -293,5 +306,5 @@ button:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
-          characteristic_uuid: ${ble_uuid_generic_command_characteristic}
+          characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x06, 0x00]

@@ -100,7 +100,7 @@ text_sensor:
           id(g_${charging_basic_id_prefix}_discriminator) = value_string.c_str();;
           id(${charging_basic_id_prefix}_discriminator).publish_state(value_string.c_str());
 
-          switch (static_cast<char>(getByte(x, 2))) {
+          switch (static_cast<char>(getByte(x, 3))) {
               case 'B':
                   value_string = "plugged";
                   break;
