@@ -250,14 +250,6 @@ text_sensor:
               ESP_LOGD("${device_name}_generic_data", "B2 map not found in the CBOR data.");
           }
 
-switch:
-  - platform: template
-    name: "App as key"
-    id: app_as_key
-    icon: mdi:cellphone-key
-    turn_on_action:
-      - logger.log: "App as key turned On!" #TODO Write change
-
 button:
   - platform: template
     name: "Read config"
