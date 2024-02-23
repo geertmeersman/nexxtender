@@ -42,10 +42,11 @@ binary_sensor:
     id: ble_client_connectivity
     device_class: connectivity
     icon: mdi:check-network-outline
-    publish_initial_state: False
+    entity_category: diagnostic
 
 switch:
   - platform: ble_client
     ble_client_id: ${device_name}_ble_client_id
     name: ${friendly_name} BLE Client
     icon: mdi:bluetooth-transfer
+    entity_category: diagnostic

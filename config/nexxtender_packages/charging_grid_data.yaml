@@ -36,6 +36,9 @@ sensor:
     unit_of_measurement: A
     state_class: measurement
     update_interval: ${grid_update_interval}
+    accuracy_decimals: 1
+    filters:
+      - lambda: return x / 10;
     lambda: |-
       return id(g_${grid_id_prefix}_l1);
   - platform: template
@@ -46,6 +49,9 @@ sensor:
     unit_of_measurement: A
     state_class: measurement
     update_interval: ${grid_update_interval}
+    accuracy_decimals: 1
+    filters:
+      - lambda: return x / 10;
     lambda: |-
       return id(g_${grid_id_prefix}_l2);
   - platform: template
@@ -56,6 +62,9 @@ sensor:
     unit_of_measurement: A
     state_class: measurement
     update_interval: ${grid_update_interval}
+    accuracy_decimals: 1
+    filters:
+      - lambda: return x / 10;
     lambda: |-
       return id(g_${grid_id_prefix}_l3);
   - platform: template
@@ -75,7 +84,6 @@ sensor:
     icon: mdi:camera-timer
     accuracy_decimals: 0
     entity_category: diagnostic
-    #disabled_by_default: true
     update_interval: ${grid_update_interval}
     lambda: |-
       return id(g_${grid_id_prefix}_interval);
@@ -100,9 +108,12 @@ text_sensor:
           }
 
           id(g_${grid_id_prefix}_timestamp) = getInt(x, 0);
-          id(g_${grid_id_prefix}_l1) = getShort(x, 4)/10;
-          id(g_${grid_id_prefix}_l2) = getShort(x, 6)/10;
-          id(g_${grid_id_prefix}_l3) = getShort(x, 8)/10;
+          id(g_${grid_id_prefix}_l1) = getShort(x, 4);
+          ESP_LOGD("L1", "%d", getShort(x, 4));
+          id(g_${grid_id_prefix}_l2) = getShort(x, 6);
+          ESP_LOGD("L2", "%d", getShort(x, 6));
+          id(g_${grid_id_prefix}_l3) = getShort(x, 8);
+          ESP_LOGD("L3", "%d", getShort(x, 8));
           id(g_${grid_id_prefix}_consumed) = getShort(x, 10);
 
           // Interval is a counter that goes from 0->900 (15 minutes)

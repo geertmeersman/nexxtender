@@ -36,6 +36,8 @@ sensor:
     unit_of_measurement: kWh
     state_class: measurement
     accuracy_decimals: 2
+    filters:
+      - lambda: return x / 1000;
     update_interval: ${charging_basic_update_interval}
     lambda: |-
       return id(g_${charging_basic_id_prefix}_energy);
@@ -117,7 +119,7 @@ text_sensor:
           id(g_${charging_basic_id_prefix}_status) = value_string.c_str();
           id(${charging_basic_id_prefix}_status).publish_state(value_string.c_str());
 
-          value = getInt(x, 8)/1000;
+          value = getInt(x, 8);
           id(g_${charging_basic_id_prefix}_energy) = value;
           
           value = getByte(x, 13);

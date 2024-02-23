@@ -262,6 +262,7 @@ button:
   - platform: template
     name: "Read config"
     id: read_config_button
+    entity_category: diagnostic
     on_press:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
