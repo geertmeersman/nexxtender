@@ -1,4 +1,7 @@
-# docker-compose.yaml file
+# docker-compose.yaml file for use with
+# Windows Docker Desktop (WSL2)
+# ESPHome Deskboard: http://localhost:6052
+
 version: '3.5'
 services:
     esphome:
@@ -6,5 +9,6 @@ services:
         container_name: esphome-nexxtender
         volumes:
             - ./config:/config
-        network_mode: host
-
+        command: /config dashboard
+        ports:
+            - 6052:6052
