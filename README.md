@@ -24,27 +24,25 @@ To integrate the ESPHome BLE client with your Powerdale Nexxtender EV Charger an
    git clone https://github.com/geertmeersman/nexxtender.git
    ```
 
-3. **Configure ESPHome:** Navigate to the `nexxtender` directory and configure your ESPHome project by editing the `nexxtender.yaml` file. Update the configuration settings according to your ESPHome device's specifications and BLE connection parameters.
+3. **Copy Secrets Template:** Navigate to the `config` folder and copy the `secrets_template.yaml` file to `secrets.yaml`. Fill in the actual values for your Wi-Fi credentials, ESPHome API key, Nexxtender MAC address, and passkey.
 
-4. **Copy Secrets Template:** Navigate to the `config` folder and copy the `secrets_template.yaml` file to `secrets.yaml`. Fill in the actual values for your Wi-Fi credentials, ESPHome API key, Nexxtender MAC address, and passkey.
-
-5. **Compile Firmware:** Compile the ESPHome firmware with the configured Nexxtender client. Run the following command in the `nexxtender` directory:
+4. **Compile Firmware:** Compile the ESPHome firmware with the configured Nexxtender client. Run the following command in the `nexxtender` directory:
 
    ```bash
    esphome nexxtender.yaml compile
    ```
 
-6. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
+5. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
 
    ```bash
    esphome nexxtender.yaml upload
    ```
 
-7. **Integrate with Home Assistant:** In your Home Assistant configuration, add the ESPHome device as a new integration. Follow the instructions provided by Home Assistant to discover and integrate the Nexxtender charger with your Home Assistant setup.
+6. **Integrate with Home Assistant:** In your Home Assistant configuration, add the ESPHome device as a new integration. Follow the instructions provided by Home Assistant to discover and integrate the Nexxtender charger with your Home Assistant setup.
 
-8. **Monitor Logs:** Monitor the ESPHome device logs to ensure that the BLE client establishes a connection with the Powerdale Nexxtender EV Charger successfully.
+7. **Monitor Logs:** Monitor the ESPHome device logs to ensure that the BLE client establishes a connection with the Powerdale Nexxtender EV Charger successfully.
 
-9. **Test Functionality:** Test the functionality of the ESPHome BLE client by monitoring real-time data from the Nexxtender charger and controlling its operation remotely from your ESPHome device or through the Home Assistant interface.
+8. **Test Functionality:** Test the functionality of the ESPHome BLE client by monitoring real-time data from the Nexxtender charger and controlling its operation remotely from your ESPHome device or through the Home Assistant interface.
 
 For detailed documentation and examples, please refer to the [ESPHome BLE Client Documentation](https://github.com/geertmeersman/nexxtender/wiki).
 
