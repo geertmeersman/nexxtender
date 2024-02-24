@@ -51,10 +51,12 @@ sensor:
     id: ${charging_advanced_id_prefix}_car_power
     icon: mdi:sigma
     device_class: power
-    unit_of_measurement: W
+    unit_of_measurement: kW
     state_class: measurement
-    accuracy_decimals: 0
     update_interval: ${grid_update_interval}
+    accuracy_decimals: 2
+    filters:
+      - lambda: return x / 1000;
     lambda: |-
       return id(g_${charging_advanced_id_prefix}_car_power);
 
