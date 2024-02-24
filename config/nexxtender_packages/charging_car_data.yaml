@@ -121,6 +121,7 @@ text_sensor:
     on_notify:
       then:
         lambda: |-
+          if (x.empty()) { return; }
           logd_x("${device_name}_charging_car_data", x);
 
           // Check if we have read the config
