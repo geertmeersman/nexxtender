@@ -20,6 +20,7 @@ text_sensor:
     on_notify:
       then:
         lambda: |-
+          if (x.empty()) { return; }
           logd_x("${device_name}_${transactions_id_prefix}_record", x);
   - platform: ble_client
     id: ${device_name}_transactions_status
@@ -32,6 +33,7 @@ text_sensor:
     on_notify:
       then:
         lambda: |-
+          if (x.empty()) { return; }
           logd_x("${device_name}_${transactions_id_prefix}_status", x);
 
 button:
