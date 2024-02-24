@@ -77,6 +77,7 @@ text_sensor:
     on_notify:
       then:
         lambda: |-
+          if (x.empty()) { return; }
           logd_x("${device_name}_charging_basic_data", x);
 
           // Declare variables outside the switch-case block
