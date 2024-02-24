@@ -1,0 +1,141 @@
+substitutions:
+  ble_uuid_charging_car_characteristic: ${ble_uuid_prefix}da
+  charging_car_prefix: Charging Car
+  charging_car_id_prefix: charging_car
+  charging_car_update_interval: 60s
+
+globals:
+  - id: g_${charging_car_id_prefix}_timestamp
+    type: int
+  - id: g_${charging_car_id_prefix}_l1
+    type: int
+  - id: g_${charging_car_id_prefix}_l2
+    type: int
+  - id: g_${charging_car_id_prefix}_l3
+    type: int
+  - id: g_${charging_car_id_prefix}_p1
+    type: int
+  - id: g_${charging_car_id_prefix}_p2
+    type: int
+  - id: g_${charging_car_id_prefix}_p3
+    type: int
+
+sensor:
+  - platform: template
+    name: "${charging_car_prefix} Timestamp"
+    id: ${charging_car_id_prefix}_timestamp
+    icon: mdi:clock-time-eight
+    device_class: timestamp
+    accuracy_decimals: 0
+    update_interval: ${charging_car_update_interval}
+    lambda: |-
+      return id(g_${charging_car_id_prefix}_timestamp);
+  - platform: template
+    name: "${charging_car_prefix} L1"
+    id: ${charging_car_id_prefix}_l1
+    icon: mdi:home-floor-1
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    update_interval: ${charging_car_update_interval}
+    accuracy_decimals: 1
+    filters:
+      - lambda: return x / 10;
+    lambda: |-
+      return id(g_${charging_car_id_prefix}_l1);
+  - platform: template
+    name: "${charging_car_prefix} L2"
+    id: ${charging_car_id_prefix}_l2
+    icon: mdi:home-floor-2
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    update_interval: ${charging_car_update_interval}
+    accuracy_decimals: 1
+    filters:
+      - lambda: return x / 10;
+    lambda: |-
+      return id(g_${charging_car_id_prefix}_l2);
+  - platform: template
+    name: "${charging_car_prefix} L3"
+    id: ${charging_car_id_prefix}_l3
+    icon: mdi:home-floor-3
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    update_interval: ${charging_car_update_interval}
+    accuracy_decimals: 1
+    filters:
+      - lambda: return x / 10;
+    lambda: |-
+      return id(g_${charging_car_id_prefix}_l3);
+  - platform: template
+    name: "${charging_car_prefix} P1"
+    id: ${charging_car_id_prefix}_p1
+    icon: mdi:home-floor-1
+    device_class: power
+    unit_of_measurement: W
+    state_class: measurement
+    update_interval: ${charging_car_update_interval}
+    accuracy_decimals: 0
+    filters:
+      - lambda: return x;
+    lambda: |-
+      return id(g_${charging_car_id_prefix}_p1);      
+  - platform: template
+    name: "${charging_car_prefix} P2"
+    id: ${charging_car_id_prefix}_p2
+    icon: mdi:home-floor-1
+    device_class: power
+    unit_of_measurement: W
+    state_class: measurement
+    update_interval: ${charging_car_update_interval}
+    accuracy_decimals: 0
+    filters:
+      - lambda: return x;
+    lambda: |-
+      return id(g_${charging_car_id_prefix}_p2);   
+  - platform: template
+    name: "${charging_car_prefix} P3"
+    id: ${charging_car_id_prefix}_p3C
+    icon: mdi:home-floor-1
+    device_class: power
+    unit_of_measurement: W
+    state_class: measurement
+    update_interval: ${charging_car_update_interval}
+    accuracy_decimals: 0
+    filters:
+      - lambda: return x;
+    lambda: |-
+      return id(g_${charging_car_id_prefix}_p3);               
+
+text_sensor:
+  - platform: ble_client
+    id: ${device_name}_charging_car_data
+    internal: true
+    ble_client_id: ${device_name}_ble_client_id
+    service_uuid: ${ble_uuid_receive_service}
+    characteristic_uuid: ${ble_uuid_charging_car_characteristic}
+    update_interval: ${charging_car_update_interval}
+    notify: true
+    on_notify:
+      then:
+        lambda: |-
+          logd_x("${device_name}_charging_car_data", x);
+
+          // Check if we have read the config
+          if (id(g_${generic_data_id_prefix}_config_read_bool) == false) {
+            id(read_config_button).press();
+          }
+
+          id(g_${charging_car_id_prefix}_timestamp) = getInt(x, 0);
+          id(g_${charging_car_id_prefix}_l1) = getShort(x, 4);
+          id(g_${charging_car_id_prefix}_l2) = getShort(x, 6);
+          id(g_${charging_car_id_prefix}_l3) = getShort(x, 8);
+          id(g_${charging_car_id_prefix}_p1) = getShort(x, 10);
+          id(g_${charging_car_id_prefix}_p2) = getShort(x, 12);
+          id(g_${charging_car_id_prefix}_p3) = getShort(x, 14);          
+          //id(g_${charging_car_id_prefix}_consumed) = getShort(x, 10);
+
+          // Interval is a counter that goes from 0->900 (15 minutes)
+          //id(g_${charging_car_id_prefix}_interval) = getShort(x, 12);
