@@ -74,12 +74,12 @@ sensor:
     id: ${charging_car_id_prefix}_p1
     icon: mdi:home-floor-1
     device_class: power
-    unit_of_measurement: W
+    unit_of_measurement: kW
     state_class: measurement
     update_interval: ${charging_car_update_interval}
-    accuracy_decimals: 0
+    accuracy_decimals: 2
     filters:
-      - lambda: return x;
+      - lambda: return x / 1000;
     lambda: |-
       return id(g_${charging_car_id_prefix}_p1);      
   - platform: template
@@ -87,12 +87,12 @@ sensor:
     id: ${charging_car_id_prefix}_p2
     icon: mdi:home-floor-1
     device_class: power
-    unit_of_measurement: W
+    unit_of_measurement: kW
     state_class: measurement
     update_interval: ${charging_car_update_interval}
-    accuracy_decimals: 0
+    accuracy_decimals: 2
     filters:
-      - lambda: return x;
+      - lambda: return x / 1000;
     lambda: |-
       return id(g_${charging_car_id_prefix}_p2);   
   - platform: template
@@ -100,12 +100,12 @@ sensor:
     id: ${charging_car_id_prefix}_p3
     icon: mdi:home-floor-1
     device_class: power
-    unit_of_measurement: W
+    unit_of_measurement: kW
     state_class: measurement
     update_interval: ${charging_car_update_interval}
-    accuracy_decimals: 0
+    accuracy_decimals: 2
     filters:
-      - lambda: return x;
+      - lambda: return x / 1000;
     lambda: |-
       return id(g_${charging_car_id_prefix}_p3);               
 
