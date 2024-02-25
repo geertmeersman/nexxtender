@@ -1,101 +1,101 @@
 substitutions:
   ble_uuid_grid_characteristic: ${ble_uuid_prefix}d0
-  grid_prefix: Grid
-  grid_id_prefix: grid
-  grid_update_interval: 60s
+  charging_grid_prefix: Charging Grid
+  charging_grid_id_prefix: charging_grid
+  charging_grid_update_interval: 60s
 
 globals:
-  - id: g_${grid_id_prefix}_consumed
+  - id: g_${charging_grid_id_prefix}_consumed
     type: int
-  - id: g_${grid_id_prefix}_interval
+  - id: g_${charging_grid_id_prefix}_interval
     type: int
-  - id: g_${grid_id_prefix}_timestamp
+  - id: g_${charging_grid_id_prefix}_timestamp
     type: int
-  - id: g_${grid_id_prefix}_l1
+  - id: g_${charging_grid_id_prefix}_l1
     type: int
-  - id: g_${grid_id_prefix}_l2
+  - id: g_${charging_grid_id_prefix}_l2
     type: int
-  - id: g_${grid_id_prefix}_l3
+  - id: g_${charging_grid_id_prefix}_l3
     type: int
 
 sensor:
   - platform: template
-    name: "${grid_prefix} Timestamp"
-    id: ${grid_id_prefix}_timestamp
+    name: "${charging_grid_prefix} Timestamp"
+    id: ${charging_grid_id_prefix}_timestamp
     icon: mdi:clock-time-eight
     device_class: timestamp
     accuracy_decimals: 0
-    update_interval: ${grid_update_interval}
+    update_interval: ${charging_grid_update_interval}
     lambda: |-
-      return id(g_${grid_id_prefix}_timestamp);
+      return id(g_${charging_grid_id_prefix}_timestamp);
   - platform: template
-    name: "${grid_prefix} L1"
-    id: ${grid_id_prefix}_l1
+    name: "${charging_grid_prefix} L1"
+    id: ${charging_grid_id_prefix}_l1
     icon: mdi:home-floor-1
     device_class: current
     unit_of_measurement: A
     state_class: measurement
-    update_interval: ${grid_update_interval}
+    update_interval: ${charging_grid_update_interval}
     accuracy_decimals: 1
     filters:
       - lambda: return x / 10;
     lambda: |-
-      return id(g_${grid_id_prefix}_l1);
+      return id(g_${charging_grid_id_prefix}_l1);
   - platform: template
-    name: "${grid_prefix} L2"
-    id: ${grid_id_prefix}_l2
+    name: "${charging_grid_prefix} L2"
+    id: ${charging_grid_id_prefix}_l2
     icon: mdi:home-floor-2
     device_class: current
     unit_of_measurement: A
     state_class: measurement
-    update_interval: ${grid_update_interval}
+    update_interval: ${charging_grid_update_interval}
     accuracy_decimals: 1
     filters:
       - lambda: return x / 10;
     lambda: |-
-      return id(g_${grid_id_prefix}_l2);
+      return id(g_${charging_grid_id_prefix}_l2);
   - platform: template
-    name: "${grid_prefix} L3"
-    id: ${grid_id_prefix}_l3
+    name: "${charging_grid_prefix} L3"
+    id: ${charging_grid_id_prefix}_l3
     icon: mdi:home-floor-3
     device_class: current
     unit_of_measurement: A
     state_class: measurement
-    update_interval: ${grid_update_interval}
+    update_interval: ${charging_grid_update_interval}
     accuracy_decimals: 1
     filters:
       - lambda: return x / 10;
     lambda: |-
-      return id(g_${grid_id_prefix}_l3);
+      return id(g_${charging_grid_id_prefix}_l3);
   - platform: template
-    name: "${grid_prefix} Consumed"
-    id: ${grid_id_prefix}_consumed
+    name: "${charging_grid_prefix} Consumed"
+    id: ${charging_grid_id_prefix}_consumed
     icon: mdi:sigma
     device_class: power
     unit_of_measurement: W
     state_class: measurement
     accuracy_decimals: 0
-    update_interval: ${grid_update_interval}
+    update_interval: ${charging_grid_update_interval}
     lambda: |-
-      return id(g_${grid_id_prefix}_consumed);
+      return id(g_${charging_grid_id_prefix}_consumed);
   - platform: template
-    name: "${grid_prefix} Interval"
-    id: ${grid_id_prefix}_interval
+    name: "${charging_grid_prefix} Interval"
+    id: ${charging_grid_id_prefix}_interval
     icon: mdi:camera-timer
     accuracy_decimals: 0
     entity_category: diagnostic
-    update_interval: ${grid_update_interval}
+    update_interval: ${charging_grid_update_interval}
     lambda: |-
-      return id(g_${grid_id_prefix}_interval);
+      return id(g_${charging_grid_id_prefix}_interval);
 
 text_sensor:
   - platform: ble_client
-    id: ${device_name}_grid_data
+    id: ${device_name}_charging_grid_data
     internal: true
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_grid_characteristic}
-    update_interval: ${grid_update_interval}
+    update_interval: ${charging_grid_update_interval}
     notify: true
     on_notify:
       then:
@@ -108,11 +108,11 @@ text_sensor:
             id(read_config_button).press();
           }
 
-          id(g_${grid_id_prefix}_timestamp) = getInt(x, 0);
-          id(g_${grid_id_prefix}_l1) = getShort(x, 4);
-          id(g_${grid_id_prefix}_l2) = getShort(x, 6);
-          id(g_${grid_id_prefix}_l3) = getShort(x, 8);
-          id(g_${grid_id_prefix}_consumed) = getShort(x, 10);
+          id(g_${charging_grid_id_prefix}_timestamp) = getInt(x, 0);
+          id(g_${charging_grid_id_prefix}_l1) = getShort(x, 4);
+          id(g_${charging_grid_id_prefix}_l2) = getShort(x, 6);
+          id(g_${charging_grid_id_prefix}_l3) = getShort(x, 8);
+          id(g_${charging_grid_id_prefix}_consumed) = getShort(x, 10);
 
           // Interval is a counter that goes from 0->900 (15 minutes)
-          id(g_${grid_id_prefix}_interval) = getShort(x, 12);
+          id(g_${charging_grid_id_prefix}_interval) = getShort(x, 12);
