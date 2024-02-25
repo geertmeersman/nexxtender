@@ -21,18 +21,18 @@ sensor:
     icon: mdi:clock-time-eight
     device_class: timestamp
     accuracy_decimals: 0
-    update_interval: ${grid_update_interval}
+    update_interval: ${charging_advanced_update_interval}
     lambda: |-
       return id(g_${charging_advanced_id_prefix}_timestamp);
   - platform: template
     name: "Available capacity"
-    id: ${generic_data_id_prefix}_i_available
+    id: ${charging_advanced_id_prefix}_i_available
     icon: mdi:current-ac
     device_class: current
     unit_of_measurement: A
     state_class: measurement
     accuracy_decimals: 0
-    update_interval: ${generic_data_update_interval}
+    update_interval: ${charging_advanced_update_interval}
     lambda: |-
       return id(g_${charging_advanced_id_prefix}_i_available);
   - platform: template
@@ -43,7 +43,7 @@ sensor:
     unit_of_measurement: W
     state_class: measurement
     accuracy_decimals: 0
-    update_interval: ${grid_update_interval}
+    update_interval: ${charging_advanced_update_interval}
     lambda: |-
       return id(g_${charging_advanced_id_prefix}_grid_power);
   - platform: template
@@ -53,7 +53,7 @@ sensor:
     device_class: power
     unit_of_measurement: kW
     state_class: measurement
-    update_interval: ${grid_update_interval}
+    update_interval: ${charging_advanced_update_interval}
     accuracy_decimals: 2
     filters:
       - lambda: return x / 1000;
