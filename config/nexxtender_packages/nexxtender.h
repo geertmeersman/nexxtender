@@ -27,4 +27,8 @@ void logd_x(const char* device_name, String x) {
     ESP_LOGD(device_name, "%s", hex_data.c_str());
 }
 
+void logd_s(const char* device_name, String x) {
+    ESP_LOGD(device_name, "%s", x.c_str());
+}
+
 #endif

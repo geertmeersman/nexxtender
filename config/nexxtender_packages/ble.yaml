@@ -47,6 +47,6 @@ binary_sensor:
 switch:
   - platform: ble_client
     ble_client_id: ${device_name}_ble_client_id
-    name: ${friendly_name} BLE Client
+    name: BLE Client
     icon: mdi:bluetooth-transfer
     entity_category: diagnostic
