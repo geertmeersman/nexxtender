@@ -64,13 +64,13 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
 4. **Compile Firmware:** Compile the ESPHome firmware with the configured Nexxtender client. Run the following command in the `nexxtender` directory:
 
    ```bash
-   esphome nexxtender.yaml compile
+   esphome compile nexxtender.yaml
    ```
 
 5. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
 
    ```bash
-   esphome nexxtender.yaml upload
+   esphome upload nexxtender.yaml
    ```
 
 6. **Integrate with Home Assistant:** In your Home Assistant configuration, add the ESPHome device as a new integration. Follow the instructions provided by Home Assistant to discover and integrate the Nexxtender charger with your Home Assistant setup.
