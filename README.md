@@ -61,23 +61,25 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
 
 3. **Copy Secrets Template:** Navigate to the `config` folder and copy the `secrets.yaml.template` file to `secrets.yaml`. Fill in the actual values for your Wi-Fi credentials, ESPHome API key, Nexxtender MAC address, and passkey.
 
-4. **Compile Firmware:** Compile the ESPHome firmware with the configured Nexxtender client. Run the following command in the `nexxtender` directory:
+4. **Copy Esp Example:** Navigate to the `config/nexxtender_packages` folder and copy the `esp.yaml.example` file to `esp.yaml`. Modify it with your ESP board specifications if needed.
+
+5. **Compile Firmware:** Compile the ESPHome firmware with the configured Nexxtender client. Run the following command in the `nexxtender` directory:
 
    ```bash
    esphome compile nexxtender.yaml
    ```
 
-5. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
+6. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
 
    ```bash
    esphome upload nexxtender.yaml
    ```
 
-6. **Integrate with Home Assistant:** In your Home Assistant configuration, add the ESPHome device as a new integration. Follow the instructions provided by Home Assistant to discover and integrate the Nexxtender charger with your Home Assistant setup.
+7. **Integrate with Home Assistant:** In your Home Assistant configuration, add the ESPHome device as a new integration. Follow the instructions provided by Home Assistant to discover and integrate the Nexxtender charger with your Home Assistant setup.
 
-7. **Monitor Logs:** Monitor the ESPHome device logs to ensure that the BLE client establishes a connection with the Powerdale Nexxtender EV Charger successfully.
+8. **Monitor Logs:** Monitor the ESPHome device logs to ensure that the BLE client establishes a connection with the Powerdale Nexxtender EV Charger successfully.
 
-8. **Test Functionality:** Test the functionality of the ESPHome BLE client by monitoring real-time data from the Nexxtender charger and controlling its operation remotely from your ESPHome device or through the Home Assistant interface.
+9. **Test Functionality:** Test the functionality of the ESPHome BLE client by monitoring real-time data from the Nexxtender charger and controlling its operation remotely from your ESPHome device or through the Home Assistant interface.
 
 For detailed documentation and examples, please refer to the [ESPHome BLE Client Documentation](https://github.com/geertmeersman/nexxtender/wiki).
 
