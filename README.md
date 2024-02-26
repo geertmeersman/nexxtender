@@ -450,6 +450,14 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
          action: toggle
          entity: button.nexxtender_start_charge_stop
          name: Stop met laden
+   - type: conditional
+      conditions:
+         - condition: state
+         entity: sensor.nexxtender_charging_basic_status
+         state: unplugged
+      card:
+         type: markdown
+         content: <center>Sluit de kabel aan om te kunnen starten met laden</center>
 
    ```
 
