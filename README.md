@@ -1,6 +1,20 @@
+[![maintainer](https://img.shields.io/badge/maintainer-Geert%20Meersman-green?style=for-the-badge&logo=github)](https://github.com/geertmeersman)
+[![buyme_coffee](https://img.shields.io/badge/Buy%20me%20a%20Duvel-donate-yellow?style=for-the-badge&logo=buymeacoffee)](https://www.buymeacoffee.com/geertmeersman)
+[![discord](https://img.shields.io/discord/1094331679327408320?style=for-the-badge&logo=discord)](https://discord.gg/PTpExQJsWA)
+
+[![MIT License](https://img.shields.io/github/license/geertmeersman/nexxtender?style=flat-square)](https://github.com/geertmeersman/nexxtender/blob/master/LICENSE)
+[![github last-commit](https://img.shields.io/github/last-commit/geertmeersman/nexxtender)](https://github.com/geertmeersman/nexxtender/commits)
+[![github contributors](https://img.shields.io/github/contributors/geertmeersman/nexxtender)](https://github.com/geertmeersman/nexxtender/graphs/contributors)
+[![github commit activity](https://img.shields.io/github/commit-activity/y/geertmeersman/nexxtender?logo=github)](https://github.com/geertmeersman/nexxtender/commits/main)
+
+---
+
 # ESPHome BLE Client for Powerdale Nexxtender EV Charger
 
 This repository contains an ESPHome BLE client for interfacing with the Powerdale Nexxtender EV Charger. The client allows you to seamlessly integrate the Nexxtender charger with your ESPHome projects, enabling you to monitor and control the charger remotely via Bluetooth Low Energy (BLE). Additionally, it integrates smoothly with Home Assistant, providing a convenient interface for managing your Nexxtender charger within your home automation setup.
+
+---
+
 
 ## Features
 
