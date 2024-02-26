@@ -59,7 +59,7 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
    git clone https://github.com/geertmeersman/nexxtender.git
    ```
 
-3. **Copy Secrets Template:** Navigate to the `config` folder and copy the `secrets_template.yaml` file to `secrets.yaml`. Fill in the actual values for your Wi-Fi credentials, ESPHome API key, Nexxtender MAC address, and passkey.
+3. **Copy Secrets Template:** Navigate to the `config` folder and copy the `secrets.yaml.template` file to `secrets.yaml`. Fill in the actual values for your Wi-Fi credentials, ESPHome API key, Nexxtender MAC address, and passkey.
 
 4. **Compile Firmware:** Compile the ESPHome firmware with the configured Nexxtender client. Run the following command in the `nexxtender` directory:
 
