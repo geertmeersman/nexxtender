@@ -190,25 +190,16 @@ cards:
       - style:
           top: 180px
           left: 18%
-        show_name: false
+        show_name: true
+        name: |
+          [[[ 
+            if (entity.state > 0) return entity.state+" kWh"; 
+            return "";
+          ]]] 
         show_icon: false
         type: custom:button-card
         entity: sensor.nexxtender_charging_basic_energy
-        show_state: true
-        styles:
-          card:
-            - background: none
-            - border-radius: 0
-            - border: 0
-            - font-size: 12px
-      - style:
-          top: 220px
-          left: 18%
-        show_name: false
-        show_icon: false
-        type: custom:button-card
-        entity: sensor.nexxtender_charging_advanced_car_power
-        show_state: true
+        show_state: false
         styles:
           card:
             - background: none
@@ -218,11 +209,35 @@ cards:
       - style:
           top: 200px
           left: 18%
-        show_name: false
+        show_name: true
+        name: |
+          [[[ 
+            if (entity.state > 0) return entity.state;
+            return "";
+          ]]] 
         show_icon: false
         type: custom:button-card
         entity: sensor.nexxtender_charging_basic_seconds
-        show_state: true
+        show_state: false
+        styles:
+          card:
+            - background: none
+            - border-radius: 0
+            - border: 0
+            - font-size: 12px
+      - style:
+          top: 220px
+          left: 18%
+        show_name: true
+        name: |
+          [[[ 
+            if (entity.state > 0) return entity.state+" kW"; 
+            return "";
+          ]]] 
+        show_icon: false
+        type: custom:button-card
+        entity: sensor.nexxtender_charging_advanced_car_power
+        show_state: false
         styles:
           card:
             - background: none
@@ -234,7 +249,10 @@ cards:
           left: 18%
         show_name: true
         name: |
-          [[[ return entity.state+" fasen"; ]]] 
+          [[[ 
+            if (entity.state > 0) return entity.state+" fasen"; 
+            return "";
+          ]]] 
         show_icon: false
         type: custom:button-card
         entity: sensor.nexxtender_charging_basic_phase_count
