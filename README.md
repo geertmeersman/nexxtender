@@ -90,21 +90,44 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
 
    ```yaml
    packages:
-     esp: github://geertmeersman/nexxtender/config/nexxtender_packages/esp.yaml
-     api: github://geertmeersman/nexxtender/config/nexxtender_packages/api.yaml
-     time: github://geertmeersman/nexxtender/config/nexxtender_packages/time.yaml
-     ble: github://geertmeersman/nexxtender/config/nexxtender_packages/ble.yaml # secrets nexxtender_mac & nexxtender_passkey required
-     device_information: github://geertmeersman/nexxtender/config/nexxtender_packages/device_information.yaml
-     generic_data: github://geertmeersman/nexxtender/config/nexxtender_packages/generic_data.yaml
-     charging_car_data: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_car_data.yaml
-     charging_grid_data: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_grid_data.yaml
-     charging_basic_data: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_basic_data.yaml
-     charging_advanced_data: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_advanced_data.yaml
-
+      esp: 
+         url: github://geertmeersman/nexxtender/config/nexxtender_packages/esp.yaml
+         refresh: 0s
+      #webserver: github://geertmeersman/nexxtender/config/nexxtender_packages/webserver.yaml # secret esphome_admin_password required
+      api: 
+         url: github://geertmeersman/nexxtender/config/nexxtender_packages/api.yaml # secrets esphome_admin_password, wifi_ssid, wifi_password & esphome_api_key required
+         refresh: 0s
+      time: 
+         url: github://geertmeersman/nexxtender/config/nexxtender_packages/time.yaml
+         refresh: 0s
+      ble: 
+         url: github://geertmeersman/nexxtender/config/nexxtender_packages/ble.yaml # secrets nexxtender_mac & nexxtender_passkey required
+         refresh: 0s
+      device_information: 
+         url: github://geertmeersman/nexxtender/config/nexxtender_packages/device_information.yaml
+         refresh: 0s
+      generic_data: 
+         url: github://geertmeersman/nexxtender/config/nexxtender_packages/generic_data.yaml
+         refresh: 0s
+      charging_car_data: 
+         url: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_car_data.yaml
+         refresh: 0s
+      charging_grid_data: 
+         url: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_grid_data.yaml
+         refresh: 0s
+      charging_basic_data: 
+         url: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_basic_data.yaml
+         refresh: 0s
+      charging_advanced_data: 
+         url: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_advanced_data.yaml
+         refresh: 0s
+      #transactions: github://geertmeersman/nexxtender/config/nexxtender_packages/transactions.yaml
+      #diagnostics: github://geertmeersman/nexxtender/config/nexxtender_packages/diagnostics.yaml
+   
    substitutions:
-     device_name: nexxtender
-     friendly_name: Nexxtender
-     update_interval: 60s
+      device_name: nexxtender
+      friendly_name: Nexxtender
+      update_interval: 60s
    ```
 
 3. **Update the secrets.yaml:**
