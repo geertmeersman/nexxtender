@@ -49,39 +49,88 @@ Before integrating your Nexxtender EV Charger with the ESPHome BLE client, you'l
 
 By following these steps, you can easily find the Bluetooth MAC address of your Nexxtender EV Charger named "HOME" using the NRF Connect app.
 
-### Installing & configuring ESPHome
+### Installing & Configuring ESPHome
 
 1. **Install ESPHome:** If you haven't already, install ESPHome by following the instructions [here](https://esphome.io/guides/getting_started_command_line.html#installation-step).
 
-2. **Clone Repository:** Clone this repository to your local machine:
+2. **Create a new ESPHome Configuration:** Create a new file named `nexxtender.yaml` in your local directory. Copy and paste the contents of the provided `nexxtender.yaml` into this file (or copy/paste the below yaml).
 
-   ```bash
-   git clone https://github.com/geertmeersman/nexxtender.git
+   ```yaml
+   packages:
+     esp: github://geertmeersman/nexxtender/config/nexxtender_packages/esp.yaml
+     api: github://geertmeersman/nexxtender/config/nexxtender_packages/api.yaml
+     time: github://geertmeersman/nexxtender/config/nexxtender_packages/time.yaml
+     ble: github://geertmeersman/nexxtender/config/nexxtender_packages/ble.yaml # secrets nexxtender_mac & nexxtender_passkey required
+     device_information: github://geertmeersman/nexxtender/config/nexxtender_packages/device_information.yaml
+     generic_data: github://geertmeersman/nexxtender/config/nexxtender_packages/generic_data.yaml
+     charging_car_data: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_car_data.yaml
+     charging_grid_data: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_grid_data.yaml
+     charging_basic_data: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_basic_data.yaml
+     charging_advanced_data: github://geertmeersman/nexxtender/config/nexxtender_packages/charging_advanced_data.yaml
+
+   substitutions:
+     device_name: nexxtender
+     friendly_name: Nexxtender
+     update_interval: 60s
    ```
 
-3. **Copy Secrets Template:** Navigate to the `config` folder and copy the `secrets.yaml.template` file to `secrets.yaml`. Fill in the actual values for your Wi-Fi credentials, ESPHome API key, Nexxtender MAC address, and passkey.
+3. **Update the secrets.yaml:** 
 
-4. **Copy Esp Example:** Navigate to the `config/nexxtender_packages` folder and copy the `esp.yaml.example` file to `esp.yaml`. Modify it with your ESP board specifications if needed.
+   Ensure that your `secrets.yaml` file contains the following entries:
 
-5. **Compile Firmware:** Compile the ESPHome firmware with the configured Nexxtender client. Run the following command in the `nexxtender` directory:
+   ```yaml
+   esphome_admin_password: "YOUR_ESPHOME_ADMIN_PASSWORD"
+   wifi_ssid: "YOUR_WIFI_SSID"
+   wifi_password: "YOUR_WIFI_PASSWORD"
+   esphome_api_key: "YOUR_ESPHOME_API_KEY"
+   nexxtender_mac: "YOUR_NEXXTENDER_MAC_ADDRESS"
+   nexxtender_passkey: "YOUR_NEXXTENDER_PASSKEY"
+   ```
+
+   Replace `"YOUR_ESPHOME_ADMIN_PASSWORD"`, `"YOUR_WIFI_SSID"`, `"YOUR_WIFI_PASSWORD"`, `"YOUR_ESPHOME_API_KEY"`, `"YOUR_NEXXTENDER_MAC_ADDRESS"`, and `"YOUR_NEXXTENDER_PASSKEY"` with your actual values.
+
+   The `nexxtender_mac` is the bluetooth mac address you found in the previous step.
+
+   The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender.
+
+   The `esphome_admin_password` is the password that is used for the wifi fallback hotspot and OTA.
+
+   If you don't know how to define the `esphome_api_key`, you can obtain one as described [here](https://esphome.io/components/api.html) in the section Configuration variables > encryption > key.
+
+
+4. **Compile Firmware:** Compile the ESPHome firmware using the `nexxtender.yaml` configuration file. Run the following command in your terminal, pointing to the location of your `nexxtender.yaml` file:
 
    ```bash
    esphome compile nexxtender.yaml
    ```
 
-6. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
+5. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
 
    ```bash
    esphome upload nexxtender.yaml
    ```
 
-7. **Integrate with Home Assistant:** In your Home Assistant configuration, add the ESPHome device as a new integration. Follow the instructions provided by Home Assistant to discover and integrate the Nexxtender charger with your Home Assistant setup.
+6. **Integrate with Home Assistant:** In your Home Assistant configuration, add the ESPHome device as a new integration. Follow the instructions provided by Home Assistant to discover and integrate the Nexxtender charger with your Home Assistant setup.
 
-8. **Monitor Logs:** Monitor the ESPHome device logs to ensure that the BLE client establishes a connection with the Powerdale Nexxtender EV Charger successfully.
+7. **Monitor Logs:** Monitor the ESPHome device logs to ensure that the BLE client establishes a connection with the Powerdale Nexxtender EV Charger successfully.
 
-9. **Test Functionality:** Test the functionality of the ESPHome BLE client by monitoring real-time data from the Nexxtender charger and controlling its operation remotely from your ESPHome device or through the Home Assistant interface.
+8. **Test Functionality:** Test the functionality of the ESPHome BLE client by monitoring real-time data from the Nexxtender charger and controlling its operation remotely from your ESPHome device or through the Home Assistant interface.
 
-For detailed documentation and examples, please refer to the [ESPHome BLE Client Documentation](https://github.com/geertmeersman/nexxtender/wiki).
+#### Customizing ESP32 Configuration (Optional)
+
+If you want to customize the ESP32 section in your `nexxtender.yaml` file for your specific board type, you can add the following section at the end of the nexxtender.yaml:
+
+```yaml
+esp32:
+  board: YOUR_ESP32_BOARD_TYPE
+  framework:
+    type: esp-idf
+    version: recommended
+```
+
+Replace `YOUR_ESP32_BOARD_TYPE` with the specific board type you're using, such as `az-delivery-devkit-v4` or any other compatible board.
+
+This flexibility allows users to tailor the configuration to their hardware requirements while still benefiting from the overall structure and functionality provided in the `nexxtender.yaml` file.
 
 ## Integrating ESPHome Devices with Home Assistant
 
