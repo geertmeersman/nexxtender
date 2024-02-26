@@ -26,6 +26,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 ### Lovelace card
 
 ![lovelace](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/lovelace.png)
+![lovelace-aansluiten](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/aansluiten.png)
 
 ### Controls
 
