@@ -26,6 +26,25 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 
 - **Home Assistant Integration:** Seamlessly integrate the ESPHome BLE client with Home Assistant, allowing you to monitor and control the Nexxtender charger through the Home Assistant interface.
 
+## Screenshots
+
+### Lovelace card
+
+![lovelace](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/lovelace.png)
+
+### Controls
+
+![bediening](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/bediening.png)
+
+### Sensors
+
+![sensors_1](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/sensors_1.png)
+![sensors_2](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/sensors_2.png)
+
+### Diagnostics
+
+![diagnose](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/diagnose.png)
+
 ## Getting Started
 
 To integrate the ESPHome BLE client with your Powerdale Nexxtender EV Charger and Home Assistant, follow these steps:
