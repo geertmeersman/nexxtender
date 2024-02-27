@@ -16,6 +16,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Move Secrets Template
+        run: |
+          cp config/secrets.yaml.template config/secrets.yaml
+          echo "Secrets template moved."
+        working-directory: ${{ github.workspace }}
+
       - name: Build ESPHOME
         uses: esphome/build-action@v1
         with:
