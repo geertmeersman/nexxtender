@@ -1,5 +1,5 @@
 packages:
-  nexxtender: github://geertmeersman/nexxtender/config/nexxtender.yaml
+  nexxtender: github://geertmeersman/nexxtender/config/nexxtender.yaml@main
   
 substitutions:
   device_name: nexxtender
