@@ -34,7 +34,7 @@ sensor:
     icon: mdi:flash
     device_class: energy
     unit_of_measurement: kWh
-    state_class: measurement
+    state_class: total
     accuracy_decimals: 2
     filters:
       - lambda: return x / 1000;
