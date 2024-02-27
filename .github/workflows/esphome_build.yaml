@@ -20,6 +20,7 @@ jobs:
       - name: Move Secrets Template
         run: |
           cp config/secrets.yaml.template config/secrets.yaml
+          sed -i 's/esphome_api_key: <to_complete>/esphome_api_key: "2EhugO+jJDJ+BiVEiRxzXnkDWTmxpdfvgdMXRv26\/pA="/' config/secrets.yaml
           echo "Secrets template moved."
         working-directory: ${{ github.workspace }}
 
