@@ -6,7 +6,7 @@ substitutions:
   ble_uuid_device_information_hardware_revision: 2a27
   device_information_prefix: Device Information
   device_information_id_prefix: device_information
-  device_information_update_interval: 60s
+  device_information_update_interval: 900s
 
 globals:
 
@@ -19,7 +19,7 @@ text_sensor:
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_device_information_service}
     characteristic_uuid: ${ble_uuid_device_information_model_number}
-    update_interval: 60s
+    update_interval: ${device_information_update_interval}
     notify: true
     on_notify:
       then:
@@ -34,7 +34,7 @@ text_sensor:
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_device_information_service}
     characteristic_uuid: ${ble_uuid_device_information_serial_number}
-    update_interval: 60s
+    update_interval: ${device_information_update_interval}
     notify: true
     on_notify:
       then:
@@ -49,7 +49,7 @@ text_sensor:
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_device_information_service}
     characteristic_uuid: ${ble_uuid_device_information_firmware_revision}
-    update_interval: 60s
+    update_interval: ${device_information_update_interval}
     notify: true
     on_notify:
       then:
@@ -64,7 +64,7 @@ text_sensor:
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_device_information_service}
     characteristic_uuid: ${ble_uuid_device_information_hardware_revision}
-    update_interval: 60s
+    update_interval: ${device_information_update_interval}
     notify: true
     on_notify:
       then:
