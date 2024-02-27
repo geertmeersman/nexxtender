@@ -1,5 +1,8 @@
 packages:
-  nexxtender: github://geertmeersman/nexxtender/config/nexxtender.yaml@main
+  nexxtender: 
+    url: https://github.com/geertmeersman/nexxtender
+    file: config/nexxtender.yaml
+    refresh: 1d
   
 substitutions:
   device_name: nexxtender
