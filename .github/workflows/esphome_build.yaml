@@ -1,0 +1,22 @@
+name: ESPHome Build
+
+on:
+  push:
+    branches:
+      - main 
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Build ESPHOME
+        uses: esphome/build-action@v1
+        with:
+          yaml_file: config/nexxtender.yaml
