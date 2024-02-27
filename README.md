@@ -11,6 +11,8 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 [![github contributors](https://img.shields.io/github/contributors/geertmeersman/nexxtender)](https://github.com/geertmeersman/nexxtender/graphs/contributors)
 [![github commit activity](https://img.shields.io/github/commit-activity/y/geertmeersman/nexxtender?logo=github)](https://github.com/geertmeersman/nexxtender/commits/main)
 
+[![ESPHOME Build action](https://github.com/geertmeersman/nexxtender/actions/workflows/esphome_build.yaml/badge.svg)](https://github.com/geertmeersman/nexxtender/actions/workflows/esphome_build.yaml)
+
 ## Features
 
 - **BLE Connectivity:** Establish a BLE connection between your ESPHome device and the Powerdale Nexxtender EV Charger for data exchange and control.
