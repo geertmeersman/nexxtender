@@ -120,7 +120,8 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
 
    The `nexxtender_mac` is the bluetooth mac address you found in the previous step.
 
-   The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender.
+   The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender. If you don't have the PIN code (or you have lost it), you can always reach out to me and I can calculate it if you provide me the serial number of the box. Format XXXXX-XX-XXXX-XXXXX-XX
+
 
    The `esphome_admin_password` is the password that is used for the wifi fallback hotspot and OTA.
 
