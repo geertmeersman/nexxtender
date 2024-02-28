@@ -165,6 +165,25 @@ esp32:
 
 Replace `YOUR_ESP32_BOARD_TYPE` with the specific board type you're using, such as `az-delivery-devkit-v4` or any other compatible board.
 
+Example for the [ESP32-S3-N16R8](https://a.aliexpress.com/_EwvIgjF)
+
+```yaml
+esp32:
+  board: esp32-s3-devkitc-1
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+    version: recommended
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  platformio_options:
+    board_build.flash_mode: dio  
+  includes:
+    - nexxtender_packages/nexxtender.h
+```
+
 This flexibility allows users to tailor the configuration to their hardware requirements while still benefiting from the overall structure and functionality provided in the `nexxtender.yaml` file.
 
 ## Integrating ESPHome Devices with Home Assistant
