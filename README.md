@@ -195,6 +195,10 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
    - [custom:button-card](https://github.com/custom-cards/button-card)
    - [card-mod](https://github.com/thomasloven/lovelace-card-mod)
 
+   The images used are available in the images folder of this repository.
+
+   In the example below they are located in your HA /config/www/images/auto/ folder.
+
    ```yaml
    type: vertical-stack
    cards:
