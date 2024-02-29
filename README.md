@@ -220,266 +220,265 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
    In the example below they are located in your HA /config/www/images/auto/ folder.
 
    ```yaml
-   type: vertical-stack
-   cards:
-   - type: picture-elements
-      aspect_ratio: 2
-      elements:
-         - style:
-            top: 180px
-            left: 18%
-         show_name: true
-         name: |
-            [[[ 
-               if (entity.state > 0) return entity.state+" kWh"; 
-               return "";
-            ]]] 
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_charging_basic_energy
-         show_state: false
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 12px
-         - style:
-            top: 200px
-            left: 18%
-         show_name: true
-         name: |
-            [[[ 
-               if (entity.state > 0) return entity.state;
-               return "";
-            ]]] 
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_charging_basic_seconds
-         show_state: false
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 12px
-         - style:
-            top: 220px
-            left: 18%
-         show_name: true
-         name: |
-            [[[ 
-               if (entity.state > 0) return entity.state+" kW"; 
-               return "";
-            ]]] 
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_charging_advanced_car_power
-         show_state: false
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 12px
-         - style:
-            top: 240px
-            left: 18%
-         show_name: true
-         name: |
-            [[[ 
-               if (entity.state > 0) return entity.state+" fasen"; 
-               return "";
-            ]]] 
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_charging_basic_phase_count
-         show_state: false
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 12px
-         - style:
-            top: 50px
-            left: 73%
-         show_name: false
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_connection_type
-         show_state: true
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 12px
-               - color: black
-         - style:
-            top: 65px
-            left: 73%
-         show_name: true
-         name: |
-            [[[ return entity.state+" fasen"; ]]] 
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_charging_phases
-         show_state: false
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 12px
-               - color: black
-         - style:
-            top: 110px
-            left: 70%
-         show_name: true
-         name: Pieklimiet
-         layout: name_state
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_peak_consumption_limit
-         show_state: true
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 12px
-               - color: black
-         - style:
-            top: 130px
-            left: 70%
-         show_name: true
-         name: Beschikbaar
-         layout: name_state
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_available_capacity
-         show_state: true
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 12px
-               - color: black
-         - style:
-            top: 192px
-            left: 70%
-         show_name: false
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_mode
-         show_state: true
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 12px
-               - color: black
-         - name: L1
-         style:
-            top: 220px
-            left: 65%
-         show_name: true
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_charging_grid_l1
-         show_state: true
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 10px
-         - name: L2
-         style:
-            top: 220px
-            left: 73%
-         show_name: true
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_charging_grid_l2
-         show_state: true
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 10px
-         - name: L3
-         style:
-            top: 220px
-            left: 81%
-         show_name: true
-         show_icon: false
-         type: custom:button-card
-         entity: sensor.nexxtender_charging_grid_l3
-         show_state: true
-         styles:
-            card:
-               - background: none
-               - border-radius: 0
-               - border: 0
-               - font-size: 10px
-      image: /local/images/1x1.png
-      card_mod:
-         style: |
-         ha-card {
-            {%- set nexxtender_state = states["sensor.nexxtender_charging_basic_status"].state -%}
-            {% if nexxtender_state == "unplugged" %}
-               {% set image = 'unplugged' %}
-            {% elif  nexxtender_state == "plugged" %}
-               {% set image = 'plugged' %}
-            {% elif  nexxtender_state == "charging" %}
-               {% set image = 'charging' %}
-            {% else %}
-               {% set image = 'offline' %}
-            {% endif %}
-            background-size: 100% 100%;
-            background-image: url(/local/images/auto/device_home_{{image}}.png);
-            height: 300px !important;
-         }
-   - type: conditional
-      conditions:
-         - condition: state
-         entity: sensor.nexxtender_charging_basic_status
-         state: plugged
-      card:
-         show_name: true
-         show_icon: false
-         type: button
-         tap_action:
-         action: toggle
-         entity: button.nexxtender_start_charge_max
-         name: Start met laden
-   - type: conditional
-      conditions:
-         - condition: state
-         entity: sensor.nexxtender_charging_basic_status
-         state: charging
-      card:
-         show_name: true
-         show_icon: false
-         type: button
-         tap_action:
-         action: toggle
-         entity: button.nexxtender_start_charge_stop
-         name: Stop met laden
-   - type: conditional
-      conditions:
-         - condition: state
-         entity: sensor.nexxtender_charging_basic_status
-         state: unplugged
-      card:
-         type: markdown
-         content: <center>Sluit de kabel aan om te kunnen starten met laden</center>
-
+    type: vertical-stack
+    cards:
+      - type: picture-elements
+        aspect_ratio: 2
+        elements:
+          - style:
+              top: 180px
+              left: 18%
+            show_name: true
+            name: |
+              [[[ 
+                if (entity.state > 0) return entity.state+" kWh"; 
+                return "";
+              ]]] 
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_charging_basic_energy
+            show_state: false
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 12px
+          - style:
+              top: 200px
+              left: 18%
+            show_name: true
+            name: |
+              [[[ 
+                if (entity.state > 0) return entity.state;
+                return "";
+              ]]] 
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_charging_basic_seconds
+            show_state: false
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 12px
+          - style:
+              top: 220px
+              left: 18%
+            show_name: true
+            name: |
+              [[[ 
+                if (entity.state > 0) return entity.state+" kW"; 
+                return "";
+              ]]] 
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_charging_advanced_car_power
+            show_state: false
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 12px
+          - style:
+              top: 240px
+              left: 18%
+            show_name: true
+            name: |
+              [[[ 
+                if (entity.state > 0) return entity.state+" fasen"; 
+                return "";
+              ]]] 
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_charging_basic_phase_count
+            show_state: false
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 12px
+          - style:
+              top: 50px
+              left: 73%
+            show_name: false
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_connection_type
+            show_state: true
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 12px
+                - color: black
+          - style:
+              top: 65px
+              left: 73%
+            show_name: true
+            name: |
+              [[[ return entity.state+" fasen"; ]]] 
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_charging_phases
+            show_state: false
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 12px
+                - color: black
+          - style:
+              top: 110px
+              left: 70%
+            show_name: true
+            name: Pieklimiet
+            layout: name_state
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_peak_consumption_limit
+            show_state: true
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 12px
+                - color: black
+          - style:
+              top: 130px
+              left: 70%
+            show_name: true
+            name: Beschikbaar
+            layout: name_state
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_available_capacity
+            show_state: true
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 12px
+                - color: black
+          - style:
+              top: 192px
+              left: 70%
+            show_name: false
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_mode
+            show_state: true
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 12px
+                - color: black
+          - name: L1
+            style:
+              top: 220px
+              left: 65%
+            show_name: true
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_charging_grid_l1
+            show_state: true
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 10px
+          - name: L2
+            style:
+              top: 220px
+              left: 73%
+            show_name: true
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_charging_grid_l2
+            show_state: true
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 10px
+          - name: L3
+            style:
+              top: 220px
+              left: 81%
+            show_name: true
+            show_icon: false
+            type: custom:button-card
+            entity: sensor.nexxtender_charging_grid_l3
+            show_state: true
+            styles:
+              card:
+                - background: none
+                - border-radius: 0
+                - border: 0
+                - font-size: 10px
+        image: /local/images/1x1.png
+        card_mod:
+          style: |
+            ha-card {
+              {%- set nexxtender_state = states["sensor.nexxtender_charging_basic_status"].state -%}
+              {% if nexxtender_state == "unplugged" %}
+                {% set image = 'unplugged' %}
+              {% elif  nexxtender_state == "plugged" %}
+                {% set image = 'plugged' %}
+              {% elif  nexxtender_state == "charging" %}
+                {% set image = 'charging' %}
+              {% else %}
+                {% set image = 'offline' %}
+              {% endif %}
+              background-size: 100% 100%;
+              background-image: url(/local/images/auto/device_home_{{image}}.png);
+              height: 300px !important;
+            }
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: sensor.nexxtender_charging_basic_status
+            state: plugged
+        card:
+          show_name: true
+          show_icon: false
+          type: button
+          tap_action:
+            action: toggle
+          entity: button.nexxtender_start_charge_max
+          name: Start met laden
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: sensor.nexxtender_charging_basic_status
+            state: charging
+        card:
+          show_name: true
+          show_icon: false
+          type: button
+          tap_action:
+            action: toggle
+          entity: button.nexxtender_start_charge_stop
+          name: Stop met laden
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: sensor.nexxtender_charging_basic_status
+            state: unplugged
+        card:
+          type: markdown
+          content: "<center>Sluit de kabel aan om te kunnen starten met laden</center>"
    ```
 
    </details>
