@@ -37,7 +37,13 @@ jobs:
           echo "Secrets template moved."
         working-directory: ${{ github.workspace }}
 
-      - name: Build ESPHOME
+      - name: Build ESPHOME az-delivery-devkit-v4
         uses: esphome/build-action@v1
         with:
           yaml_file: config/nexxtender.yaml
+
+      - name: Build ESPHOME esp32-s3-devkitc-1
+        uses: esphome/build-action@v1
+        with:
+          yaml_file: config/nexxtender.s3.yaml
+  
