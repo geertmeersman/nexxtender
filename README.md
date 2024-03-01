@@ -255,7 +255,13 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
             show_name: true
             name: |
               [[[ 
-                if (entity.state > 0) return entity.state;
+                if (entity.state > 0) {
+                  const seconds = entity.state;
+                  const hours = Math.floor(seconds / 3600);
+                  const minutes = Math.floor((seconds % 3600) / 60);
+                  const remainingSeconds = seconds % 60;
+                  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+                }
                 return "";
               ]]] 
             show_icon: false
