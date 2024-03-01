@@ -1,7 +1,7 @@
 substitutions:
   ble_uuid_prefix: fd47416a-95fb-4206-88b5-b4a8045f75
   ble_uuid_receive_service: ${ble_uuid_prefix}c1
-  notify_ble: "false"
+  notify_ble: "true"
 
 esp32_ble:
   io_capability: keyboard_only
