@@ -211,107 +211,27 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
 
 8. **Lovelace dashboard card**:
 
-   ![lovelace-card](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/lovelace.png)
+   ![lovelace-card](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/lovelace_start.png)
+   ![lovelace-card](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/lovelace_stop.png)
 
    <details><summary>Show markdown code</summary>
 
    The example uses the following custom lovelace cards:
 
-   - [custom:button-card](https://github.com/custom-cards/button-card)
+   - [button-card](https://github.com/custom-cards/button-card)
    - [card-mod](https://github.com/thomasloven/lovelace-card-mod)
+   - [vertical-stack-in-card](https://github.com/ofekashery/vertical-stack-in-card)
 
    The images used are available in the images folder of this repository.
 
    In the example below they are located in your HA /config/www/images/auto/ folder.
 
    ```yaml
-    type: vertical-stack
+    type: custom:vertical-stack-in-card
     cards:
       - type: picture-elements
         aspect_ratio: 2
         elements:
-          - style:
-              top: 180px
-              left: 18%
-            show_name: true
-            name: |
-              [[[ 
-                if (entity.state > 0) return entity.state+" kWh"; 
-                return "";
-              ]]] 
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_charging_basic_energy
-            show_state: false
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 12px
-          - style:
-              top: 200px
-              left: 18%
-            show_name: true
-            name: |
-              [[[ 
-                if (entity.state > 0) {
-                  const seconds = entity.state;
-                  const hours = Math.floor(seconds / 3600);
-                  const minutes = Math.floor((seconds % 3600) / 60);
-                  const remainingSeconds = seconds % 60;
-                  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-                }
-                return "";
-              ]]] 
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_charging_basic_seconds
-            show_state: false
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 12px
-          - style:
-              top: 220px
-              left: 18%
-            show_name: true
-            name: |
-              [[[ 
-                if (entity.state > 0) return entity.state+" kW"; 
-                return "";
-              ]]] 
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_charging_advanced_car_power
-            show_state: false
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 12px
-          - style:
-              top: 240px
-              left: 18%
-            show_name: true
-            name: |
-              [[[ 
-                if (entity.state > 0) return entity.state+" fasen"; 
-                return "";
-              ]]] 
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_charging_basic_phase_count
-            show_state: false
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 12px
           - style:
               top: 50px
               left: 73%
@@ -455,20 +375,86 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
               background-size: 100% 100%;
               background-image: url(/local/images/auto/device_home_{{image}}.png);
               height: 300px !important;
+              border-radius: 0;
+              margin: 0;
             }
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            entity: sensor.nexxtender_charging_basic_phase_count
+            above: 0
+        card:
+          type: picture-elements
+          elements:
+            - type: state-icon
+              entity: sensor.nexxtender_charging_basic_energy
+              style:
+                top: 25px
+                left: 10%
+            - type: state-label
+              entity: sensor.nexxtender_charging_basic_energy
+              style:
+                top: 25px
+                left: 30%
+            - type: state-label
+              entity: sensor.nexxtender_charging_basic_seconds
+              style:
+                top: 25px
+                left: 50%
+            - type: state-label
+              entity: sensor.nexxtender_charging_advanced_car_power
+              style:
+                top: 25px
+                left: 70%
+            - type: state-label
+              entity: sensor.nexxtender_charging_basic_phase_count
+              suffix: ' fases'
+              style:
+                top: 25px
+                left: 90%
+          image: /local/images/1x1.png
+          card_mod:
+            style: |
+              ha-card {
+                height: 50px !important;
+                background-color: #325FA8;
+              }
       - type: conditional
         conditions:
           - condition: state
             entity: sensor.nexxtender_charging_basic_status
             state: plugged
         card:
-          show_name: true
-          show_icon: false
-          type: button
-          tap_action:
-            action: toggle
-          entity: button.nexxtender_start_charge_max
-          name: Start met laden
+          type: horizontal-stack
+          cards:
+            - show_name: true
+              show_icon: true
+              icon: mdi:speedometer-slow
+              type: custom:button-card
+              layout: icon_name
+              tap_action:
+                action: toggle
+              entity: button.nexxtender_start_charge_eco
+              name: ECO laden
+              styles:
+                card:
+                  - background: green
+                  - border-radius: 0
+                  - height: 50px
+            - show_name: true
+              show_icon: true
+              icon: mdi:speedometer
+              type: custom:button-card
+              layout: icon_name
+              tap_action:
+                action: toggle
+              entity: button.nexxtender_start_charge_max
+              name: MAX laden
+              styles:
+                card:
+                  - background: blue
+                  - border-radius: 0
+                  - height: 50px
       - type: conditional
         conditions:
           - condition: state
@@ -477,11 +463,17 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
         card:
           show_name: true
           show_icon: false
-          type: button
+          type: custom:button-card
+          icon: mdi:stop
           tap_action:
             action: toggle
           entity: button.nexxtender_start_charge_stop
           name: Stop met laden
+          styles:
+            card:
+              - background: '#8E8D92'
+              - border-radius: 0
+              - height: 50px
       - type: conditional
         conditions:
           - condition: state
@@ -489,7 +481,14 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
             state: unplugged
         card:
           type: markdown
-          content: "<center>Sluit de kabel aan om te kunnen starten met laden</center>"
+          content: <center>Sluit de kabel aan om te kunnen starten met laden</center>
+      - type: history-graph
+        entities:
+          - entity: sensor.nexxtender_charging_grid_l1
+          - entity: sensor.nexxtender_charging_grid_l2
+          - entity: sensor.nexxtender_charging_grid_l3
+        logarithmic_scale: false
+
    ```
 
    </details>
