@@ -2,7 +2,7 @@ packages:
   nexxtender: 
     url: https://github.com/geertmeersman/nexxtender
     file: config/nexxtender.yaml
-    refresh: 1d
+    refresh: 0s
   
 substitutions:
   device_name: nexxtender

@@ -95,7 +95,7 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
       nexxtender: 
          url: https://github.com/geertmeersman/nexxtender
          file: config/nexxtender.yaml
-         refresh: 1d
+         refresh: 0s
   
    substitutions:
       device_name: nexxtender
@@ -181,7 +181,7 @@ The complete configuration file would look like:
       nexxtender: 
          url: https://github.com/geertmeersman/nexxtender
          files:  [config/nexxtender.yaml, config/nexxtender_packages/esp.s3.yaml]
-         refresh: 1d
+         refresh: 0s
 
    substitutions:
       device_name: nexxtender
