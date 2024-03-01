@@ -16,13 +16,13 @@ ble_client:
         - lambda: |-
             ESP_LOGD("ble_client_lambda", "Connected to BLE device");
             id(${device_name}_ble_client_id)->pair();
-            id(ble_client_connectivity).publish_state("1");
+            id(ble_client_connectivity).publish_state(true);
         - esp32_ble_tracker.stop_scan:
     on_disconnect:
       then:
         - lambda: |-
             ESP_LOGD("ble_client_lambda", "Disconnected from BLE device");
-            id(ble_client_connectivity).publish_state("0");
+            id(ble_client_connectivity).publish_state(false);
         - esp32_ble_tracker.start_scan:
     on_passkey_notification:
       then:
@@ -40,6 +40,7 @@ binary_sensor:
   - platform: template
     name: BLE Client
     id: ble_client_connectivity
+    publish_initial_state: true
     device_class: connectivity
     icon: mdi:check-network-outline
     entity_category: diagnostic

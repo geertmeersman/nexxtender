@@ -67,7 +67,6 @@ text_sensor:
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_charging_advanced_characteristic}
-    update_interval: ${charging_advanced_update_interval}
     notify: ${notify_ble}
     on_value:
       then:

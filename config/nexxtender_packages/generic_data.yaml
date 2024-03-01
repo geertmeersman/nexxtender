@@ -110,7 +110,6 @@ text_sensor:
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_generic_status}
-    update_interval: ${generic_data_update_interval}
     notify: true
     on_notify:
       then:
@@ -123,7 +122,6 @@ text_sensor:
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_generic_data}
     notify: true
-    update_interval: never
     on_notify:
       then:
         lambda: |-
