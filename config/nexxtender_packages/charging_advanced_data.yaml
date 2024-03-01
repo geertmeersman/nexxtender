@@ -21,6 +21,7 @@ sensor:
     icon: mdi:clock-time-eight
     device_class: timestamp
     accuracy_decimals: 0
+    disabled_by_default: true
     update_interval: ${charging_advanced_update_interval}
     lambda: |-
       return id(g_${charging_advanced_id_prefix}_timestamp);
@@ -67,11 +68,14 @@ text_sensor:
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_charging_advanced_characteristic}
-    notify: ${notify_ble}
+    update_interval: 15s
     on_value:
       then:
         lambda: |-
-          if (x.empty()) { return; }
+          if (x.empty()) { 
+          logd_x("${device_name}_charging_advanced_data", "empty Geert");
+            return; 
+            }
           logd_x("${device_name}_charging_advanced_data", x);
 
           id(g_${charging_advanced_id_prefix}_timestamp) = getInt(x, 0);

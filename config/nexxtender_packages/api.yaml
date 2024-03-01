@@ -1,3 +1,8 @@
+globals:
+  - id: g_wifi_connected
+    type: bool
+    initial_value: "false"
+
 ota:
   password: !secret esphome_admin_password
 
@@ -7,6 +12,14 @@ wifi:
   ap:
     ssid: ${device_name} - FB
     password: !secret esphome_admin_password
+  on_connect:
+    then:
+      - lambda: |-
+          id(g_wifi_connected) = true;
+  on_disconnect:
+    then:
+      - lambda: |-
+          id(g_wifi_connected) = false;
 
 captive_portal:
 

@@ -15,6 +15,8 @@ globals:
     type: std::string
   - id: g_${charging_basic_id_prefix}_status
     type: std::string
+  - id: g_${charging_basic_id_prefix}_status_id
+    type: int
 
 sensor:
   - platform: template
@@ -73,6 +75,7 @@ text_sensor:
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_charging_basic_characteristic}
     notify: true
+    update_interval: never
     on_notify:
       then:
         lambda: |-
@@ -105,17 +108,23 @@ text_sensor:
           switch (static_cast<char>(getByte(x, 3))) {
               case 'B':
                   value_string = "plugged";
+                  value = 1;
                   break;
               case 'C':
               case 'D':
                   value_string = "charging";
+                  value = 2;
                   break;
               case 'E':
                   value_string = "fault";
+                  value = 3;
                   break;
               default:
                   value_string = "unplugged";
+                  value = 4;
+                  break;
           }
+          id(g_${charging_basic_id_prefix}_status_id) = value;
           id(g_${charging_basic_id_prefix}_status) = value_string.c_str();
           id(${charging_basic_id_prefix}_status).publish_state(value_string.c_str());
 

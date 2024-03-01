@@ -151,15 +151,15 @@ text_sensor:
 
                   if (additional_info < 24) {
                     value = initial_byte;
-                    ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
+                    // ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
                   } else if (additional_info == 24) {
                     value = x[index];
                     index += 1;
-                    ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
+                    // ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
                   } else if (additional_info == 25) {
                     value = (x[index] << 8) | x[index+1];
                     index += 2;
-                    ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
+                    // ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
                   }
 
                   switch (key) {

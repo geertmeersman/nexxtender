@@ -1,0 +1,217 @@
+esp32:
+  board: esp32-s3-devkitc-1
+  flash_size: 16MB
+
+esphome:
+  platformio_options:
+    board_build.flash_mode: dio  
+
+globals:
+  - id: g_rgb_color
+    type: int
+    initial_value: '0'
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: rgb_light
+    rgb_order: GRB
+    pin: GPIO48
+    num_leds: 1
+    rmt_channel: 0
+    chipset: ws2812
+    name: RGB ${friendly_name}
+    effects:
+      - pulse:
+          name: Pulse
+          transition_length:
+            on_length: 2s
+            off_length: 500ms
+          update_interval: 2.5s          
+      - pulse:
+          name: Flash
+          transition_length: 100ms
+          update_interval: 100ms
+
+script:
+  - id: rgb_blue_flash
+    then:
+      - globals.set:
+          id: g_rgb_color
+          value: '1'
+      - light.turn_off:
+          id: rgb_light
+      - light.turn_on:
+          id: rgb_light
+          red: 0%
+          blue: 100%
+          green: 0%
+          brightness: 60%
+          effect: Flash
+  - id: rgb_green_steady
+    then:
+      - globals.set:
+          id: g_rgb_color
+          value: '2'
+      - light.turn_off:
+          id: rgb_light
+      - light.turn_on:
+          id: rgb_light
+          red: 0%
+          blue: 0%
+          green: 100%
+          brightness: 60%
+  - id: rgb_blue_steady
+    then:
+      - globals.set:
+          id: g_rgb_color
+          value: '3'
+      - light.turn_off:
+          id: rgb_light
+      - light.turn_on:
+          id: rgb_light
+          red: 0%
+          blue: 100%
+          green: 0%
+          brightness: 60%
+  - id: rgb_green_pulse
+    then:
+      - globals.set:
+          id: g_rgb_color
+          value: '4'
+      - light.turn_off:
+          id: rgb_light
+      - light.turn_on:
+          id: rgb_light
+          red: 0%
+          blue: 0%
+          green: 100%
+          brightness: 60%
+          effect: Pulse
+  - id: rgb_blue_pulse
+    then:
+      - globals.set:
+          id: g_rgb_color
+          value: '5'
+      - light.turn_off:
+          id: rgb_light
+      - light.turn_on:
+          id: rgb_light
+          red: 0%
+          blue: 100%
+          green: 0%
+          brightness: 60%
+          effect: Pulse
+  - id: rgb_yellow_pulse
+    then:
+      - globals.set:
+          id: g_rgb_color
+          value: '6'
+      - light.turn_off:
+          id: rgb_light
+      - light.turn_on:
+          id: rgb_light
+          red: 100%
+          blue: 0%
+          green: 100%
+          brightness: 60%
+          effect: Pulse
+  - id: rgb_yellow_steady
+    then:
+      - globals.set:
+          id: g_rgb_color
+          value: '7'
+      - light.turn_off:
+          id: rgb_light
+      - light.turn_on:
+          id: rgb_light
+          red: 100%
+          blue: 0%
+          green: 100%
+          brightness: 60%
+  - id: rgb_orange_pulse
+    then:
+      - globals.set:
+          id: g_rgb_color
+          value: '8'
+      - light.turn_off:
+          id: rgb_light
+      - light.turn_on:
+          id: rgb_light
+          red: 100%
+          blue: 0%
+          green: 52%
+          brightness: 60%
+          effect: Pulse
+  - id: rgb_red_pulse
+    then:
+      - globals.set:
+          id: g_rgb_color
+          value: '9'
+      - light.turn_off:
+          id: rgb_light
+      - light.turn_on:
+          id: rgb_light
+          red: 100%
+          blue: 0%
+          green: 0%
+          brightness: 60%
+          effect: Pulse
+  - id: rgb_red
+    then:
+      - globals.set:
+          id: g_rgb_color
+          value: '0'
+      - light.turn_off:
+          id: rgb_light
+      - light.turn_on:
+          id: rgb_light
+          red: 100%
+          blue: 0%
+          green: 0%
+          brightness: 60%
+
+interval:
+  - interval: 2s
+    then:
+      - lambda: |-
+          // Check if BLE client is connected
+          if (id(ble_client_connectivity).state) {
+            // If BLE client is connected, execute the corresponding script based on charging status
+
+            switch (id(g_${charging_basic_id_prefix}_status_id)) {
+                case 1:
+                    // Plugged: Execute rgb_blue_pulse script if not already active
+                    if (id(g_rgb_color) != 5) id(rgb_blue_pulse).execute();
+                    break;
+                case 2:
+                    // Charging: Execute rgb_green_pulse script if not already active
+                    if (id(g_rgb_color) != 4) id(rgb_green_pulse).execute();
+                    break;
+                case 3:
+                    // Fault: Execute rgb_red_pulse script if not already active
+                    if (id(g_rgb_color) != 9) id(rgb_red_pulse).execute();
+                    break;
+                default:
+                    // Unplugged: Execute rgb_green_steady script if not already active
+                    if (id(g_rgb_color) != 2) id(rgb_green_steady).execute();
+                    break;
+            }
+          } else if (id(g_ble_client_manual_disconnect) == 1) {
+            // Check if BLE client manual disconnect flag is set
+            if (id(g_wifi_connected)) {
+              // If WiFi is connected, execute the rgb_yellow_steady script if not already active
+              if (id(g_rgb_color) != 7) id(rgb_yellow_steady).execute();
+            } else {
+              // If WiFi is not connected, execute the rgb_yellow_pulse script if not already active
+              if (id(g_rgb_color) != 6) id(rgb_yellow_pulse).execute();
+            }
+          } else {
+            // If neither BLE client is connected nor manual disconnect flag is set
+            if (id(g_wifi_connected)) {
+              // If WiFi is connected, execute the rgb_orange_pulse script if not already active
+              if (id(g_rgb_color) != 8) id(rgb_orange_pulse).execute();
+            } else {
+              // If WiFi is not connected, execute the rgb_red script if not already active
+              if (id(g_rgb_color) != 0) id(rgb_red).execute();
+            }
+          }

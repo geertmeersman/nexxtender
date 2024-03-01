@@ -100,7 +100,6 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
    substitutions:
       device_name: nexxtender
       friendly_name: Nexxtender
-      update_interval: 60s
    ```
 
 3. **Update the secrets.yaml:**
@@ -158,31 +157,37 @@ If you want to customize the ESP32 section in your `nexxtender.yaml` file for yo
 ```yaml
 esp32:
   board: YOUR_ESP32_BOARD_TYPE
-  framework:
-    type: esp-idf
-    version: recommended
 ```
 
 Replace `YOUR_ESP32_BOARD_TYPE` with the specific board type you're using, such as `az-delivery-devkit-v4` or any other compatible board.
 
-Example for the [ESP32-S3-N16R8](https://a.aliexpress.com/_EwvIgjF)
+Example for the ESP32-S3-N16R8, buy here: [Aliexpress](https://a.aliexpress.com/_EwvIgjF)
 
 ```yaml
 esp32:
   board: esp32-s3-devkitc-1
-  flash_size: 16MB
-  framework:
-    type: esp-idf
-    version: recommended
 
 esphome:
-  name: ${device_name}
-  friendly_name: ${friendly_name}
   platformio_options:
     board_build.flash_mode: dio  
-  includes:
-    - nexxtender_packages/nexxtender.h
 ```
+
+For this specific board, I have created a specific yaml that manages the RGB Led that is integrated on the board.
+
+The complete configuration file would look like:
+
+   ```yaml
+   packages:
+      nexxtender: 
+         url: https://github.com/geertmeersman/nexxtender
+         files:  [config/nexxtender.yaml, config/nexxtender_packages/esp.s3.yaml]
+         refresh: 1d
+
+   substitutions:
+      device_name: nexxtender
+      friendly_name: Nexxtender
+   ```
+
 
 This flexibility allows users to tailor the configuration to their hardware requirements while still benefiting from the overall structure and functionality provided in the `nexxtender.yaml` file.
 

@@ -24,6 +24,7 @@ sensor:
     id: ${charging_grid_id_prefix}_timestamp
     icon: mdi:clock-time-eight
     device_class: timestamp
+    disabled_by_default: true
     accuracy_decimals: 0
     update_interval: ${charging_grid_update_interval}
     lambda: |-
@@ -84,6 +85,7 @@ sensor:
     icon: mdi:camera-timer
     accuracy_decimals: 0
     entity_category: diagnostic
+    disabled_by_default: true
     update_interval: ${charging_grid_update_interval}
     lambda: |-
       return id(g_${charging_grid_id_prefix}_interval);
@@ -96,6 +98,7 @@ text_sensor:
     service_uuid: ${ble_uuid_receive_service}
     characteristic_uuid: ${ble_uuid_grid_characteristic}
     notify: true
+    update_interval: never
     on_notify:
       then:
         lambda: |-

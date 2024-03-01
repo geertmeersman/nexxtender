@@ -1,3 +1,6 @@
+substitutions:
+  diagnostics_update_interval: 60s
+
 # ----------------------------------------------------------------
 # Global variables
 # ----------------------------------------------------------------
@@ -54,7 +57,7 @@ sensor:
     name: Uptime Sensor
     id: uptime_sensor
     icon: mdi:clock-start
-    update_interval: ${update_interval}
+    update_interval: ${diagnostics_update_interval}
     on_raw_value:
       then:
         - text_sensor.template.publish:
@@ -79,7 +82,7 @@ sensor:
   - platform: wifi_signal
     id: wifi_signal_strength
     name: WiFi Signal Strength
-    update_interval: ${update_interval}
+    update_interval: ${diagnostics_update_interval}
     entity_category: diagnostic
     disabled_by_default: true
 
@@ -88,7 +91,7 @@ sensor:
     name: WiFi Signal Percentage
     icon: mdi:wifi
     unit_of_measurement: "%"
-    update_interval: ${update_interval}
+    update_interval: ${diagnostics_update_interval}
     accuracy_decimals: 0
     lambda: |-
         if (id(wifi_signal_strength).state < -92.0)

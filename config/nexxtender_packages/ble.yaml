@@ -1,7 +1,11 @@
 substitutions:
   ble_uuid_prefix: fd47416a-95fb-4206-88b5-b4a8045f75
   ble_uuid_receive_service: ${ble_uuid_prefix}c1
-  notify_ble: "true"
+
+globals:
+  - id: g_ble_client_manual_disconnect
+    type: int
+    initial_value: '0'
 
 esp32_ble:
   io_capability: keyboard_only
@@ -51,3 +55,11 @@ switch:
     name: BLE Client
     icon: mdi:bluetooth-transfer
     entity_category: diagnostic
+    on_turn_on:
+      - globals.set:
+          id: g_ble_client_manual_disconnect
+          value: '0'
+    on_turn_off:
+      - globals.set:
+          id: g_ble_client_manual_disconnect
+          value: '1'
