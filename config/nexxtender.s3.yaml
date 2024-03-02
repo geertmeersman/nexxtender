@@ -17,4 +17,3 @@ packages:
 substitutions:
   device_name: nexxtender
   friendly_name: Nexxtender
-  update_interval: 60s
