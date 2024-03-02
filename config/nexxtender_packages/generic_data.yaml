@@ -248,7 +248,7 @@ text_sensor:
           }
 
           if (!found_b2) {
-              ESP_LOGD("${device_name}_generic_data", "B2 map not found in the CBOR data.");
+              ESP_LOGW("${device_name}_generic_data", "B2 map not found in the CBOR data.");
               if (x.size() == 15) {
                 String value_string;
                 int value;
@@ -290,6 +290,8 @@ text_sensor:
                 id(g_${generic_data_id_prefix}_week_end) = getTimeString(getShort(x, 7));
                 id(g_${generic_data_id_prefix}_weekend_start) = getTimeString(getShort(x, 9));
                 id(g_${generic_data_id_prefix}_weekend_end) = getTimeString(getShort(x, 11));
+              } else {
+                ESP_LOGW("${device_name}_generic_data", "Config data size not equal to 15. Please open an issue with your HEX string information.");
               }
           }
 
