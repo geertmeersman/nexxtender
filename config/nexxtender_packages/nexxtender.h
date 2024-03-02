@@ -13,6 +13,15 @@ int16_t getShort(String x, int i) {
     return (int16_t(x[i+1]) << 8) | int16_t(x[i]);
 }
 
+int8_t getInt8(String x, int i) {
+    uint8_t byte = x[i];
+    if (byte & 0x80) {
+        return static_cast<int8_t>(byte) | 0xFF00;
+    } else {
+        return static_cast<int8_t>(byte);
+    }
+}
+
 String getTimeString(int minutes) {
     char time_string[20];
     minutes += 60; // add 1 hour due to timezone

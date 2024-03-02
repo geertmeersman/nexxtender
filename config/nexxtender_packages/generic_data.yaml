@@ -20,7 +20,6 @@ globals:
   - id: g_selected_charge_mode
     type: std::string
     restore_value: true
-
 sensor:
   - platform: template
     name: "Charging Phases"
@@ -250,19 +249,67 @@ text_sensor:
 
           if (!found_b2) {
               ESP_LOGD("${device_name}_generic_data", "B2 map not found in the CBOR data.");
+              if (x.size() == 15) {
+                String value_string;
+                int value;
+                ESP_LOGD("${device_name}_generic_data", "Hex size is 15, parsing old firmware config.");
+                id(${generic_data_id_prefix}_i_max).publish_state(getInt8(x, 0));
+                id(${generic_data_id_prefix}_i_evse_max).publish_state(getInt8(x, 1));
+                value = getInt8(x, 2);
+                switch (value) {
+                    case 0:
+                        value_string = "Eco Private";
+                        break;
+                    case 1:
+                        value_string = "Max Private";
+                        break;
+                    case 4:
+                        value_string = "Eco Open";
+                        break;
+                    case 5:
+                        value_string = "Max Open";
+                        break;
+                    default:
+                        value_string = "unknown";
+                }
+                id(${generic_data_id_prefix}_charge_mode).publish_state(value_string.c_str());
+                id(${generic_data_id_prefix}_i_min).publish_state(getInt8(x, 3));
+                value = (3 & getInt8(x, 4)) >> 1;
+                switch (value) {
+                    case 0:
+                        value_string = "Mono/Tri+N";
+                        break;
+                    case 3:
+                        value_string = "Tri";
+                        break;
+                    default:
+                        value_string = "unknown";
+                }
+                id(${generic_data_id_prefix}_connection_type).publish_state(value_string.c_str());
+                id(g_${generic_data_id_prefix}_week_start) = getTimeString(getShort(x, 5));
+                id(g_${generic_data_id_prefix}_week_end) = getTimeString(getShort(x, 7));
+                id(g_${generic_data_id_prefix}_weekend_start) = getTimeString(getShort(x, 9));
+                id(g_${generic_data_id_prefix}_weekend_end) = getTimeString(getShort(x, 11));
+              }
           }
 
-button:
-  - platform: template
-    name: "Read config"
-    id: read_config_button
-    entity_category: diagnostic
-    on_press:
+script:
+  - id: script_read_config
+    then:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x04, 0x50]
+  - id: script_read_config_old
+    then:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command}
+          value: [0x02, 0x50]
+          
+button:
   - platform: template
     name: "Start Charge Default"
     on_press:
@@ -296,7 +343,7 @@ button:
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x04, 0x00]
   - platform: template
-    name: "Start Charge Stop"
+    name: "Stop Charging"
     on_press:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id

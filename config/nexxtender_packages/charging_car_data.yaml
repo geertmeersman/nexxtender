@@ -125,11 +125,6 @@ text_sensor:
           if (x.empty()) { return; }
           logd_x("${device_name}_charging_car_data", x);
 
-          // Check if we have read the config
-          if (id(g_${generic_data_id_prefix}_config_read_bool) == false) {
-            id(read_config_button).press();
-          }
-
           id(g_${charging_car_id_prefix}_timestamp) = getInt(x, 0);
           id(g_${charging_car_id_prefix}_l1) = getShort(x, 4);
           id(g_${charging_car_id_prefix}_l2) = getShort(x, 6);

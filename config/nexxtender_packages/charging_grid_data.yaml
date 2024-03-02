@@ -107,7 +107,19 @@ text_sensor:
 
           // Check if we have read the config
           if (id(g_${generic_data_id_prefix}_config_read_bool) == false) {
-            id(read_config_button).press();
+            String revision = id(${device_name}_device_information_firmware_revision).state;
+            if (revision[0] != '\0') {
+              if (strcmp(revision.c_str(), "3.65.0") == 0) {
+                ESP_LOGD("nexxtender_firmware_revision", "Newest version %s", revision.c_str());
+                id(script_read_config).execute();
+              } else {
+                ESP_LOGD("nexxtender_firmware_revision", "Old version %s", revision.c_str());
+                id(script_read_config_old).execute();
+              }
+            }
+            else {
+              ESP_LOGD("nexxtender_firmware_revision", "Not yet received");
+            }
           }
 
           id(g_${charging_grid_id_prefix}_timestamp) = getInt(x, 0);

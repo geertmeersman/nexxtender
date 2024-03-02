@@ -72,10 +72,7 @@ text_sensor:
     on_value:
       then:
         lambda: |-
-          if (x.empty()) { 
-          logd_x("${device_name}_charging_advanced_data", "empty Geert");
-            return; 
-            }
+          if (x.empty()) { return; }
           logd_x("${device_name}_charging_advanced_data", x);
 
           id(g_${charging_advanced_id_prefix}_timestamp) = getInt(x, 0);
