@@ -100,8 +100,10 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
    substitutions:
       device_name: nexxtender
       friendly_name: Nexxtender
-      #charging_mode_eco_threshold: "2.5" # <-- uncomment and modify when you want to use a different threshold
+      # charging_mode_eco_threshold: "20" # <-- uncomment and modify when you want to use a different threshold, set to 8 for mono phase (6A + 2 margin), default is 20: (3 * 6A) + 2 margin
    ```
+
+   The substitution `charging_mode_eco_threshold` is optional and you can set it to whatever A you want to be used as threshold for the ECO/MAX sensor. Attention, it does not influence your charger, it is just a way of showing which speed the charger is delivering.
 
 3. **Update the secrets.yaml:**
 

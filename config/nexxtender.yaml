@@ -16,3 +16,4 @@ packages:
 substitutions:
   device_name: nexxtender
   friendly_name: Nexxtender
+  # charging_mode_eco_threshold: "20" # set to 8 for mono phase, default is 20: (3 * 6) + 2
