@@ -32,6 +32,19 @@ sensor:
     lambda: |-
       return id(g_${charging_car_id_prefix}_timestamp);
   - platform: template
+    name: "${charging_car_prefix} Current"
+    id: ${charging_car_id_prefix}_current
+    icon: mdi:current-ac
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+    update_interval: ${charging_car_update_interval}
+    accuracy_decimals: 1
+    filters:
+      - lambda: return x / 10;
+    lambda: |-
+      return id(g_${charging_car_id_prefix}_l1)+id(g_${charging_car_id_prefix}_l2)+id(g_${charging_car_id_prefix}_l3);
+  - platform: template
     name: "${charging_car_prefix} L1"
     id: ${charging_car_id_prefix}_l1
     icon: mdi:home-floor-1

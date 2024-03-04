@@ -100,6 +100,7 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
    substitutions:
       device_name: nexxtender
       friendly_name: Nexxtender
+      #charging_mode_eco_threshold: "2.5" # <-- uncomment and modify when you want to use a different threshold
    ```
 
 3. **Update the secrets.yaml:**
