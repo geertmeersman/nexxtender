@@ -1,6 +1,6 @@
 substitutions:
   ble_uuid_charging_basic_characteristic: ${ble_uuid_prefix}cf
-  charging_basic_prefix: Charging Basic
+  charging_basic_prefix: Charging
   charging_basic_id_prefix: charging_basic
   charging_basic_update_interval: 60s
 
