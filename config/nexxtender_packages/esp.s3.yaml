@@ -1,3 +1,6 @@
+substitutions:
+  rgb_led_brightness: "20%"
+
 esp32:
   board: esp32-s3-devkitc-1
   flash_size: 16MB
@@ -19,13 +22,14 @@ light:
     num_leds: 1
     rmt_channel: 0
     chipset: ws2812
-    name: RGB ${friendly_name}
+    name: ${friendly_name}
     effects:
       - pulse:
           name: Pulse
           transition_length:
             on_length: 2s
             off_length: 500ms
+          max_brightness: ${rgb_led_brightness}
           update_interval: 2.5s          
       - pulse:
           name: Flash
@@ -45,7 +49,7 @@ script:
           red: 0%
           blue: 100%
           green: 0%
-          brightness: 60%
+          brightness: ${rgb_led_brightness}
           effect: Flash
   - id: rgb_green_steady
     then:
@@ -59,7 +63,7 @@ script:
           red: 0%
           blue: 0%
           green: 100%
-          brightness: 60%
+          brightness: ${rgb_led_brightness}
   - id: rgb_blue_steady
     then:
       - globals.set:
@@ -72,7 +76,7 @@ script:
           red: 0%
           blue: 100%
           green: 0%
-          brightness: 60%
+          brightness: ${rgb_led_brightness}
   - id: rgb_green_pulse
     then:
       - globals.set:
@@ -85,7 +89,7 @@ script:
           red: 0%
           blue: 0%
           green: 100%
-          brightness: 60%
+          brightness: ${rgb_led_brightness}
           effect: Pulse
   - id: rgb_blue_pulse
     then:
@@ -99,7 +103,7 @@ script:
           red: 0%
           blue: 100%
           green: 0%
-          brightness: 60%
+          brightness: ${rgb_led_brightness}
           effect: Pulse
   - id: rgb_yellow_pulse
     then:
@@ -113,7 +117,7 @@ script:
           red: 100%
           blue: 0%
           green: 100%
-          brightness: 60%
+          brightness: ${rgb_led_brightness}
           effect: Pulse
   - id: rgb_yellow_steady
     then:
@@ -127,7 +131,7 @@ script:
           red: 100%
           blue: 0%
           green: 100%
-          brightness: 60%
+          brightness: ${rgb_led_brightness}
   - id: rgb_orange_pulse
     then:
       - globals.set:
@@ -140,7 +144,7 @@ script:
           red: 100%
           blue: 0%
           green: 52%
-          brightness: 60%
+          brightness: ${rgb_led_brightness}
           effect: Pulse
   - id: rgb_red_pulse
     then:
@@ -154,7 +158,7 @@ script:
           red: 100%
           blue: 0%
           green: 0%
-          brightness: 60%
+          brightness: ${rgb_led_brightness}
           effect: Pulse
   - id: rgb_red
     then:
@@ -168,7 +172,7 @@ script:
           red: 100%
           blue: 0%
           green: 0%
-          brightness: 60%
+          brightness: ${rgb_led_brightness}
 
 interval:
   - interval: 2s

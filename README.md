@@ -105,8 +105,8 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
       # charging_mode_eco_tri_threshold: "20" # Tri-phase (18A + 2 margin)
    ```
 
-   The charging power mode is estimated based on the number of phases used during the charge.
-   The substitution `charging_mode_eco_threshold` is optional, and you can set it to whatever Amp you want to be used as a threshold for the ECO/MAX sensor.
+   The charging power mode is estimated based on the number of phases used during the charge.  
+   The substitution `charging_mode_eco_threshold` and the others are optional, and you can set it to whatever Amp you want to be used as a threshold for the ECO/MAX sensor.  
    Attention, it does not influence your charger; it is just a way of indicating which speed the charger is delivering.
 
 3. **Update the secrets.yaml:**
@@ -127,7 +127,6 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
    The `nexxtender_mac` is the bluetooth mac address you found in the previous step.
 
    The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender. If you don't have the PIN code (or you have lost it), you can always reach out to me and I can calculate it if you provide me the serial number of the box. Format XXXXX-XX-XXXX-XXXXX-XX
-
 
    The `esphome_admin_password` is the password that is used for the Wi-Fi fallback hotspot and OTA.
 
@@ -189,12 +188,10 @@ The complete configuration file would look like:
          url: https://github.com/geertmeersman/nexxtender
          files:  [config/nexxtender.yaml, config/nexxtender_packages/esp.s3.yaml]
          refresh: 0s
-
    substitutions:
       device_name: nexxtender
       friendly_name: Nexxtender
    ```
-
 
 This flexibility allows users to tailor the configuration to their hardware requirements while still benefiting from the overall structure and functionality provided in the `nexxtender.yaml` file.
 
