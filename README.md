@@ -320,7 +320,7 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
             show_name: true
             show_icon: false
             type: custom:button-card
-            entity: sensor.nexxtender_charging_grid_l1
+            entity: sensor.nexxtender_grid_l1
             show_state: true
             styles:
               card:
@@ -335,7 +335,7 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
             show_name: true
             show_icon: false
             type: custom:button-card
-            entity: sensor.nexxtender_charging_grid_l2
+            entity: sensor.nexxtender_grid_l2
             show_state: true
             styles:
               card:
@@ -350,7 +350,7 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
             show_name: true
             show_icon: false
             type: custom:button-card
-            entity: sensor.nexxtender_charging_grid_l3
+            entity: sensor.nexxtender_grid_l3
             show_state: true
             styles:
               card:
@@ -362,7 +362,7 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
         card_mod:
           style: |
             ha-card {
-              {%- set nexxtender_state = states["sensor.nexxtender_charging_basic_status"].state -%}
+              {%- set nexxtender_state = states["sensor.nexxtender_status"].state -%}
               {% if nexxtender_state == "unplugged" %}
                 {% set image = 'unplugged' %}
               {% elif  nexxtender_state == "plugged" %}
@@ -381,33 +381,33 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
       - type: conditional
         conditions:
           - condition: numeric_state
-            entity: sensor.nexxtender_charging_basic_phase_count
+            entity: sensor.nexxtender_charging_phase_count
             above: 0
         card:
           type: picture-elements
           elements:
             - type: state-icon
-              entity: sensor.nexxtender_charging_basic_energy
+              entity: sensor.nexxtender_energy
               style:
                 top: 25px
                 left: 10%
             - type: state-label
-              entity: sensor.nexxtender_charging_basic_energy
+              entity: sensor.nexxtender_energy
               style:
                 top: 25px
                 left: 30%
             - type: state-label
-              entity: sensor.nexxtender_charging_basic_seconds
+              entity: sensor.nexxtender_charging_seconds
               style:
                 top: 25px
                 left: 50%
             - type: state-label
-              entity: sensor.nexxtender_charging_advanced_car_power
+              entity: sensor.nexxtender_car_power
               style:
                 top: 25px
                 left: 70%
             - type: state-label
-              entity: sensor.nexxtender_charging_basic_phase_count
+              entity: sensor.nexxtender_charging_phase_count
               suffix: ' fases'
               style:
                 top: 25px
@@ -422,7 +422,7 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
       - type: conditional
         conditions:
           - condition: state
-            entity: sensor.nexxtender_charging_basic_status
+            entity: sensor.nexxtender_status
             state: plugged
         card:
           type: horizontal-stack
@@ -458,7 +458,7 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
       - type: conditional
         conditions:
           - condition: state
-            entity: sensor.nexxtender_charging_basic_status
+            entity: sensor.nexxtender_status
             state: charging
         card:
           show_name: true
@@ -477,16 +477,16 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
       - type: conditional
         conditions:
           - condition: state
-            entity: sensor.nexxtender_charging_basic_status
+            entity: sensor.nexxtender_status
             state: unplugged
         card:
           type: markdown
           content: <center>Sluit de kabel aan om te kunnen starten met laden</center>
       - type: history-graph
         entities:
-          - entity: sensor.nexxtender_charging_grid_l1
-          - entity: sensor.nexxtender_charging_grid_l2
-          - entity: sensor.nexxtender_charging_grid_l3
+          - entity: sensor.nexxtender_grid_l1
+          - entity: sensor.nexxtender_grid_l2
+          - entity: sensor.nexxtender_grid_l3
         logarithmic_scale: false
 
    ```
