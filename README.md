@@ -96,14 +96,18 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
          url: https://github.com/geertmeersman/nexxtender
          file: config/nexxtender.yaml
          refresh: 0s
-  
    substitutions:
       device_name: nexxtender
       friendly_name: Nexxtender
-      # charging_mode_eco_threshold: "20" # <-- uncomment and modify when you want to use a different threshold, set to 8 for mono phase (6A + 2 margin), default is 20: (3 * 6A) + 2 margin
+      ## Uncomment and modify when you want to use a different threshold.
+      # charging_mode_eco_threshold: "8"      # Single phase (6A + 2 margin)
+      # charging_mode_eco_bi_threshold: "14"  # Bi-phase (12A + 2 margin)
+      # charging_mode_eco_tri_threshold: "20" # Tri-phase (18A + 2 margin)
    ```
 
-   The substitution `charging_mode_eco_threshold` is optional and you can set it to whatever A you want to be used as threshold for the ECO/MAX sensor. Attention, it does not influence your charger, it is just a way of showing which speed the charger is delivering.
+   The charging power mode is estimated based on the number of phases used during the charge.
+   The substitution `charging_mode_eco_threshold` is optional, and you can set it to whatever Amp you want to be used as a threshold for the ECO/MAX sensor.
+   Attention, it does not influence your charger; it is just a way of indicating which speed the charger is delivering.
 
 3. **Update the secrets.yaml:**
 
@@ -125,7 +129,7 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
    The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender. If you don't have the PIN code (or you have lost it), you can always reach out to me and I can calculate it if you provide me the serial number of the box. Format XXXXX-XX-XXXX-XXXXX-XX
 
 
-   The `esphome_admin_password` is the password that is used for the wifi fallback hotspot and OTA.
+   The `esphome_admin_password` is the password that is used for the Wi-Fi fallback hotspot and OTA.
 
    If you don't know how to define the `esphome_api_key`, you can obtain one as described [here](https://esphome.io/components/api.html) in the section Configuration variables > encryption > key.
 
@@ -141,9 +145,9 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
    esphome upload nexxtender.yaml
    ```
 
-   Note: If you’re just seeing Connecting....____.... on the screen and the flashing fails, please double check the UART wires are connected correctly if flashing using a USB to UART bridge.
+   Note: If you’re just seeing Connecting....____.... on the screen and the flashing fails, please double-check the UART wires are connected correctly if flashing using a USB to UART bridge.
 
-   For some devices you need to keep pressing the BOOT button until flashing has begun (ie. Geekcreit DOIT ESP32 DEVKIT V1).
+   For some devices you need to keep pressing the BOOT button until flashing has begun (i.e. Geekcreit DOIT ESP32 DEVKIT V1).
 
    [Consult the FAQ part on esphome.io](https://esphome.io/guides/faq.html).
 
@@ -175,7 +179,7 @@ esphome:
     board_build.flash_mode: dio  
 ```
 
-For this specific board, I have created a specific yaml that manages the RGB Led that is integrated on the board.
+For this specific board, I have created a specific yaml that manages the RGB LED that is integrated on the board.
 
 The complete configuration file would look like:
 
