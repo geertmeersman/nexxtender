@@ -1,6 +1,6 @@
 substitutions:
   ble_uuid_grid_characteristic: ${ble_uuid_prefix}d0
-  charging_grid_prefix: Charging Grid
+  charging_grid_prefix: Grid
   charging_grid_id_prefix: charging_grid
   charging_grid_update_interval: 60s
 

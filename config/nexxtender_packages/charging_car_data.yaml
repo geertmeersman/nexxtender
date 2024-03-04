@@ -1,6 +1,6 @@
 substitutions:
   ble_uuid_charging_car_characteristic: ${ble_uuid_prefix}da
-  charging_car_prefix: Charging Car
+  charging_car_prefix: Car
   charging_car_id_prefix: charging_car
   charging_car_update_interval: 60s
 

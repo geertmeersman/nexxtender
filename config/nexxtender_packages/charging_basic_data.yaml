@@ -31,7 +31,7 @@ sensor:
     lambda: |-
       return id(g_${charging_basic_id_prefix}_seconds);
   - platform: template
-    name: "${charging_basic_prefix} Energy"
+    name: "Energy"
     id: ${charging_basic_id_prefix}_energy
     icon: mdi:flash
     device_class: energy
@@ -44,7 +44,7 @@ sensor:
     lambda: |-
       return id(g_${charging_basic_id_prefix}_energy);
   - platform: template
-    name: "${charging_basic_prefix} Phase Count"
+    name: "Charging Phase Count"
     id: ${charging_basic_id_prefix}_phase_count
     icon: mdi:counter
     state_class: measurement
@@ -55,14 +55,14 @@ sensor:
 
 text_sensor:
   - platform: template
-    name: "${charging_basic_prefix} Discriminator"
+    name: "Discriminator"
     id: ${charging_basic_id_prefix}_discriminator
     icon: mdi:battery-charging-100
     update_interval: ${charging_basic_update_interval}
     lambda: |-
       return id(g_${charging_basic_id_prefix}_discriminator);
   - platform: template
-    name: "${charging_basic_prefix} Status"
+    name: "Status"
     id: ${charging_basic_id_prefix}_status
     icon: mdi:ev-station
     update_interval: ${charging_basic_update_interval}

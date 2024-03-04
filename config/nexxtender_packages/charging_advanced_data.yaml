@@ -37,7 +37,7 @@ sensor:
     lambda: |-
       return id(g_${charging_advanced_id_prefix}_i_available);
   - platform: template
-    name: "${charging_advanced_prefix} Grid Power"
+    name: "Grid Power"
     id: ${charging_advanced_id_prefix}_grid_power
     icon: mdi:sigma
     device_class: power
@@ -48,7 +48,7 @@ sensor:
     lambda: |-
       return id(g_${charging_advanced_id_prefix}_grid_power);
   - platform: template
-    name: "${charging_advanced_prefix} Car Power"
+    name: "Car Power"
     id: ${charging_advanced_id_prefix}_car_power
     icon: mdi:sigma
     device_class: power
