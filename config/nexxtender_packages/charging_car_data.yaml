@@ -9,22 +9,22 @@ globals:
     type: int
   - id: g_${charging_car_id_prefix}_l1
     type: int
-    initital_value: '0'
+    initial_value: '0'
   - id: g_${charging_car_id_prefix}_l2
     type: int
-    initital_value: '0'
+    initial_value: '0'
   - id: g_${charging_car_id_prefix}_l3
     type: int
-    initital_value: '0'
+    initial_value: '0'
   - id: g_${charging_car_id_prefix}_p1
     type: int
-    initital_value: '0'
+    initial_value: '0'
   - id: g_${charging_car_id_prefix}_p2
     type: int
-    initital_value: '0'
+    initial_value: '0'
   - id: g_${charging_car_id_prefix}_p3
     type: int
-    initital_value: '0'
+    initial_value: '0'
 
 sensor:
   - platform: template

@@ -69,7 +69,7 @@ text_sensor:
     icon: mdi:speedometer
     update_interval: ${charging_advanced_update_interval}
     lambda: |-
-      int power = id(${charging_car_id_prefix}_current);
+      int power = id(${charging_car_id_prefix}_current)->state;
       if (power == 0) { return std::string("Not charging"); }
       if (power < $charging_mode_eco_threshold) {return std::string("Eco");}
       return std::string("Max");
