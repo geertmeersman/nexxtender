@@ -11,7 +11,7 @@ on:
       - main
     paths:
       - 'config/**'  # Trigger only if there are changes in config folder or its subfolders
-    workflow_dispatch: 
+  workflow_dispatch:
   schedule:
     - cron: "0 0 * * *"
 
