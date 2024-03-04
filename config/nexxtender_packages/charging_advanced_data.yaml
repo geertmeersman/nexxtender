@@ -3,7 +3,7 @@ substitutions:
   charging_advanced_prefix: Charging Advanced
   charging_advanced_id_prefix: charging_advanced
   charging_advanced_update_interval: 60s
-  charging_mode_eco_threshold: "20" # 3 * 6A (+2 as a margin)
+  # charging_mode_eco_threshold: "20" # 3 * 6A (+2 as a margin)
 
 globals:
   - id: g_${charging_advanced_id_prefix}_timestamp
@@ -71,7 +71,15 @@ text_sensor:
     lambda: |-
       int power = id(${charging_car_id_prefix}_current)->state;
       if (power == 0) { return std::string("Not charging"); }
-      if (power < $charging_mode_eco_threshold) {return std::string("Eco");}
+      
+      int mode_eco_threshold = 0;      
+      int phase_count = id(${charging_basic_id_prefix}_phase_count)->state;
+      
+      if (phase_count == 1) { mode_eco_threshold = 8; } // Mono-Phase
+      if (phase_count == 3) { mode_eco_threshold = 20; } // Three-Phase
+      
+      if (power < mode_eco_threshold) { return std::string("Eco"); }
+      
       return std::string("Max");
   - platform: ble_client
     id: ${device_name}_charging_advanced_data
