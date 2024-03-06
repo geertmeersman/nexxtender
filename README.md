@@ -367,11 +367,11 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
           style: |
             ha-card {
               {%- set nexxtender_state = states["sensor.nexxtender_status"].state -%}
-              {% if nexxtender_state == "unplugged" %}
+              {% if nexxtender_state == "Unplugged" %}
                 {% set image = 'unplugged' %}
-              {% elif  nexxtender_state == "plugged" %}
+              {% elif  nexxtender_state == "Plugged" %}
                 {% set image = 'plugged' %}
-              {% elif  nexxtender_state == "charging" %}
+              {% elif  nexxtender_state == "Charging" %}
                 {% set image = 'charging' %}
               {% else %}
                 {% set image = 'offline' %}
@@ -427,7 +427,7 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
         conditions:
           - condition: state
             entity: sensor.nexxtender_status
-            state: plugged
+            state: Plugged
         card:
           type: horizontal-stack
           cards:
@@ -463,7 +463,7 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
         conditions:
           - condition: state
             entity: sensor.nexxtender_status
-            state: charging
+            state: Charging
         card:
           show_name: true
           show_icon: false
@@ -482,7 +482,7 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
         conditions:
           - condition: state
             entity: sensor.nexxtender_status
-            state: unplugged
+            state: Unplugged
         card:
           type: markdown
           content: <center>Sluit de kabel aan om te kunnen starten met laden</center>
