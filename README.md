@@ -471,7 +471,7 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
           icon: mdi:stop
           tap_action:
             action: toggle
-          entity: button.nexxtender_start_charge_stop
+          entity: button.nexxtender_stop_charging
           name: Stop met laden
           styles:
             card:
