@@ -91,36 +91,36 @@ text_sensor:
           // Publish the discriminator state
           switch (getByte(x, 2)) {
               case 1:
-                  value_string = "started";
+                  value_string = "Started";
                   break;
               case 2:
-                  value_string = "charging";
+                  value_string = "Charging";
                   break;
               case 3:
-                  value_string = "stopped";
+                  value_string = "Stopped";
                   break;
               default:
-                  value_string = "unknown";
+                  value_string = "Unknown";
           }
           id(g_${charging_basic_id_prefix}_discriminator) = value_string.c_str();;
           id(${charging_basic_id_prefix}_discriminator).publish_state(value_string.c_str());
 
           switch (static_cast<char>(getByte(x, 3))) {
               case 'B':
-                  value_string = "plugged";
+                  value_string = "Plugged";
                   value = 1;
                   break;
               case 'C':
               case 'D':
-                  value_string = "charging";
+                  value_string = "Charging";
                   value = 2;
                   break;
               case 'E':
-                  value_string = "fault";
+                  value_string = "Fault";
                   value = 3;
                   break;
               default:
-                  value_string = "unplugged";
+                  value_string = "Unplugged";
                   value = 4;
                   break;
           }
