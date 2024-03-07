@@ -4,7 +4,6 @@ substitutions:
   ble_uuid_device_information_serial_number: 2a25
   ble_uuid_device_information_firmware_revision: 2a26
   ble_uuid_device_information_hardware_revision: 2a27
-  device_information_prefix: Device Information
   device_information_id_prefix: device_information
   device_information_update_interval: 60s
 
