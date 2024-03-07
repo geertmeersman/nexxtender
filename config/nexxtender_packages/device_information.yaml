@@ -10,7 +10,7 @@ substitutions:
 
 text_sensor:
   - platform: ble_client
-    id: ${device_name}_device_information_model_number
+    id: ${device_information_id_prefix}_model_number
     disabled_by_default: true
     name: "Model Number"
     icon: mdi:numeric
@@ -24,9 +24,9 @@ text_sensor:
       then:
         lambda: |-
           if (x.empty()) { return; }
-          logd_s("${device_name}_device_information_model_number", x);
+          logd_s("${device_information_id_prefix}_model_number", x);
   - platform: ble_client
-    id: ${device_name}_device_information_serial_number
+    id: ${device_information_id_prefix}_serial_number
     disabled_by_default: true
     name: "Serial Number"
     icon: mdi:numeric
@@ -40,9 +40,9 @@ text_sensor:
       then:
         lambda: |-
           if (x.empty()) { return; }
-          logd_s("${device_name}_device_information_serial_number", x);
+          logd_s("${device_information_id_prefix}_serial_number", x);
   - platform: ble_client
-    id: ${device_name}_device_information_firmware_revision
+    id: ${device_information_id_prefix}_firmware_revision
     name: "Firmware Revision"
     icon: mdi:file-certificate
     entity_category: diagnostic
@@ -55,9 +55,9 @@ text_sensor:
       then:
         lambda: |-
           if (x.empty()) { return; }
-          logd_s("${device_name}_device_information_firmware_revision", x);
+          logd_s("${device_information_id_prefix}_firmware_revision", x);
   - platform: ble_client
-    id: ${device_name}_device_information_hardware_revision
+    id: ${device_information_id_prefix}_hardware_revision
     disabled_by_default: true
     name: "Hardware Revision"
     icon: mdi:file-certificate
@@ -71,4 +71,4 @@ text_sensor:
       then:
         lambda: |-
           if (x.empty()) { return; }
-          logd_s("${device_name}_device_information_hardware_revision", x);
+          logd_s("${device_information_id_prefix}_hardware_revision", x);
