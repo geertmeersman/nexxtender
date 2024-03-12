@@ -239,7 +239,8 @@ script:
             ESP_LOGD("${device_name}_generic_data script_write_config", "Checksum CRC16 Failed");
             return;
           }
-          x[1] = id(g_${generic_data_id_prefix}_i_evse_max);
+          int rounded_i_evse_max = static_cast<int>(id(g_${generic_data_id_prefix}_i_evse_max));  // Round down to nearest integer
+          x[1] = rounded_i_evse_max;
           x[2] = id(g_${generic_data_id_prefix}_charge_mode);
           add_crc_to_data(x, x.size());
           logd_x("${device_name}_generic_data script_write_config|Recalculated config before writing to BLE", x);
