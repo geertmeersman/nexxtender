@@ -12,6 +12,7 @@ packages:
   charging_advanced_data: !include nexxtender_packages/charging_advanced_data.yaml
   #transactions: !include nexxtender_packages/transactions.yaml
   #diagnostics: !include nexxtender_packages/diagnostics.yaml
+  #dev_debug: !include nexxtender_packages/dev_debug.yaml
   
 substitutions:
   device_name: nexxtender
