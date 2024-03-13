@@ -50,6 +50,12 @@ binary_sensor:
     icon: mdi:check-network-outline
     entity_category: diagnostic
 
+button:
+  - platform: restart
+    name: "Restart Nexxtender ESP"
+    icon: "mdi:restart"
+    entity_category: diagnostic
+
 switch:
   - platform: ble_client
     ble_client_id: ${device_name}_ble_client_id

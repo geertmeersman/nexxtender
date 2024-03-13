@@ -24,11 +24,6 @@ binary_sensor:
 ## switches
 ## ---------------------------------------------------
 switch:
-  - platform: restart
-    id: restart_device
-    name: Restart
-    entity_category: diagnostic
-    disabled_by_default: true
   - platform: template
     name: Reset boot counter
     turn_on_action:
