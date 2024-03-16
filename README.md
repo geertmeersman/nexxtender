@@ -225,9 +225,9 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
 
    [![Import the blueprint.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fgeertmeersman%2Fnexxtender%2Fblob%2Fmain%2Fblueprints%2Fnexxtender_car_zone.yaml)
 
-   ![blueprint](images/blueprint.png) 
+   ![blueprint](images/blueprint.png)
 
-9.  **Lovelace dashboard card**:
+9. **Lovelace dashboard card**:
 
    ![lovelace-card](images/lovelace_start.png)
    ![lovelace-card](images/lovelace_stop.png)
