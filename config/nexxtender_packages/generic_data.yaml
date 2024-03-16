@@ -26,6 +26,7 @@ globals:
     initial_value: ''
   - id: g_${generic_data_id_prefix}_i_evse_max
     type: float
+    initial_value: '0'
   - id: g_${generic_data_id_prefix}_charge_mode
     type: int
     initial_value: '6'
@@ -521,8 +522,12 @@ number:
             std::string config = id(g_${generic_data_id_prefix}_config);
             if (config.empty()) { return; }
             float value = static_cast<float>(x);
-            ESP_LOGD("NUMBER RECEIVED", "%f", value);
-            if (id(g_${generic_data_id_prefix}_i_evse_max) != value) {
+            ESP_LOGD("Maximum car charging speed", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
+            if (id(g_${generic_data_id_prefix}_i_evse_max) == 0) {
+              ESP_LOGD("Setting Maximum car charging speed", "%f A", value);
+              id(g_${generic_data_id_prefix}_i_evse_max) = value;
+            } else if (id(g_${generic_data_id_prefix}_i_evse_max) != value) {
+              ESP_LOGD("Setting Maximum car charging speed and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
               id(g_${generic_data_id_prefix}_i_evse_max) = value;
               id(script_send_config_old).execute();
             }
@@ -544,7 +549,6 @@ select:
         - lambda: |-
             std::string config = id(g_${generic_data_id_prefix}_config);
             if (config.empty()) { return; }
-            ESP_LOGD("CHARGE MODE RECEIVED", "%s (%d)", x.c_str(), i);
             int value_int = 6;
             switch (i) {
                 case 0: //"Eco Private"
@@ -562,7 +566,12 @@ select:
                 default:
                     break;
             }
-            if (value_int != 6 && id(g_${generic_data_id_prefix}_charge_mode) != value_int) {
+            ESP_LOGD("Car charge mode", "Received %s (%d), previous: %d", x.c_str(), value_int, id(g_${generic_data_id_prefix}_charge_mode));
+            if (id(g_${generic_data_id_prefix}_charge_mode) == 6) {
+              ESP_LOGD("Setting global car charge mode", "%s (%d)", x.c_str(), i);
+              id(g_${generic_data_id_prefix}_charge_mode) = value_int;
+            } else if (value_int != 6 && id(g_${generic_data_id_prefix}_charge_mode) != value_int) {
+              ESP_LOGD("Setting car charge mode and sending config", "Received %s (%d), previous: %d", x.c_str(), i, id(g_${generic_data_id_prefix}_charge_mode));
               id(g_${generic_data_id_prefix}_charge_mode) = value_int;
               id(script_send_config_old).execute();
             }
