@@ -5,7 +5,7 @@ substitutions:
   generic_data_prefix: Generic Data
   generic_data_id_prefix: generic_data
   generic_data_update_interval: 60s
-  slider_max_car_charging_speed: 32
+  slider_max_car_charging_speed: "32"
 
 globals:
   - id: g_${generic_data_id_prefix}_config_init

@@ -20,4 +20,4 @@ substitutions:
   # charging_mode_eco_mono_threshold: "8"
   # charging_mode_eco_bi_threshold: "14"
   # charging_mode_eco_tri_threshold: "20"
-  # slider_max_car_charging_speed: 32
+  # slider_max_car_charging_speed: "32"
