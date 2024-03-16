@@ -247,14 +247,14 @@ script:
           add_crc_to_data(x, x.size());
           logd_x("${device_name}_generic_data script_write_config|Recalculated config before writing to BLE", x);
           id(g_${generic_data_id_prefix}_config) = x;
-      #- ble_client.ble_write:
-          #id: ${device_name}_ble_client_id
-          #service_uuid: ${ble_uuid_receive_service}
-          #characteristic_uuid: ${ble_uuid_generic_data}
-          #value: !lambda |-
-            #std::string x = id(g_${generic_data_id_prefix}_config);
-            #std::vector<uint8_t> config_data(x.begin(), x.end());
-            #return config_data;
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_data}
+          value: !lambda |-
+            std::string x = id(g_${generic_data_id_prefix}_config);
+            std::vector<uint8_t> config_data(x.begin(), x.end());
+            return config_data;
 
   - id: script_read_generic_data
     then:
