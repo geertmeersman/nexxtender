@@ -5,6 +5,7 @@ substitutions:
   generic_data_prefix: Generic Data
   generic_data_id_prefix: generic_data
   generic_data_update_interval: 60s
+  slider_max_car_charging_speed: "32"
 
 globals:
   - id: g_${generic_data_id_prefix}_config_init
@@ -514,7 +515,7 @@ number:
     optimistic: true
     device_class: current
     step: 1
-    max_value: 32
+    max_value: ${slider_max_car_charging_speed}
     min_value: 6
     mode: box
     entity_category: "config"
