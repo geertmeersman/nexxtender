@@ -218,7 +218,16 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
 
 7. **Updates and Maintenance**: Keep your ESPHome devices up to date by regularly checking for firmware updates and configuring automatic OTA updates if desired.
 
-8. **Lovelace dashboard card**:
+8. **Blueprint for zone automation**:
+   Automate the switching of Nexxtender mode based on car entry or exit from a specified zone.
+
+   This blueprint allows you to configure the device tracker for your car, the Nexxtender mode sensor, the mode selector, the zone where the Nexxtender is located, the desired Nexxtender mode, and the trigger event for zone entry or exit.
+
+   [![Import the blueprint.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fgeertmeersman%2Fnexxtender%2Fblob%2Fmain%2Fblueprints%2Fnexxtender_car_zone.yaml)
+
+   ![blueprint](images/blueprint.png) 
+
+9.  **Lovelace dashboard card**:
 
    ![lovelace-card](images/lovelace_start.png)
    ![lovelace-card](images/lovelace_stop.png)

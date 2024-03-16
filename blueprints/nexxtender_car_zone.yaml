@@ -1,0 +1,72 @@
+blueprint:
+  name: Nexxtender - Car leaving/entering zone
+  description: Switch Nexxtender mode when coming home.
+  domain: automation
+  input:
+    device_tracker_entity:
+      name: Device Tracker Entity
+      description: "The entity ID of the car's device tracker."
+      selector:
+        entity:
+          domain: device_tracker
+    nexxtender_mode_sensor:
+      name: Nexxtender Mode Sensor
+      description: |
+        The entity representing the current mode of the Nexxtender.
+        By default, it is `sensor.nexxtender_mode`.
+      selector:
+        entity:
+          domain: sensor
+          integration: esphome  # Filter entities from ESPHome integration
+    nexxtender_mode_selector:
+      name: Nexxtender Mode Selector
+      description: |
+        The entity used to control the Nexxtender mode.
+        By default, it is `select.nexxtender_mode`.
+      selector:
+        entity:
+          domain: select
+          integration: esphome  # Filter entities from ESPHome integration
+    nexxtender_zone:
+      name: Nexxtender Zone
+      description: "The zone representing the area where the Nexxtender is located."
+      selector:
+        entity:
+          domain: zone
+    target_mode:
+      name: Target Nexxtender Mode
+      description: "The desired mode to set the Nexxtender to when triggered."
+      selector:
+        select:
+          options:
+            - Eco Private
+            - Max Private
+            - Eco Open
+            - Max Open
+    nexxtender_zone_event:
+      name: Nexxtender Zone Event
+      description: "Determines whether the automation triggers when entering or leaving the Nexxtender zone."
+      default: enter
+      selector:
+        select:
+          options:
+            - enter
+            - leave
+
+trigger:
+  platform: zone
+  entity_id: !input device_tracker_entity
+  zone: !input nexxtender_zone
+  event: !input nexxtender_zone_event
+
+condition:
+  - condition: state
+    entity_id: !input nexxtender_mode_sensor
+    state: Max Private
+
+action:
+  - service: select.select_option
+    target:
+      entity_id: !input nexxtender_mode_selector
+    data:
+      option: !input target_mode
