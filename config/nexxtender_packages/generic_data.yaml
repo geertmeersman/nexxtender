@@ -118,6 +118,7 @@ text_sensor:
     id: ${device_name}_generic_status
     icon: mdi:information-box
     update_interval: ${generic_data_update_interval}
+    entity_category: diagnostic    
   - platform: ble_client
     id: ${device_name}_generic_status_internal
     name: Generic Internal Status
