@@ -59,6 +59,13 @@ trigger:
   zone: !input nexxtender_zone
   event: !input nexxtender_zone_event
 
+condition:
+  condition: not
+  conditions:
+    - condition: state
+      entity_id: !input nexxtender_mode_sensor
+      state: !input target_mode
+
 action:
   - service: select.select_option
     target:
