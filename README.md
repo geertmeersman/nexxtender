@@ -114,7 +114,7 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
    - The charging power mode is estimated based on the number of phases used during the charge.  
    - The substitution `charging_mode_eco_threshold` and the others are optional, and you can set it to whatever Amp you want to be used as a threshold for the ECO/MAX sensor. Default values are the ones set in the example.  
    Attention, it does not influence your charger; it is just a way of indicating which speed the charger is delivering.  
-   - The substitution `slider_max_car_charging_speed` lets you override the maximum value for the configuration slider of the maximum car charging speed. This is usually set to the value of the circuit breaker A. Default value is the ones set in the example.  
+   - The substitution `slider_max_car_charging_speed` lets you override the maximum value for the configuration slider of the maximum car charging speed. This is usually set to the value of the circuit breaker A. Default value is the one set in the example.  
 
 3. **Update the secrets.yaml:**
 
