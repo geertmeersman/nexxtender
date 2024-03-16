@@ -60,9 +60,11 @@ trigger:
   event: !input nexxtender_zone_event
 
 condition:
-  - condition: state
-    entity_id: !input nexxtender_mode_sensor
-    state: Max Private
+  condition: not
+  conditions:
+    - condition: state
+      entity_id: !input nexxtender_mode_sensor
+      state: !input target_mode
 
 action:
   - service: select.select_option
