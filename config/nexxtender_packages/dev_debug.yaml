@@ -1,0 +1,62 @@
+button:
+  - platform: template
+    entity_category: "config"
+    name: "Send dummy break"
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command}
+          value: [0x07, 0x50]
+      - delay: 2s
+      - lambda: |-
+          ESP_LOGD("${device_name}_dummy_break", "Status is: 0x%x", id(g_${generic_data_id_prefix}_status));
+  - platform: template
+    entity_category: "config"
+    name: "Read CONFIG"
+    on_press:
+      - script.execute: script_read_config
+      - delay: 2s
+      - lambda: |-
+          if (id(g_${generic_data_id_prefix}_status) == 0x5006) {
+            ESP_LOGD("${device_name}_CBOR_config", "Status is OK, let's read!: 0x%x", id(g_${generic_data_id_prefix}_status));
+          } else {
+            ESP_LOGD("${device_name}_CBOR_config", "Status is NOK, let's read old config!: 0x%x", id(g_${generic_data_id_prefix}_status));
+            id(script_read_config_old).execute();
+          }
+  - platform: template
+    entity_category: "config"
+    name: "Config sending command get"
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command}
+          value: [0x02, 0x50]
+  - platform: template
+    entity_category: "config"
+    name: "Config sending command set" #Klaarzetten om config te sturen, als status dan 5001 geeft => GO
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command}
+          value: [0x01, 0x50]
+  - platform: template
+    entity_category: "config"
+    name: "Metric next"
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command}
+          value: [0x01, 0x20]
+  - platform: template
+    entity_category: "config"
+    name: "Metric update"
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command}
+          value: [0x02, 0x20]

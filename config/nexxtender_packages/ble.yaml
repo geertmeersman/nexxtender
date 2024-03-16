@@ -21,6 +21,7 @@ ble_client:
             ESP_LOGD("ble_client_lambda", "Connected to BLE device");
             id(${device_name}_ble_client_id)->pair();
             id(ble_client_connectivity).publish_state(true);
+            id(g_${generic_data_id_prefix}_config_init) = false;
         - esp32_ble_tracker.stop_scan:
     on_disconnect:
       then:
@@ -47,6 +48,12 @@ binary_sensor:
     publish_initial_state: true
     device_class: connectivity
     icon: mdi:check-network-outline
+    entity_category: diagnostic
+
+button:
+  - platform: restart
+    name: "Restart Nexxtender ESP"
+    icon: "mdi:restart"
     entity_category: diagnostic
 
 switch:

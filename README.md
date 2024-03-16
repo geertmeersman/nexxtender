@@ -19,7 +19,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 
 - **Real-time Monitoring:** Retrieve real-time data from the Nexxtender charger, including charging status, voltage, current, and power consumption.
 
-- **Remote Control:** Control the Nexxtender charger remotely from your ESPHome device, enabling features such as starting, stopping, and scheduling charging sessions.
+- **Remote Control:** Control the Nexxtender charger remotely from your ESPHome device, enabling features such as starting, stopping, change charge mode, set the charger to Open/Private, set the maximum car charging speed and scheduling charging sessions.
 
 - **Home Assistant Integration:** Seamlessly integrate the ESPHome BLE client with Home Assistant, allowing you to monitor and control the Nexxtender charger through the Home Assistant interface.
 
@@ -27,21 +27,25 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 
 ### Lovelace card
 
-![lovelace-card](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/lovelace_start.png)
-![lovelace-card](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/lovelace_stop.png)
+![lovelace-card](images/lovelace_start.png)
+![lovelace-card](images/lovelace_stop.png)
+
+### Change charger config
+
+![config](images/change_config.png)
 
 ### Controls
 
-![bediening](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/bediening.png)
+![bediening](images/bediening.png)
 
 ### Sensors
 
-![sensors_1](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/sensors_1.png)
-![sensors_2](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/sensors_2.png)
+![sensors_1](images/sensors_1.png)
+![sensors_2](images/sensors_2.png)
 
 ### Diagnostics
 
-![diagnose](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/diagnose.png)
+![diagnose](images/diagnose.png)
 
 ## Table of contents
 
@@ -49,6 +53,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
   - [Features](#features)
   - [Screenshots](#screenshots)
     - [Lovelace card](#lovelace-card)
+    - [Change charger config](#change-charger-config)
     - [Controls](#controls)
     - [Sensors](#sensors)
     - [Diagnostics](#diagnostics)
@@ -215,8 +220,8 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
 
 8. **Lovelace dashboard card**:
 
-   ![lovelace-card](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/lovelace_start.png)
-   ![lovelace-card](https://raw.githubusercontent.com/geertmeersman/nexxtender/main/images/lovelace_stop.png)
+   ![lovelace-card](images/lovelace_start.png)
+   ![lovelace-card](images/lovelace_stop.png)
 
    <details><summary>Show markdown code</summary>
 
