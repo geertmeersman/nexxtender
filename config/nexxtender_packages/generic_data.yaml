@@ -525,7 +525,7 @@ number:
     step: 1
     max_value: ${slider_max_car_charging_speed}
     min_value: 6
-    mode: box
+    mode: slider
     entity_category: "config"
     set_action:
         - lambda: |-
@@ -552,7 +552,7 @@ number:
     step: 1
     max_value: ${slider_max_available_capacity}
     min_value: 6
-    mode: box
+    mode: slider
     entity_category: "config"
     set_action:
         - lambda: |-
