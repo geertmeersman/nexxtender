@@ -102,19 +102,22 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
          file: config/nexxtender.yaml
          refresh: 0s
    substitutions:
-      device_name: nexxtender
-      friendly_name: Nexxtender
+      ## Uncomment and modify when you want to use a different device name.
+      # device_name: nexxtender
+      # friendly_name: Nexxtender
       ## Uncomment and modify when you want to use a different threshold.
       # charging_mode_eco_threshold: "8"      # Single phase (6A + 2 margin)
       # charging_mode_eco_bi_threshold: "14"  # Bi-phase (12A + 2 margin)
       # charging_mode_eco_tri_threshold: "20" # Tri-phase (18A + 2 margin)
       # slider_max_car_charging_speed: "32"     # The max value of the slider for the maximum car charging speed slider
+      # slider_max_available_capacity: "40"     # The max value of the slider for the maximum available capacity slider
    ```
 
    - The charging power mode is estimated based on the number of phases used during the charge.  
    - The substitution `charging_mode_eco_threshold` and the others are optional, and you can set it to whatever Amp you want to be used as a threshold for the ECO/MAX sensor. Default values are the ones set in the example.  
    Attention, it does not influence your charger; it is just a way of indicating which speed the charger is delivering.  
    - The substitution `slider_max_car_charging_speed` lets you override the maximum value for the configuration slider of the maximum car charging speed. This is usually set to the value of the circuit breaker A. Default value is the ones set in the example.  
+   - The substitution `slider_max_available_capacity` lets you override the maximum value for the configuration slider of the maximum available capacity of the grid. This is usually set to the value of the circuit breaker A. Default value is the ones set in the example.  
 
 3. **Update the secrets.yaml:**
 
