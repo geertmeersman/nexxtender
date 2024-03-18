@@ -1,3 +1,7 @@
+substitutions:
+  device_name: nexxtender
+  friendly_name: Nexxtender
+
 esp32:
   board: az-delivery-devkit-v4
   framework:

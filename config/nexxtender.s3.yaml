@@ -13,7 +13,12 @@ packages:
   charging_advanced_data: !include nexxtender_packages/charging_advanced_data.yaml
   #transactions: !include nexxtender_packages/transactions.yaml
   #diagnostics: !include nexxtender_packages/diagnostics.yaml
-  
+
 substitutions:
-  device_name: nexxtender
-  friendly_name: Nexxtender
+  # device_name: nexxtender
+  # friendly_name: Nexxtender
+  # charging_mode_eco_mono_threshold: "8"
+  # charging_mode_eco_bi_threshold: "14"
+  # charging_mode_eco_tri_threshold: "20"
+  # slider_max_car_charging_speed: "32"
+  # slider_max_available_capacity: "40"
