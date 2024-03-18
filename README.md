@@ -109,8 +109,8 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
       # charging_mode_eco_threshold: "8"      # Single phase (6A + 2 margin)
       # charging_mode_eco_bi_threshold: "14"  # Bi-phase (12A + 2 margin)
       # charging_mode_eco_tri_threshold: "20" # Tri-phase (18A + 2 margin)
-      # slider_max_car_charging_speed: "32"     # The max value of the slider for the maximum car charging speed slider
-      # slider_max_available_capacity: "40"     # The max value of the slider for the maximum available capacity slider
+      # slider_max_car_charging_speed: "32"     # The max value of the slider for the maximum car charging speed slider, default set to 32
+      # slider_max_available_capacity: "40"     # The max value of the slider for the maximum available capacity slider, default set to 40
    ```
 
    - The charging power mode is estimated based on the number of phases used during the charge.  
