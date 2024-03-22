@@ -200,6 +200,33 @@ text_sensor:
     notify: true
 
 script:
+  - id: switch_charger_mode
+    then:
+      - lambda: |-
+          if (id(g_${generic_data_id_prefix}_charge_mode) != 6) {
+            auto select_call = id(select_mode).make_call();
+            int value = id(g_${generic_data_id_prefix}_charge_mode);
+            String value_string;
+            switch (value) {
+                case 0:
+                    value_string = "Eco Open";
+                    break;
+                case 1:
+                    value_string = "Max Open";
+                    break;
+                case 4:
+                    value_string = "Eco Private";
+                    break;
+                case 5:
+                    value_string = "Max Private";
+                    break;
+                default:
+                    value_string = "unknown";
+            }
+            ESP_LOGD("script.switch_charger_mode", "Switching to status: %s", value_string.c_str());
+            select_call.set_option(value_string.c_str());
+            select_call.perform();              
+          }
   - id: script_read_config
     then:
       - ble_client.ble_write:
@@ -473,6 +500,13 @@ script:
 
 button:
   - platform: template
+    name: Toggle charger mode
+    icon: mdi:home-switch-outline
+    on_press:
+      then:
+        - lambda: |-
+            id(switch_charger_mode).execute();
+  - platform: template
     name: "Start Charge Default"
     on_press:
       - ble_client.ble_write:
@@ -612,3 +646,19 @@ select:
               id(g_${generic_data_id_prefix}_charge_mode) = value_int;
               id(script_send_config_old).execute();
             }
+
+binary_sensor:
+  - platform: gpio
+    pin: 
+      number: GPIO00
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    name: Toggle charger mode
+    internal: true
+    on_release:
+      then:
+        - lambda: |-
+            ESP_LOGD("Boot switch", "Released");
+            id(switch_charger_mode).execute();

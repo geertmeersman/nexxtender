@@ -21,6 +21,8 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 
 - **Remote Control:** Control the Nexxtender charger remotely from your ESPHome device, enabling features such as starting, stopping, change charge mode, set the charger to Open/Private, set the maximum car charging speed and scheduling charging sessions.
 
+- **Toggle open/private mode:** Toggle the open/private mode of the charger by pressing the "boot" button on the ESP board.
+
 - **Home Assistant Integration:** Seamlessly integrate the ESPHome BLE client with Home Assistant, allowing you to monitor and control the Nexxtender charger through the Home Assistant interface.
 
 ## Screenshots
