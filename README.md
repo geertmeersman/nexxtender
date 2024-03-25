@@ -62,6 +62,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
   - [Table of contents](#table-of-contents)
   - [Getting Started](#getting-started)
     - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
+    - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
     - [Installing \& Configuring ESPHome](#installing--configuring-esphome)
       - [Customizing ESP32 Configuration (Optional)](#customizing-esp32-configuration-optional)
         - [ESP32-S3-N16R8](#esp32-s3-n16r8)
@@ -91,6 +92,17 @@ Before integrating your Nexxtender EV Charger with the ESPHome BLE client, you'l
 6. **Note MAC Address**: Make a note of the Bluetooth MAC address of your Nexxtender EV Charger. You'll need this MAC address when configuring the ESPHome BLE client.
 
 By following these steps, you can easily find the Bluetooth MAC address of your Nexxtender EV Charger named "HOME" using the NRF Connect app.
+
+### Finding Nexxtender Bluetooth passkey
+
+The Nexxtender passkey is the PIN code that is used to pair your BLE device with the charger. (6 digit number)  
+If you don't have the PIN code (or you have lost it), you can always reach out to me and I can calculate it if you provide me the serial number of the box (format XXXXX-XX-XXXX-XXXXX-XX).  
+The serial number can be found on the sticker, located at the bottom of the Nexxtender device.  
+The PN and the SN numbers are the numbers needed to calculate the PIN code.  
+PN: XXXXX-XX  
+SN: XXXX-XXXXX-XX  
+
+![serial](images/serial.png)
 
 ### Installing & Configuring ESPHome
 
@@ -139,7 +151,7 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
 
    The `nexxtender_mac` is the bluetooth mac address you found in the previous step.
 
-   The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender. If you don't have the PIN code (or you have lost it), you can always reach out to me and I can calculate it if you provide me the serial number of the box. Format XXXXX-XX-XXXX-XXXXX-XX
+   The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender. Explanations on how to find it can be found [here](#finding-nexxtender-bluetooth-passkey).  
 
    The `esphome_admin_password` is the password that is used for the Wi-Fi fallback hotspot and OTA.
 
