@@ -64,6 +64,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
     - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
     - [Installing \& Configuring ESPHome](#installing--configuring-esphome)
       - [Customizing ESP32 Configuration (Optional)](#customizing-esp32-configuration-optional)
+    - [ESP32-S3-N16R8](#esp32-s3-n16r8)
   - [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
   - [Contributing](#contributing)
   - [License](#license)
@@ -170,6 +171,8 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
 
 #### Customizing ESP32 Configuration (Optional)
 
+The standard configuration utilises the `az-delivery-devkit-v4` board. If you would have another ESP32 board, feel free to customize it.  
+
 If you want to customize the ESP32 section in your `nexxtender.yaml` file for your specific board type, you can add the following section at the end of the nexxtender.yaml:
 
 ```yaml
@@ -178,6 +181,8 @@ esp32:
 ```
 
 Replace `YOUR_ESP32_BOARD_TYPE` with the specific board type you're using, such as `az-delivery-devkit-v4` or any other compatible board.
+
+### ESP32-S3-N16R8
 
 Example for the ESP32-S3-N16R8, buy here: [Aliexpress](https://a.aliexpress.com/_EwvIgjF)
 
