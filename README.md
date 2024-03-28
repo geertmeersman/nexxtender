@@ -23,6 +23,8 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 
 - **Toggle open/private mode:** Toggle the open/private mode of the charger by pressing the "boot" button on the ESP board.
 
+- **Integrated webserver:** Access the integrated `web_server` component of ESPHome, providing a simple API that lets your monitor and control the Nexxtender.
+
 - **Home Assistant Integration:** Seamlessly integrate the ESPHome BLE client with Home Assistant, allowing you to monitor and control the Nexxtender charger through the Home Assistant interface.
 
 ## Screenshots
@@ -66,6 +68,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
     - [Installing \& Configuring ESPHome](#installing--configuring-esphome)
       - [Customizing ESP32 Configuration (Optional)](#customizing-esp32-configuration-optional)
         - [ESP32-S3-N16R8](#esp32-s3-n16r8)
+  - [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
   - [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
   - [Contributing](#contributing)
   - [License](#license)
@@ -223,6 +226,51 @@ The complete configuration file would look like:
    ```
 
 This flexibility allows users to tailor the configuration to their hardware requirements while still benefiting from the overall structure and functionality provided in the `nexxtender.yaml` file.
+
+## Activating the Integrated ESPHome Webserver/GUI
+
+The Nexxtender comes equipped with an integrated ESPHome webserver and graphical user interface (GUI) to provide an intuitive way to manage and configure your device if you don't plan to use [Home Assistant](https://www.home-assistant.io). Follow the steps below to activate and access this feature:
+
+1. **Activate the webserver package:**
+
+    There is a webserver configuration that you can activate by using the yaml below.
+
+    ```yaml
+    packages:
+        nexxtender: 
+          url: https://github.com/geertmeersman/nexxtender
+          files:  [config/nexxtender.yaml, config/nexxtender_packages/webserver.yaml]
+          refresh: 0s
+    ```
+
+    The content of the included webserver.yaml configuration file is the following:
+
+    ```yaml
+    web_server:
+      auth:
+        username: admin
+        password: !secret esphome_admin_password
+    ```
+
+    If you don't need authentication, you can just add this to your nexxtender.yaml configuration:
+
+    ```yaml
+    web_server:
+    ```
+
+    It will then activate the webserver on the standard port and without authentication.
+
+2. **Access the Web Interface:** Open a web browser on a device connected to the same network as your Nexxtender.
+
+3. **Enter the IP Address/mDNS:** In the address bar of your web browser, enter the IP address assigned to your Nexxtender. You can usually find this information in your router's administration interface or by using a network scanning tool. You could also use the mDNS [http://nexxtender.local](http://nexxtender.local)
+
+4. **Login:** If prompted, enter any necessary login credentials to access the ESPHome webserver.
+
+5. **Explore and Configure:** Once logged in, you'll have access to the ESPHome GUI, where you can explore various settings, configure parameters, and monitor the status of your Nexxtender.
+
+6. **Save Changes:** Remember to save any changes you make within the ESPHome interface to ensure they are applied to your Nexxtender.
+
+More details can be found here: [https://esphome.io/components/web_server.html](https://esphome.io/components/web_server.html)
 
 ## Integrating ESPHome Devices with Home Assistant
 
