@@ -165,6 +165,8 @@ SN: XXXX-XXXXX-XX
    ```bash
    esphome compile nexxtender.yaml
    ```
+   
+   Note: if the compilation fails due to missing `nexxtender_packages/nexxtender.h` file. You can copy [nexxtender_packages/nextender.h](config/nexxtender_packages/nextender.h) in your configuration folder.
 
 5. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
 
