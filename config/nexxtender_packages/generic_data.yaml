@@ -567,13 +567,20 @@ number:
             if (config.empty()) { return; }
             float value = static_cast<float>(x);
             ESP_LOGD("Maximum car charging speed", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
-            if (id(g_${generic_data_id_prefix}_i_evse_max) == 0) {
-              ESP_LOGD("Setting Maximum car charging speed", "%f A", value);
-              id(g_${generic_data_id_prefix}_i_evse_max) = value;
-            } else if (id(g_${generic_data_id_prefix}_i_evse_max) != value) {
-              ESP_LOGD("Setting Maximum car charging speed and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
-              id(g_${generic_data_id_prefix}_i_evse_max) = value;
+            if (value > id(g_${generic_data_id_prefix}_i_max)) {
+              ESP_LOGD("Value ignored since higher than the maximum available capacity, setting it to the max available charging speed");
+              ESP_LOGD("Setting Maximum car charging speed", "%f A", id(g_${generic_data_id_prefix}_i_max));
+              id(g_${generic_data_id_prefix}_i_evse_max) = id(g_${generic_data_id_prefix}_i_max);
               id(script_send_config_old).execute();
+            } else {
+              if (id(g_${generic_data_id_prefix}_i_evse_max) == 0) {
+                ESP_LOGD("Setting Maximum car charging speed", "%f A", value);
+                id(g_${generic_data_id_prefix}_i_evse_max) = value;
+              } else if (id(g_${generic_data_id_prefix}_i_evse_max) != value) {
+                ESP_LOGD("Setting Maximum car charging speed and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
+                id(g_${generic_data_id_prefix}_i_evse_max) = value;
+                id(script_send_config_old).execute();
+              }
             }
   - platform: template
     id: max_available_capacity
@@ -594,6 +601,9 @@ number:
             if (config.empty()) { return; }
             float value = static_cast<float>(x);
             ESP_LOGD("Maximum available capacity", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_max));
+            if (value < id(g_${generic_data_id_prefix}_i_evse_max)) {
+              id(g_${generic_data_id_prefix}_i_evse_max) = value;
+            }
             if (id(g_${generic_data_id_prefix}_i_max) == 0) {
               ESP_LOGD("Setting Maximum available capacity", "%f A", value);
               id(g_${generic_data_id_prefix}_i_max) = value;
