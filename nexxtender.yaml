@@ -3,7 +3,3 @@ packages:
     url: https://github.com/geertmeersman/nexxtender
     file: config/nexxtender.yaml
     refresh: 0s
-  
-substitutions:
-  device_name: nexxtender
-  friendly_name: Nexxtender

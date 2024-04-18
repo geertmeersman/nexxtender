@@ -3,7 +3,3 @@ packages:
       url: https://github.com/geertmeersman/nexxtender
       files:  [config/nexxtender.yaml, config/nexxtender_packages/esp.s3.yaml]
       refresh: 0s
-
-substitutions:
-   device_name: nexxtender
-   friendly_name: Nexxtender
