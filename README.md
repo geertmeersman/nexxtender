@@ -109,14 +109,17 @@ SN: XXXX-XXXXX-XX
 
 ### Installing & Configuring ESPHome
 
-**Install ESPHome:** If you haven't already, install ESPHome by following the instructions [here](https://esphome.io/guides/getting_started_command_line.html#installation-step) or [here in combination with HA](https://esphome.io/guides/getting_started_hassio.html).
+1. **Install ESPHome:** If you haven't already, install ESPHome by following the instructions [here](https://esphome.io/guides/getting_started_command_line.html#installation-step) or [here in combination with HA](https://esphome.io/guides/getting_started_hassio.html).
 
-You then need to create a new YAML configuration for you nexxtender charger, compile it (this will create the corresponding C++ code and resulting binary), and upload it to your esp32.
-There is several ways to do this, for example using command line or your favorite IDE, or directly via the ESPHome dashboard add-on proposed by Home Assistant.
+   You then need to create a new YAML configuration for you nexxtender charger, compile it (this will create the corresponding C++ code and resulting binary), and upload it to your esp32.
 
-#### Using command line / IDE
+   There is several ways to do this, for example using command line or your favorite IDE, or directly via the ESPHome dashboard add-on proposed by Home Assistant.
 
-1. **Create a new ESPHome Configuration:** Create a new file named `nexxtender.yaml` in your local directory. Copy and paste the contents of the provided `nexxtender.yaml` into this file (or copy/paste the below yaml).
+2. **Create a new ESPHome Configuration:** Create a new file named `nexxtender.yaml` in your local directory.
+
+   If you followed the proposed HomeAssistant ESPHome wizard, you already ended up with a yaml file. If needed, first rename this file in `nexxtender.yaml` using the `Rename hostname` option. Note that this will also trigger the compilation and can take some time. Alternatively, delete the configuration created by the wizard and create a new one.
+
+   Edit and copy/paste the content of the provided `nexxtender.yaml` into or at the end of this file (or copy/paste the below yaml).
 
    ```yaml
    packages:
@@ -142,9 +145,9 @@ There is several ways to do this, for example using command line or your favorit
    - The substitution `slider_max_car_charging_speed` lets you override the maximum value for the configuration slider of the maximum car charging speed. This is usually set to the value of the circuit breaker A. Default value is the ones set in the example.  
    - The substitution `slider_max_available_capacity` lets you override the maximum value for the configuration slider of the maximum available capacity of the grid. This is usually set to the value of the circuit breaker A. Default value is the ones set in the example.  
 
-2. **Update the secrets.yaml:**
+3. **Update the secrets.yaml:**
 
-   Ensure that your `secrets.yaml` file contains the following entries:
+   Ensure that your `secrets.yaml` file contains the following entries.
 
    ```yaml
    esphome_admin_password: "YOUR_ESPHOME_ADMIN_PASSWORD"
@@ -154,6 +157,8 @@ There is several ways to do this, for example using command line or your favorit
    nexxtender_mac: "YOUR_NEXXTENDER_MAC_ADDRESS"
    nexxtender_passkey: "YOUR_NEXXTENDER_PASSKEY"
    ```
+
+   In the HomeAssistant ESPHome dashboard, this is done using the top righ shortcut `SECRETS`. 
 
    Replace `"YOUR_ESPHOME_ADMIN_PASSWORD"`, `"YOUR_WIFI_SSID"`, `"YOUR_WIFI_PASSWORD"`, `"YOUR_ESPHOME_API_KEY"`, `"YOUR_NEXXTENDER_MAC_ADDRESS"`, and `"YOUR_NEXXTENDER_PASSKEY"` with your actual values.
 
@@ -165,19 +170,25 @@ There is several ways to do this, for example using command line or your favorit
 
    If you don't know how to define the `esphome_api_key`, you can obtain one as described [here](https://esphome.io/components/api.html) in the section Configuration variables > encryption > key.
 
-3. **Compile Firmware:** Compile the ESPHome firmware using the `nexxtender.yaml` configuration file. Run the following command in your terminal, pointing to the location of your `nexxtender.yaml` file:
+5. **Compile Firmware:** Compile the ESPHome firmware using the `nexxtender.yaml` configuration file. Run the following command in your terminal, pointing to the location of your `nexxtender.yaml` file:
 
    ```bash
    esphome compile nexxtender.yaml
    ```
-   
-   Note: if the compilation fails due to missing `nexxtender_packages/nexxtender.h` file. You can copy [nexxtender_packages/nexxtender.h](config/nexxtender_packages/nexxtender.h) in your configuration folder.
 
-4. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
+   Using the Home Assistant ESPHome dashboard, the firmware compilation, upload and flashing of your esp32 is done in one step by using the `Install` option.
+  Optionally, you can first run the `Validate` command that will check all the code and links before compiling it. Considering the compilation can take some time, this is a recommended step.
+
+   Note: if the compilation fails due to missing `nexxtender_packages/nexxtender.h` file. You can copy [nexxtender_packages/nexxtender.h](config/nexxtender_packages/nexxtender.h) in your configuration folder.
+   In HomeAssistant, the configuration files for ESPHome can be found and edited under `<HOME_ASSISTANT_CONFIG>/esphome/`. For example the configuration for the nexxtender node can be found in `/config/esphome/nexxtender.yaml`. You'll then need to use a terminal or IDE to create the directory `<HOME_ASSISTANT_CONFIG>/esphome/nexxtender_packages` and the file `nexxtender.h`.
+
+5. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
 
    ```bash
    esphome upload nexxtender.yaml
    ```
+
+   This step is thus normally already done when using the HomeAssistant ESPHome dashboard.
 
    Note: If you’re just seeing Connecting....____.... on the screen and the flashing fails, please double-check the UART wires are connected correctly if flashing using a USB to UART bridge.
 
@@ -185,71 +196,6 @@ There is several ways to do this, for example using command line or your favorit
 
    [Consult the FAQ part on esphome.io](https://esphome.io/guides/faq.html).
 
-#### Using the ESPHome dashboard in Home Assistant
-
-If you haven't already, followed the steps described [here in combination with HA](https://esphome.io/guides/getting_started_hassio.html).
-
-1. **Create a new ESPHome Configuration:** if you followed the proposed wizard, you have ended up with a yaml file. Rename this file in `nexxtender.yaml`, edit it and copy/paste the content of the provided `nexxtender.yaml` at the end of the file (or copy/paste the below yaml).
-
-   ```yaml
-   packages:
-      nexxtender: 
-         url: https://github.com/geertmeersman/nexxtender
-         file: config/nexxtender.yaml
-         refresh: 0s
-   substitutions:
-      ## Uncomment and modify when you want to use a different device name.
-      # device_name: nexxtender
-      # friendly_name: Nexxtender
-      ## Uncomment and modify when you want to use a different threshold.
-      # charging_mode_eco_threshold: "8"      # Single phase (6A + 2 margin)
-      # charging_mode_eco_bi_threshold: "14"  # Bi-phase (12A + 2 margin)
-      # charging_mode_eco_tri_threshold: "20" # Tri-phase (18A + 2 margin)
-      # slider_max_car_charging_speed: "32"     # The max value of the slider for the maximum car charging speed slider, default set to 32
-      # slider_max_available_capacity: "40"     # The max value of the slider for the maximum available capacity slider, default set to 40
-   ```
-
-   - The charging power mode is estimated based on the number of phases used during the charge.  
-   - The substitution `charging_mode_eco_threshold` and the others are optional, and you can set it to whatever Amp you want to be used as a threshold for the ECO/MAX sensor. Default values are the ones set in the example.  
-   Attention, it does not influence your charger; it is just a way of indicating which speed the charger is delivering.  
-   - The substitution `slider_max_car_charging_speed` lets you override the maximum value for the configuration slider of the maximum car charging speed. This is usually set to the value of the circuit breaker A. Default value is the ones set in the example.  
-   - The substitution `slider_max_available_capacity` lets you override the maximum value for the configuration slider of the maximum available capacity of the grid. This is usually set to the value of the circuit breaker A. Default value is the ones set in the example.  
-
-2. **Update the secrets.yaml:**
-
-   On the top right of the dashboard, you can edit your `secrets.yaml` file and ensure it contains the following entries:
-
-   ```yaml
-   esphome_admin_password: "YOUR_ESPHOME_ADMIN_PASSWORD"
-   wifi_ssid: "YOUR_WIFI_SSID"
-   wifi_password: "YOUR_WIFI_PASSWORD"
-   esphome_api_key: "YOUR_ESPHOME_API_KEY"
-   nexxtender_mac: "YOUR_NEXXTENDER_MAC_ADDRESS"
-   nexxtender_passkey: "YOUR_NEXXTENDER_PASSKEY"
-   ```
-
-   Replace `"YOUR_ESPHOME_ADMIN_PASSWORD"`, `"YOUR_WIFI_SSID"`, `"YOUR_WIFI_PASSWORD"`, `"YOUR_ESPHOME_API_KEY"`, `"YOUR_NEXXTENDER_MAC_ADDRESS"`, and `"YOUR_NEXXTENDER_PASSKEY"` with your actual values.
-
-   The `nexxtender_mac` is the bluetooth mac address you found in the previous step.
-
-   The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender. Explanations on how to find it can be found [here](#finding-nexxtender-bluetooth-passkey).  
-
-   The `esphome_admin_password` is the password that is used for the Wi-Fi fallback hotspot and OTA.
-
-   If you don't know how to define the `esphome_api_key`, you can obtain one as described [here](https://esphome.io/components/api.html) in the section Configuration variables > encryption > key.
-
-3. **Compile and Flash the firmware:** Using the Home Assistant ESPHome dashboard, the firmware compilation, upload and flashing of your esp32 is done in one step. For that, simply click on the 3 dots options list of the `nexxtender.yaml` configuration file card and select 'Upload'.
-
-   Optionally, you can first run the Validate command that will check all the code and links before compiling it. Considering the compilation can take some time, this is a recommended step.
-
-   Note: There is a high chance that the compilation fails due to missing `nexxtender_packages/nexxtender.h` file. You can copy [nexxtender_packages/nexxtender.h](config/nexxtender_packages/nexxtender.h) in your configuration folder. The configuration files for ESPHome can be found and edited under `<HOME_ASSISTANT_CONFIG>/esphome/`. For example the configuration for the nexxtender node can be found in `/config/esphome/nexxtender.yaml`. You'll then need to use a terminal or IDE to create the nexxtender_packages in the `<HOME_ASSISTANT_CONFIG>/esphome/` directory and then the file `nexxtender.h`.
-
-   Example of add-ons for terminal [TO DO]
-   Example of command to create the folder and file [TO DO]
-
-   For some devices you need to keep pressing the BOOT button until flashing has begun (i.e. Geekcreit DOIT ESP32 DEVKIT V1).
-
-   [Consult the FAQ part on esphome.io](https://esphome.io/guides/faq.html).
 
 ### Integrating your esp32 in Home Assistant
 
