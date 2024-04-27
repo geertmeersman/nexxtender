@@ -147,7 +147,7 @@ SN: XXXX-XXXXX-XX
 
 3. **Update the secrets.yaml:**
 
-   Ensure that your `secrets.yaml` file contains the following entries.
+   Ensure that your `secrets.yaml` file contains the following entries:
 
    ```yaml
    esphome_admin_password: "YOUR_ESPHOME_ADMIN_PASSWORD"
@@ -170,7 +170,7 @@ SN: XXXX-XXXXX-XX
 
    If you don't know how to define the `esphome_api_key`, you can obtain one as described [here](https://esphome.io/components/api.html) in the section Configuration variables > encryption > key.
 
-5. **Compile Firmware:** Compile the ESPHome firmware using the `nexxtender.yaml` configuration file. Run the following command in your terminal, pointing to the location of your `nexxtender.yaml` file:
+4. **Compile Firmware:** Compile the ESPHome firmware using the `nexxtender.yaml` configuration file. Run the following command in your terminal, pointing to the location of your `nexxtender.yaml` file:
 
    ```bash
    esphome compile nexxtender.yaml
@@ -182,7 +182,7 @@ SN: XXXX-XXXXX-XX
    Note: if the compilation fails due to missing `nexxtender_packages/nexxtender.h` file. You can copy [nexxtender_packages/nexxtender.h](config/nexxtender_packages/nexxtender.h) in your configuration folder.
    In HomeAssistant, the configuration files for ESPHome can be found and edited under `<HOME_ASSISTANT_CONFIG>/esphome/`. For example the configuration for the nexxtender node can be found in `/config/esphome/nexxtender.yaml`. You'll then need to use a terminal or IDE to create the directory `<HOME_ASSISTANT_CONFIG>/esphome/nexxtender_packages` and the file `nexxtender.h`.
 
-5. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
+6. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
 
    ```bash
    esphome upload nexxtender.yaml
