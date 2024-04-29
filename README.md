@@ -111,7 +111,15 @@ SN: XXXX-XXXXX-XX
 
 1. **Install ESPHome:** If you haven't already, install ESPHome by following the instructions [here](https://esphome.io/guides/getting_started_command_line.html#installation-step) or [here in combination with HA](https://esphome.io/guides/getting_started_hassio.html).
 
-2. **Create a new ESPHome Configuration:** Create a new file named `nexxtender.yaml` in your local directory. Copy and paste the contents of the provided `nexxtender.yaml` into this file (or copy/paste the below yaml).
+   You then need to create a new YAML configuration for you nexxtender charger, compile it (this will create the corresponding C++ code and resulting binary), and upload it to your esp32.
+
+   There is several ways to do this, for example using command line or your favorite IDE, or directly via the ESPHome dashboard add-on proposed by Home Assistant.
+
+2. **Create a new ESPHome Configuration:** Create a new file named `nexxtender.yaml` in your local directory.
+
+   If you followed the proposed HomeAssistant ESPHome wizard, you already ended up with a yaml file. If needed, first rename this file in `nexxtender.yaml` using the `Rename hostname` option. Note that this will also trigger the compilation and can take some time. Alternatively, delete the configuration created by the wizard and create a new one.
+
+   Edit and copy/paste the content of the provided `nexxtender.yaml` into or at the end of this file (or copy/paste the below yaml).
 
    ```yaml
    packages:
@@ -150,6 +158,8 @@ SN: XXXX-XXXXX-XX
    nexxtender_passkey: "YOUR_NEXXTENDER_PASSKEY"
    ```
 
+   In the HomeAssistant ESPHome dashboard, this is done using the top righ shortcut `SECRETS`. 
+
    Replace `"YOUR_ESPHOME_ADMIN_PASSWORD"`, `"YOUR_WIFI_SSID"`, `"YOUR_WIFI_PASSWORD"`, `"YOUR_ESPHOME_API_KEY"`, `"YOUR_NEXXTENDER_MAC_ADDRESS"`, and `"YOUR_NEXXTENDER_PASSKEY"` with your actual values.
 
    The `nexxtender_mac` is the bluetooth mac address you found in the previous step.
@@ -165,14 +175,20 @@ SN: XXXX-XXXXX-XX
    ```bash
    esphome compile nexxtender.yaml
    ```
-   
-   Note: if the compilation fails due to missing `nexxtender_packages/nexxtender.h` file. You can copy [nexxtender_packages/nextender.h](config/nexxtender_packages/nextender.h) in your configuration folder.
 
-5. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
+   Using the Home Assistant ESPHome dashboard, the firmware compilation, upload and flashing of your esp32 is done in one step by using the `Install` option.
+  Optionally, you can first run the `Validate` command that will check all the code and links before compiling it. Considering the compilation can take some time, this is a recommended step.
+
+   Note: if the compilation fails due to missing `nexxtender_packages/nexxtender.h` file. You can copy [nexxtender_packages/nexxtender.h](config/nexxtender_packages/nexxtender.h) in your configuration folder.
+   In HomeAssistant, the configuration files for ESPHome can be found and edited under `<HOME_ASSISTANT_CONFIG>/esphome/`. For example the configuration for the nexxtender node can be found in `/config/esphome/nexxtender.yaml`. You'll then need to use a terminal or IDE to create the directory `<HOME_ASSISTANT_CONFIG>/esphome/nexxtender_packages` and the file `nexxtender.h`.
+
+6. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
 
    ```bash
    esphome upload nexxtender.yaml
    ```
+
+   This step is thus normally already done when using the HomeAssistant ESPHome dashboard.
 
    Note: If you’re just seeing Connecting....____.... on the screen and the flashing fails, please double-check the UART wires are connected correctly if flashing using a USB to UART bridge.
 
@@ -180,11 +196,14 @@ SN: XXXX-XXXXX-XX
 
    [Consult the FAQ part on esphome.io](https://esphome.io/guides/faq.html).
 
-6. **Integrate with Home Assistant:** In your Home Assistant configuration, add the ESPHome device as a new integration. Follow the instructions provided by Home Assistant to discover and integrate the Nexxtender charger with your Home Assistant setup.
 
-7. **Monitor Logs:** Monitor the ESPHome device logs to ensure that the BLE client establishes a connection with the Powerdale Nexxtender EV Charger successfully.
+### Integrating your esp32 in Home Assistant
 
-8. **Test Functionality:** Test the functionality of the ESPHome BLE client by monitoring real-time data from the Nexxtender charger and controlling its operation remotely from your ESPHome device or through the Home Assistant interface.
+1. **Integrate with Home Assistant:** In your Home Assistant configuration, add the ESPHome device as a new integration. Follow the instructions provided by Home Assistant to discover and integrate the Nexxtender charger with your Home Assistant setup.
+
+2. **Monitor Logs:** Monitor the ESPHome device logs to ensure that the BLE client establishes a connection with the Powerdale Nexxtender EV Charger successfully.
+
+3. **Test Functionality:** Test the functionality of the ESPHome BLE client by monitoring real-time data from the Nexxtender charger and controlling its operation remotely from your ESPHome device or through the Home Assistant interface.
 
 #### Customizing ESP32 Configuration (Optional)
 
