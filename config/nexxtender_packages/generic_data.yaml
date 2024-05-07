@@ -159,8 +159,16 @@ text_sensor:
             case 0x0003:
                 id(${device_name}_generic_status).publish_state(std::string("Unlocked force eco"));
                 return;
+            case 0x4001:
+                id(${device_name}_generic_status).publish_state(std::string("Time Set READY"));
+                id(script_write_time).execute();
+                return;
+            case 0x4002:
+                id(${device_name}_generic_status).publish_state(std::string("Time Set SUCCESS"));
+                return;
             case 0x4003:
-                id(${device_name}_generic_status).publish_state(std::string("Time read"));
+                id(${device_name}_generic_status).publish_state(std::string("Time read POPPED"));
+                id(script_read_generic_data).execute();
                 return;
             case 0x5001:
                 id(${device_name}_generic_status).publish_state(std::string("Config Set READY"));
@@ -263,6 +271,32 @@ script:
           service_uuid: ${ble_uuid_receive_service}
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x02, 0x40]
+  - id: script_sync_time
+    then:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command}
+          value: [0x01, 0x40]
+  - id: script_write_time
+    then:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_data}
+          value: !lambda |-
+            // Get the epoch time integer from ESP32
+            std::time_t current_time_epoch = std::time(nullptr);
+            int epoch_time_int = static_cast<int>(current_time_epoch);
+            // Convert the integer into a byte array
+            std::array<uint8_t, sizeof(epoch_time_int)> epoch_time_bytes;
+            for (size_t i = 0; i < sizeof(epoch_time_int); ++i) {
+                epoch_time_bytes[i] = (epoch_time_int >> (8 * i)) & 0xFF;
+            }
+            // Convert the byte array into a vector
+            std::vector<uint8_t> epoch_time_vector(epoch_time_bytes.begin(), epoch_time_bytes.end());
+            return epoch_time_vector;
+
   - id: script_write_config
     then:
       - lambda: |-
@@ -296,18 +330,36 @@ script:
           std::string x = id(${device_name}_generic_data).state;
           logd_x("${device_name}_generic_data", x);
           if (x.empty()) { return; }
-          if (!check_crc(x, x.size())) {
-            ESP_LOGD("${device_name}_generic_data", "Checksum CRC16 Failed");
-            return;
-          }
           ESP_LOGD("${device_name}_generic_data", "Status is: 0x%x", id(g_${generic_data_id_prefix}_status));
           switch(id(g_${generic_data_id_prefix}_status)) {
+            case 0x4003:
+              break;
             case 0x5003:
             case 0x5006:
+              if (!check_crc(x, x.size())) {
+                ESP_LOGD("${device_name}_generic_data", "Checksum CRC16 Failed");
+                return;
+              }
               break;
             default:
               ESP_LOGD("${device_name}_generic_data", "Status not recognized: 0x%x", id(g_${generic_data_id_prefix}_status));
               break;
+          }
+          if (id(g_${generic_data_id_prefix}_status) == 0x4003) {
+            // Get the epoch time integer from ESP32
+            std::time_t current_time_epoch = std::time(nullptr);
+            int current_time_epoch_int_esp32 = static_cast<int>(current_time_epoch);
+            // Get the epoch time integer from the BLE
+            int epoch_time_int = getInt(x, 0);
+            // Convert epoch time to a human-readable format
+            std::time_t current_time_epoch_nexxtender = static_cast<std::time_t>(epoch_time_int);
+            char current_time_human_readable[20]; // Adjust size as needed
+            strftime(current_time_human_readable, sizeof(current_time_human_readable), "%Y-%m-%d %H:%M:%S", localtime(&current_time_epoch_nexxtender));
+            // Log both epoch time and human-readable time
+            ESP_LOGD("${device_name}_generic_data - time", "Nexxtender Epoch Time: %d, Human Readable Time: %s", epoch_time_int, current_time_human_readable);
+            strftime(current_time_human_readable, sizeof(current_time_human_readable), "%Y-%m-%d %H:%M:%S", localtime(&current_time_epoch));
+            ESP_LOGD("${device_name}_generic_data - time", "     ESP32 Epoch Time: %d, Human Readable Time: %s", current_time_epoch_int_esp32, current_time_human_readable);
+            return;
           }
           if (id(g_${generic_data_id_prefix}_status) == 0x5006) {
             //Flag the config read as true
@@ -405,15 +457,19 @@ script:
                           break;
                       case 12: //touWeekStart(12)
                           id(g_${generic_data_id_prefix}_week_start) = getTimeString(value);
+                          ESP_LOGI("_week_start", "Total minutes: %llu", value);
                           break;
                       case 13: //touWeekStop(13)
                           id(g_${generic_data_id_prefix}_week_end) = getTimeString(value);
+                          ESP_LOGI("_week_end", "Total minutes: %llu", value);
                           break;
                       case 14: //touWeekendStart(14), 0
                           id(g_${generic_data_id_prefix}_weekend_start) = getTimeString(value);
+                          ESP_LOGI("_weekend_start", "Total minutes: %llu", value);
                           break;
                       case 15: //touWeekendStop(15), 0
                           id(g_${generic_data_id_prefix}_weekend_end) = getTimeString(value);
+                          ESP_LOGI("_weekend_end", "Total minutes: %llu", value);
                           break;
                       case 16: //timezone(16), 0
                           break;
@@ -494,9 +550,10 @@ script:
             } else {
               ESP_LOGW("${device_name}_generic_data", "Config data size not equal to 15. Please open an issue with your HEX string information.");
             }
+            // Synchronise Nexxtender time
+            id(script_sync_time).execute();            
             return;
           }
-
 
 button:
   - platform: template
@@ -507,7 +564,26 @@ button:
         - lambda: |-
             id(switch_charger_mode).execute();
   - platform: template
+    name: Read time
+    icon: mdi:clock-time-eight-outline
+    entity_category: diagnostic
+    on_press:
+      then:
+        - lambda: |-
+            id(script_read_time).execute();
+  - platform: template
+    name: Sync time
+    icon: mdi:timer-refresh-outline
+    entity_category: diagnostic
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command}
+          value: [0x01, 0x40]
+  - platform: template
     name: "Start Charge Default"
+    icon: mdi:alpha-d-circle-outline
     on_press:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
@@ -516,6 +592,7 @@ button:
           value: [0x01, 0x00]
   - platform: template
     name: "Start Charge Max"
+    icon: mdi:alpha-m-circle-outline
     on_press:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
@@ -524,6 +601,7 @@ button:
           value: [0x02, 0x00]
   - platform: template
     name: "Start Charge Auto"
+    icon: mdi:alpha-a-circle-outline
     on_press:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
@@ -532,6 +610,7 @@ button:
           value: [0x03, 0x00]
   - platform: template
     name: "Start Charge Eco"
+    icon: mdi:alpha-e-circle-outline
     on_press:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
@@ -540,6 +619,7 @@ button:
           value: [0x04, 0x00]
   - platform: template
     name: "Stop Charging"
+    icon: mdi:stop-circle-outline
     on_press:
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
@@ -566,21 +646,14 @@ number:
             std::string config = id(g_${generic_data_id_prefix}_config);
             if (config.empty()) { return; }
             float value = static_cast<float>(x);
-            ESP_LOGD("${device_name}_generic_data", "Maximum car charging speed Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
-            if (value > id(g_${generic_data_id_prefix}_i_max)) {
-              ESP_LOGD("${device_name}_generic_data", "Value ignored since higher than the maximum available capacity, setting it to the max available charging speed");
-              ESP_LOGD("${device_name}_generic_data", "Setting Maximum car charging speed to %f A", id(g_${generic_data_id_prefix}_i_max));
-              id(g_${generic_data_id_prefix}_i_evse_max) = id(g_${generic_data_id_prefix}_i_max);
+            ESP_LOGD("Maximum car charging speed", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
+            if (id(g_${generic_data_id_prefix}_i_evse_max) == 0) {
+              ESP_LOGD("Setting Maximum car charging speed", "%f A", value);
+              id(g_${generic_data_id_prefix}_i_evse_max) = value;
+            } else if (id(g_${generic_data_id_prefix}_i_evse_max) != value) {
+              ESP_LOGD("Setting Maximum car charging speed and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
+              id(g_${generic_data_id_prefix}_i_evse_max) = value;
               id(script_send_config_old).execute();
-            } else {
-              if (id(g_${generic_data_id_prefix}_i_evse_max) == 0) {
-                ESP_LOGD("${device_name}_generic_data", "Setting Maximum car charging speed to %f A", value);
-                id(g_${generic_data_id_prefix}_i_evse_max) = value;
-              } else if (id(g_${generic_data_id_prefix}_i_evse_max) != value) {
-                ESP_LOGD("${device_name}_generic_data", "Setting Maximum car charging speed and sending config, Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
-                id(g_${generic_data_id_prefix}_i_evse_max) = value;
-                id(script_send_config_old).execute();
-              }
             }
   - platform: template
     id: max_available_capacity
@@ -600,15 +673,12 @@ number:
             std::string config = id(g_${generic_data_id_prefix}_config);
             if (config.empty()) { return; }
             float value = static_cast<float>(x);
-            ESP_LOGD("${device_name}_generic_data", "Maximum available capacity: Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_max));
-            if (value < id(g_${generic_data_id_prefix}_i_evse_max)) {
-              id(g_${generic_data_id_prefix}_i_evse_max) = value;
-            }
+            ESP_LOGD("Maximum available capacity", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_max));
             if (id(g_${generic_data_id_prefix}_i_max) == 0) {
-              ESP_LOGD("${device_name}_generic_data", "Setting Maximum available capacity: %f A", value);
+              ESP_LOGD("Setting Maximum available capacity", "%f A", value);
               id(g_${generic_data_id_prefix}_i_max) = value;
             } else if (id(g_${generic_data_id_prefix}_i_max) != value) {
-              ESP_LOGD("${device_name}_generic_data", "Setting Maximum available capacity and sending config: Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_max));
+              ESP_LOGD("Setting Maximum available capacity and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_max));
               id(g_${generic_data_id_prefix}_i_max) = value;
               id(script_send_config_old).execute();
             }
@@ -672,3 +742,18 @@ binary_sensor:
         - lambda: |-
             ESP_LOGD("Boot switch", "Released");
             id(switch_charger_mode).execute();
+
+# Services in API
+api:
+  services:
+    - service: set_week_schema_start
+      variables:
+        time_string: string
+      then:
+        - lambda: |-
+            int total_minutes = convert_time_string_to_minutes(time_string);
+            if (total_minutes < 0) {
+              // An error occurred
+              return;
+            }
+            ESP_LOGI("set_week_schema_start", "Total minutes: %d", total_minutes);

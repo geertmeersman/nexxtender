@@ -1,11 +1,13 @@
 time:
-  - platform: sntp
-    id: sntp_time
-    timezone: Europe/Brussels
-    servers:
-      - 0.at.pool.ntp.org
-      - 0.pool.ntp.org
-      - 1.pool.ntp.org
+#  - platform: sntp
+#    id: sntp_time
+#    timezone: Europe/Brussels
+#    servers:
+#      - 0.at.pool.ntp.org
+#      - 0.pool.ntp.org
+#      - 1.pool.ntp.org
+  - platform: homeassistant
+    id: homeassistant_time
     on_time_sync:
       then:
-        - logger.log: "Synchronized sntp clock"
+        - logger.log: "Synchronized system clock with HA"

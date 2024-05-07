@@ -1,0 +1,73 @@
+name-template: "Release v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+template: |
+  ## What Changed 👀
+
+  $CHANGES
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+categories:
+  - title: 🚀 Features
+    labels:
+      - feat
+      - feature
+      - enhancement
+  - title: 🐛 Bug Fixes
+    labels:
+      - fix
+      - bug
+  - title: ⚠️ Breaking
+    labels:
+      - breaking
+      - breaking change
+  - title: ⚠️ Changes
+    labels:
+      - changed
+  - title: ⛔️ Deprecated
+    labels:
+      - deprecated
+  - title: 🗑 Removed
+    labels:
+      - removed
+  - title: 🔐 Security
+    labels:
+      - security
+  - title: 📄 Documentation
+    labels:
+      - docs
+      - doc
+      - documentation
+  - title: 🛠 Refactoring
+    labels:
+      - refactor
+      - style
+  - title: 🚀 Performance
+    labels:
+      - perf
+  - title: 🧪 Test
+    labels:
+      - test
+  - title: 👷 Chore
+    labels:
+      - chore
+  - title: 🧩 Dependency Updates
+    labels:
+      - deps
+      - dependencies
+    collapse-after: 5
+
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
+change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
+version-resolver:
+  major:
+    labels:
+      - major
+  minor:
+    labels:
+      - minor
+  patch:
+    labels:
+      - patch
+  default: patch
+
+exclude-labels:
+  - skip-changelog

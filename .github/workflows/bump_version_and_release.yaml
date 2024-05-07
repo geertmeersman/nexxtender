@@ -1,0 +1,92 @@
+name: Release - Bump and Release
+on: [workflow_dispatch]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  create_release_draft:
+    name: Create the release draft
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: ⤵️　Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: 🗑　Delete drafts
+        uses: hugo19941994/delete-draft-releases@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📝　Draft release
+        uses: release-drafter/release-drafter@v6
+        id: release_drafter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔄　Update version in 'VERSION' and push changes
+        env:
+          tag_name: ${{ steps.release_drafter.outputs.tag_name }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+        run: |
+          echo $tag_name > VERSION
+
+      - name: 🚀　Add and commit changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: Bump version ${{ steps.release_drafter.outputs.tag_name }}
+
+      - name: 📝　Publish release
+        uses: release-drafter/release-drafter@v6
+        id: release_published
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          publish: true
+
+      - name: "✏️　Generate release changelog"
+        uses: heinrichreimer/github-changelog-generator-action@v2.4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          issues: true
+          issuesWoLabels: true
+          pullRequests: true
+          prWoLabels: true
+          unreleased: false
+          addSections: '{"documentation":{"prefix":"**Documentation:**","labels":["documentation"]}}'
+
+      - name: ✅　Commit release notes
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: Commit release notes ${{ steps.release_drafter.outputs.tag_name }}
+
+      - name: 📦 Create zip file
+        run: |
+          cd config
+          zip -r "${{ github.event.repository.name }}.zip" .
+          mv "${{ github.event.repository.name }}.zip" ..
+
+      - name: 📎 Upload zip file to release
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifact
+          path: "${{ github.event.repository.name }}.zip"
+
+      - name: 📝 Update release with zip file
+        run: |
+          gh release upload ${{ steps.release_drafter.outputs.tag_name }} "${{ github.event.repository.name }}.zip"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🚀　Discord notification
+        env:
+          tag_name: ${{ steps.release_drafter.outputs.tag_name }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: "New release published: https://github.com/{{ EVENT_PAYLOAD.repository.full_name }}/releases/tag/{{tag_name}}"
