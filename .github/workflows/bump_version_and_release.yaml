@@ -35,6 +35,7 @@ jobs:
           GITHUB_REPO: ${{ github.event.repository.name }}
         run: |
           echo $tag_name > VERSION
+          echo $tag_name > config/VERSION
 
       - name: 🚀　Add and commit changes
         uses: EndBug/add-and-commit@v9
@@ -66,8 +67,11 @@ jobs:
           message: Commit release notes ${{ steps.release_drafter.outputs.tag_name }}
 
       - name: 📦 Create zip file
+        env:
+          tag_name: ${{ steps.release_drafter.outputs.tag_name }}
         run: |
           cd config
+          echo $tag_name > VERSION
           zip -r "${{ github.event.repository.name }}.zip" .
           mv "${{ github.event.repository.name }}.zip" ..
 
