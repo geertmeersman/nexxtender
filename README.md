@@ -7,6 +7,8 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 [![discord](https://img.shields.io/discord/1094331679327408320?style=for-the-badge&logo=discord)](https://discord.gg/PTpExQJsWA)
 
 [![MIT License](https://img.shields.io/github/license/geertmeersman/nexxtender?style=flat-square)](https://github.com/geertmeersman/nexxtender/blob/master/LICENSE)
+[![github release](https://img.shields.io/github/v/release/geertmeersman/nexxtender?logo=github)](https://github.com/geertmeersman/nexxtender/releases)
+[![github release date](https://img.shields.io/github/release-date/geertmeersman/nexxtender)](https://github.com/geertmeersman/nexxtender/releases)
 [![github last-commit](https://img.shields.io/github/last-commit/geertmeersman/nexxtender)](https://github.com/geertmeersman/nexxtender/commits)
 [![github contributors](https://img.shields.io/github/contributors/geertmeersman/nexxtender)](https://github.com/geertmeersman/nexxtender/graphs/contributors)
 [![github commit activity](https://img.shields.io/github/commit-activity/y/geertmeersman/nexxtender?logo=github)](https://github.com/geertmeersman/nexxtender/commits/main)
