@@ -79,4 +79,36 @@ void logd_s(const char* device_name, String x) {
     ESP_LOGD(device_name, "%s", x.c_str());
 }
 
+int convert_time_string_to_minutes(const std::string &time_str) {
+    // Parse the input string
+    int hours, minutes;
+    if (sscanf(time_str.c_str(), "%2dh%2d", &hours, &minutes) != 2) {
+        ESP_LOGE("convert_time_string_to_minutes", "Invalid time format: %s", time_str.c_str());
+        return -1; // Return an error value
+    }
+
+    // Verify hours and minutes are within valid range
+    if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+        ESP_LOGE("convert_time_string_to_minutes", "Invalid time range: %02d:%02d", hours, minutes);
+        return -1; // Return an error value
+    }
+
+    // Calculate total minutes
+    int total_minutes = hours * 60 + minutes;
+    return total_minutes;
+}
+
+// Function to check if daylight saving time (DST) is in effect
+bool is_dst(int timestamp_utc) {
+    // DST starts on the last Sunday of March and ends on the last Sunday of October
+    // Determine the year of the timestamp
+    int year = timestamp_utc / (365 * 24 * 60); // Assuming a non-leap year
+    // Calculate the last Sunday in March
+    int last_sunday_march = 31 - ((5 * year / 4 + 4) % 7); // Daylight saving time starts
+    // Calculate the last Sunday in October
+    int last_sunday_october = 31 - ((5 * (year + 1) / 4 + 1) % 7); // Daylight saving time ends
+    // Check if the timestamp falls within the DST period
+    return (timestamp_utc >= last_sunday_march * 24 * 60 && timestamp_utc < last_sunday_october * 24 * 60);
+}
+
 #endif
