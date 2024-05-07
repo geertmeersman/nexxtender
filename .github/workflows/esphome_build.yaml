@@ -3,16 +3,16 @@ name: ESPHome Build
 on:
   push:
     paths:
-      - 'config/**'  # Trigger only if there are changes in config folder or its subfolders
+      - "config/**" # Trigger only if there are changes in config folder or its subfolders
   pull_request:
     paths:
-      - 'config/**'  # Trigger only if there are changes in config folder or its subfolders
+      - "config/**" # Trigger only if there are changes in config folder or its subfolders
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * *"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref_slug }}
   cancel-in-progress: true
 
 jobs:
@@ -42,4 +42,3 @@ jobs:
         uses: esphome/build-action@v2
         with:
           yaml_file: config/nexxtender.s3.yaml
-  
