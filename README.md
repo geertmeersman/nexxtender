@@ -117,8 +117,9 @@ SN: XXXX-XXXXX-XX
    You then need to create a new YAML configuration for you nexxtender charger, compile it (this will create the corresponding C++ code and resulting binary), and upload it to your esp32.
 
    ```yaml
-   Note: as from ESPHome version 2024.5.x make sure you add the following sdkconfig option to the framework config
-   if you override the repository code for the esp32 as some changes were made to the esp-idf framework (v4.4.7)
+   Note: as from ESPHome version 2024.5.x make sure you add the following sdkconfig option
+   to the framework config if you override the repository code for the esp32
+   as some changes were made to the esp-idf framework (v4.4.7)
 
    framework:
      type: esp-idf
