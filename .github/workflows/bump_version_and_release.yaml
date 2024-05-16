@@ -72,18 +72,18 @@ jobs:
         run: |
           cd config
           echo $tag_name > VERSION
-          zip -r "${{ github.event.repository.name }}.zip" .
-          mv "${{ github.event.repository.name }}.zip" ..
+          zip -r "${{ github.event.repository.name }} ${{ steps.release_drafter.outputs.tag_name }}.zip" .
+          mv "${{ github.event.repository.name }} ${{ steps.release_drafter.outputs.tag_name }}.zip" ..
 
       - name: 📎 Upload zip file to release
         uses: actions/upload-artifact@v4
         with:
           name: release-artifact
-          path: "${{ github.event.repository.name }}.zip"
+          path: "${{ github.event.repository.name }} ${{ steps.release_drafter.outputs.tag_name }}.zip"
 
       - name: 📝 Update release with zip file
         run: |
-          gh release upload ${{ steps.release_drafter.outputs.tag_name }} "${{ github.event.repository.name }}.zip"
+          gh release upload ${{ steps.release_drafter.outputs.tag_name }} "${{ github.event.repository.name }} ${{ steps.release_drafter.outputs.tag_name }}.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
