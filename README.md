@@ -115,7 +115,9 @@ SN: XXXX-XXXXX-XX
 
    You then need to create a new YAML configuration for you nexxtender charger, compile it (this will create the corresponding C++ code and resulting binary), and upload it to your esp32.
 
-   There is several ways to do this, for example using command line or your favorite IDE, or directly via the ESPHome dashboard add-on proposed by Home Assistant.
+   ```Note: it seems that as from version 2024.5.x there are some issues, the last "compliant" version of ESPHome is 2024.4.2```
+
+   There are several ways to do this, for example using command line or your favorite IDE, or directly via the ESPHome dashboard add-on proposed by Home Assistant.
 
 2. **Create a new ESPHome Configuration:** Create a new file named `nexxtender.yaml` in your local directory.
 
