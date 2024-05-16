@@ -68,6 +68,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
     - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
     - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
     - [Installing \& Configuring ESPHome](#installing--configuring-esphome)
+    - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
       - [Customizing ESP32 Configuration (Optional)](#customizing-esp32-configuration-optional)
         - [ESP32-S3-N16R8](#esp32-s3-n16r8)
   - [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
@@ -100,12 +101,12 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
 
 ### Finding Nexxtender Bluetooth passkey
 
-The Nexxtender passkey is the PIN code that is used to pair your BLE device with the charger. (6 digit number)  
-If you don't have the PIN code (or you have lost it), you can always reach out to me and I can calculate it if you provide me the serial number of the box (format XXXXX-XX-XXXX-XXXXX-XX).  
-The serial number can be found on the sticker, located at the bottom of the Nexxtender device.  
-The PN and the SN numbers are the numbers needed to calculate the PIN code.  
-PN: XXXXX-XX  
-SN: XXXX-XXXXX-XX  
+The Nexxtender passkey is the PIN code that is used to pair your BLE device with the charger. (6 digit number)
+If you don't have the PIN code (or you have lost it), you can always reach out to me and I can calculate it if you provide me the serial number of the box (format XXXXX-XX-XXXX-XXXXX-XX).
+The serial number can be found on the sticker, located at the bottom of the Nexxtender device.
+The PN and the SN numbers are the numbers needed to calculate the PIN code.
+PN: XXXXX-XX
+SN: XXXX-XXXXX-XX
 
 ![serial](images/serial.png)
 
@@ -115,7 +116,16 @@ SN: XXXX-XXXXX-XX
 
    You then need to create a new YAML configuration for you nexxtender charger, compile it (this will create the corresponding C++ code and resulting binary), and upload it to your esp32.
 
-   ```Note: it seems that as from version 2024.5.x there are some issues, the last "compliant" version of ESPHome is 2024.4.2```
+   ```yaml
+   Note: as from ESPHome version 2024.5.x make sure you add the following sdkconfig option to the framework config
+   if you override the repository code for the esp32 as some changes were made to the esp-idf framework (v4.4.7)
+
+   framework:
+     type: esp-idf
+     version: recommended
+     sdkconfig_options:
+       "CONFIG_BT_GATTC_NOTIF_REG_MAX": "32"
+   ```
 
    There are several ways to do this, for example using command line or your favorite IDE, or directly via the ESPHome dashboard add-on proposed by Home Assistant.
 
@@ -127,27 +137,27 @@ SN: XXXX-XXXXX-XX
 
    ```yaml
    packages:
-      nexxtender: 
-         url: https://github.com/geertmeersman/nexxtender
-         file: config/nexxtender.yaml
-         refresh: 0s
+     nexxtender:
+       url: https://github.com/geertmeersman/nexxtender
+       file: config/nexxtender.yaml
+       refresh: 0s
    substitutions:
-      ## Uncomment and modify when you want to use a different device name.
-      # device_name: nexxtender
-      # friendly_name: Nexxtender
-      ## Uncomment and modify when you want to use a different threshold.
-      # charging_mode_eco_threshold: "8"      # Single phase (6A + 2 margin)
-      # charging_mode_eco_bi_threshold: "14"  # Bi-phase (12A + 2 margin)
-      # charging_mode_eco_tri_threshold: "20" # Tri-phase (18A + 2 margin)
-      # slider_max_car_charging_speed: "32"     # The max value of the slider for the maximum car charging speed slider, default set to 32
-      # slider_max_available_capacity: "40"     # The max value of the slider for the maximum available capacity slider, default set to 40
+     ## Uncomment and modify when you want to use a different device name.
+     # device_name: nexxtender
+     # friendly_name: Nexxtender
+     ## Uncomment and modify when you want to use a different threshold.
+     # charging_mode_eco_threshold: "8"      # Single phase (6A + 2 margin)
+     # charging_mode_eco_bi_threshold: "14"  # Bi-phase (12A + 2 margin)
+     # charging_mode_eco_tri_threshold: "20" # Tri-phase (18A + 2 margin)
+     # slider_max_car_charging_speed: "32"     # The max value of the slider for the maximum car charging speed slider, default set to 32
+     # slider_max_available_capacity: "40"     # The max value of the slider for the maximum available capacity slider, default set to 40
    ```
 
-   - The charging power mode is estimated based on the number of phases used during the charge.  
-   - The substitution `charging_mode_eco_threshold` and the others are optional, and you can set it to whatever Amp you want to be used as a threshold for the ECO/MAX sensor. Default values are the ones set in the example.  
-   Attention, it does not influence your charger; it is just a way of indicating which speed the charger is delivering.  
-   - The substitution `slider_max_car_charging_speed` lets you override the maximum value for the configuration slider of the maximum car charging speed. This is usually set to the value of the circuit breaker A. Default value is the ones set in the example.  
-   - The substitution `slider_max_available_capacity` lets you override the maximum value for the configuration slider of the maximum available capacity of the grid. This is usually set to the value of the circuit breaker A. Default value is the ones set in the example.  
+   - The charging power mode is estimated based on the number of phases used during the charge.
+   - The substitution `charging_mode_eco_threshold` and the others are optional, and you can set it to whatever Amp you want to be used as a threshold for the ECO/MAX sensor. Default values are the ones set in the example.
+     Attention, it does not influence your charger; it is just a way of indicating which speed the charger is delivering.
+   - The substitution `slider_max_car_charging_speed` lets you override the maximum value for the configuration slider of the maximum car charging speed. This is usually set to the value of the circuit breaker A. Default value is the ones set in the example.
+   - The substitution `slider_max_available_capacity` lets you override the maximum value for the configuration slider of the maximum available capacity of the grid. This is usually set to the value of the circuit breaker A. Default value is the ones set in the example.
 
 3. **Update the secrets.yaml:**
 
@@ -162,13 +172,13 @@ SN: XXXX-XXXXX-XX
    nexxtender_passkey: "YOUR_NEXXTENDER_PASSKEY"
    ```
 
-   In the HomeAssistant ESPHome dashboard, this is done using the top righ shortcut `SECRETS`. 
+   In the HomeAssistant ESPHome dashboard, this is done using the top righ shortcut `SECRETS`.
 
    Replace `"YOUR_ESPHOME_ADMIN_PASSWORD"`, `"YOUR_WIFI_SSID"`, `"YOUR_WIFI_PASSWORD"`, `"YOUR_ESPHOME_API_KEY"`, `"YOUR_NEXXTENDER_MAC_ADDRESS"`, and `"YOUR_NEXXTENDER_PASSKEY"` with your actual values.
 
    The `nexxtender_mac` is the bluetooth mac address you found in the previous step.
 
-   The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender. Explanations on how to find it can be found [here](#finding-nexxtender-bluetooth-passkey).  
+   The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender. Explanations on how to find it can be found [here](#finding-nexxtender-bluetooth-passkey).
 
    The `esphome_admin_password` is the password that is used for the Wi-Fi fallback hotspot and OTA.
 
@@ -181,12 +191,12 @@ SN: XXXX-XXXXX-XX
    ```
 
    Using the Home Assistant ESPHome dashboard, the firmware compilation, upload and flashing of your esp32 is done in one step by using the `Install` option.
-  Optionally, you can first run the `Validate` command that will check all the code and links before compiling it. Considering the compilation can take some time, this is a recommended step.
+   Optionally, you can first run the `Validate` command that will check all the code and links before compiling it. Considering the compilation can take some time, this is a recommended step.
 
    Note: if the compilation fails due to missing `nexxtender_packages/nexxtender.h` file. You can copy [nexxtender_packages/nexxtender.h](config/nexxtender_packages/nexxtender.h) in your configuration folder.
    In HomeAssistant, the configuration files for ESPHome can be found and edited under `<HOME_ASSISTANT_CONFIG>/esphome/`. For example the configuration for the nexxtender node can be found in `/config/esphome/nexxtender.yaml`. You'll then need to use a terminal or IDE to create the directory `<HOME_ASSISTANT_CONFIG>/esphome/nexxtender_packages` and the file `nexxtender.h`.
 
-6. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
+5. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
 
    ```bash
    esphome upload nexxtender.yaml
@@ -194,12 +204,11 @@ SN: XXXX-XXXXX-XX
 
    This step is thus normally already done when using the HomeAssistant ESPHome dashboard.
 
-   Note: If you’re just seeing Connecting....____.... on the screen and the flashing fails, please double-check the UART wires are connected correctly if flashing using a USB to UART bridge.
+   Note: If you’re just seeing Connecting....\_\_\_\_.... on the screen and the flashing fails, please double-check the UART wires are connected correctly if flashing using a USB to UART bridge.
 
    For some devices you need to keep pressing the BOOT button until flashing has begun (i.e. Geekcreit DOIT ESP32 DEVKIT V1).
 
    [Consult the FAQ part on esphome.io](https://esphome.io/guides/faq.html).
-
 
 ### Integrating your esp32 in Home Assistant
 
@@ -211,7 +220,7 @@ SN: XXXX-XXXXX-XX
 
 #### Customizing ESP32 Configuration (Optional)
 
-The standard configuration utilises the `az-delivery-devkit-v4` board. If you would have another ESP32 board, feel free to customize it.  
+The standard configuration utilises the `az-delivery-devkit-v4` board. If you would have another ESP32 board, feel free to customize it.
 
 If you want to customize the ESP32 section in your `nexxtender.yaml` file for your specific board type, you can add the following section at the end of the nexxtender.yaml:
 
@@ -232,23 +241,23 @@ esp32:
 
 esphome:
   platformio_options:
-    board_build.flash_mode: dio  
+    board_build.flash_mode: dio
 ```
 
 For this specific board, I have created a specific yaml that manages the RGB LED that is integrated on the board.
 
 The complete configuration file would look like:
 
-   ```yaml
-   packages:
-      nexxtender: 
-         url: https://github.com/geertmeersman/nexxtender
-         files:  [config/nexxtender.yaml, config/nexxtender_packages/esp.s3.yaml]
-         refresh: 0s
-   substitutions:
-      device_name: nexxtender
-      friendly_name: Nexxtender
-   ```
+```yaml
+packages:
+  nexxtender:
+    url: https://github.com/geertmeersman/nexxtender
+    files: [config/nexxtender.yaml, config/nexxtender_packages/esp.s3.yaml]
+    refresh: 0s
+substitutions:
+  device_name: nexxtender
+  friendly_name: Nexxtender
+```
 
 This flexibility allows users to tailor the configuration to their hardware requirements while still benefiting from the overall structure and functionality provided in the `nexxtender.yaml` file.
 
@@ -258,32 +267,33 @@ The Nexxtender comes equipped with an integrated ESPHome webserver and graphical
 
 1. **Activate the webserver package:**
 
-    There is a webserver configuration that you can activate by using the yaml below.
+   There is a webserver configuration that you can activate by using the yaml below.
 
-    ```yaml
-    packages:
-        nexxtender: 
-          url: https://github.com/geertmeersman/nexxtender
-          files:  [config/nexxtender.yaml, config/nexxtender_packages/webserver.yaml]
-          refresh: 0s
-    ```
+   ```yaml
+   packages:
+     nexxtender:
+       url: https://github.com/geertmeersman/nexxtender
+       files:
+         [config/nexxtender.yaml, config/nexxtender_packages/webserver.yaml]
+       refresh: 0s
+   ```
 
-    The content of the included webserver.yaml configuration file is the following:
+   The content of the included webserver.yaml configuration file is the following:
 
-    ```yaml
-    web_server:
-      auth:
-        username: admin
-        password: !secret esphome_admin_password
-    ```
+   ```yaml
+   web_server:
+     auth:
+       username: admin
+       password: !secret esphome_admin_password
+   ```
 
-    If you don't need authentication, you can just add this to your nexxtender.yaml configuration:
+   If you don't need authentication, you can just add this to your nexxtender.yaml configuration:
 
-    ```yaml
-    web_server:
-    ```
+   ```yaml
+   web_server:
+   ```
 
-    It will then activate the webserver on the standard port and without authentication.
+   It will then activate the webserver on the standard port and without authentication.
 
 2. **Access the Web Interface:** Open a web browser on a device connected to the same network as your Nexxtender.
 
@@ -342,268 +352,267 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
    In the example below they are located in your HA /config/www/images/auto/ folder.
 
    ```yaml
-    type: custom:vertical-stack-in-card
-    cards:
-      - type: picture-elements
-        aspect_ratio: 2
-        elements:
-          - style:
-              top: 50px
-              left: 73%
-            show_name: false
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_connection_type
-            show_state: true
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 12px
-                - color: black
-          - style:
-              top: 65px
-              left: 73%
-            show_name: true
-            name: |
-              [[[ return entity.state+" fasen"; ]]] 
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_charging_phases
-            show_state: false
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 12px
-                - color: black
-          - style:
-              top: 110px
-              left: 70%
-            show_name: true
-            name: Pieklimiet
-            layout: name_state
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_peak_consumption_limit
-            show_state: true
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 12px
-                - color: black
-          - style:
-              top: 130px
-              left: 70%
-            show_name: true
-            name: Beschikbaar
-            layout: name_state
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_available_capacity
-            show_state: true
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 12px
-                - color: black
-          - style:
-              top: 192px
-              left: 70%
-            show_name: false
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_mode
-            show_state: true
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 12px
-                - color: black
-          - name: L1
-            style:
-              top: 220px
-              left: 65%
-            show_name: true
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_grid_l1
-            show_state: true
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 10px
-          - name: L2
-            style:
-              top: 220px
-              left: 73%
-            show_name: true
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_grid_l2
-            show_state: true
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 10px
-          - name: L3
-            style:
-              top: 220px
-              left: 81%
-            show_name: true
-            show_icon: false
-            type: custom:button-card
-            entity: sensor.nexxtender_grid_l3
-            show_state: true
-            styles:
-              card:
-                - background: none
-                - border-radius: 0
-                - border: 0
-                - font-size: 10px
-        image: /local/images/1x1.png
-        card_mod:
-          style: |
-            ha-card {
-              {%- set nexxtender_state = states["sensor.nexxtender_status"].state -%}
-              {% if nexxtender_state == "Unplugged" %}
-                {% set image = 'unplugged' %}
-              {% elif  nexxtender_state == "Plugged" %}
-                {% set image = 'plugged' %}
-              {% elif  nexxtender_state == "Charging" %}
-                {% set image = 'charging' %}
-              {% else %}
-                {% set image = 'offline' %}
-              {% endif %}
-              background-size: 100% 100%;
-              background-image: url(/local/images/auto/device_home_{{image}}.png);
-              height: 300px !important;
-              border-radius: 0;
-              margin: 0;
-            }
-      - type: conditional
-        conditions:
-          - condition: numeric_state
-            entity: sensor.nexxtender_charging_phase_count
-            above: 0
-        card:
-          type: picture-elements
-          elements:
-            - type: state-icon
-              entity: sensor.nexxtender_energy
-              style:
-                top: 25px
-                left: 10%
-            - type: state-label
-              entity: sensor.nexxtender_energy
-              style:
-                top: 25px
-                left: 30%
-            - type: state-label
-              entity: sensor.nexxtender_charging_seconds
-              style:
-                top: 25px
-                left: 50%
-            - type: state-label
-              entity: sensor.nexxtender_car_power
-              style:
-                top: 25px
-                left: 70%
-            - type: state-label
-              entity: sensor.nexxtender_charging_phase_count
-              suffix: ' fases'
-              style:
-                top: 25px
-                left: 90%
-          image: /local/images/1x1.png
-          card_mod:
-            style: |
-              ha-card {
-                height: 50px !important;
-                background-color: #325FA8;
-              }
-      - type: conditional
-        conditions:
-          - condition: state
-            entity: sensor.nexxtender_status
-            state: Plugged
-        card:
-          type: horizontal-stack
-          cards:
-            - show_name: true
-              show_icon: true
-              icon: mdi:speedometer-slow
-              type: custom:button-card
-              layout: icon_name
-              tap_action:
-                action: toggle
-              entity: button.nexxtender_start_charge_eco
-              name: ECO laden
-              styles:
-                card:
-                  - background: green
-                  - border-radius: 0
-                  - height: 50px
-            - show_name: true
-              show_icon: true
-              icon: mdi:speedometer
-              type: custom:button-card
-              layout: icon_name
-              tap_action:
-                action: toggle
-              entity: button.nexxtender_start_charge_max
-              name: MAX laden
-              styles:
-                card:
-                  - background: blue
-                  - border-radius: 0
-                  - height: 50px
-      - type: conditional
-        conditions:
-          - condition: state
-            entity: sensor.nexxtender_status
-            state: Charging
-        card:
-          show_name: true
-          show_icon: false
-          type: custom:button-card
-          icon: mdi:stop
-          tap_action:
-            action: toggle
-          entity: button.nexxtender_stop_charging
-          name: Stop met laden
-          styles:
-            card:
-              - background: '#8E8D92'
-              - border-radius: 0
-              - height: 50px
-      - type: conditional
-        conditions:
-          - condition: state
-            entity: sensor.nexxtender_status
-            state: Unplugged
-        card:
-          type: markdown
-          content: <center>Sluit de kabel aan om te kunnen starten met laden</center>
-      - type: history-graph
-        entities:
-          - entity: sensor.nexxtender_grid_l1
-          - entity: sensor.nexxtender_grid_l2
-          - entity: sensor.nexxtender_grid_l3
-        logarithmic_scale: false
-
+   type: custom:vertical-stack-in-card
+   cards:
+     - type: picture-elements
+       aspect_ratio: 2
+       elements:
+         - style:
+             top: 50px
+             left: 73%
+           show_name: false
+           show_icon: false
+           type: custom:button-card
+           entity: sensor.nexxtender_connection_type
+           show_state: true
+           styles:
+             card:
+               - background: none
+               - border-radius: 0
+               - border: 0
+               - font-size: 12px
+               - color: black
+         - style:
+             top: 65px
+             left: 73%
+           show_name: true
+           name: |
+             [[[ return entity.state+" fasen"; ]]]
+           show_icon: false
+           type: custom:button-card
+           entity: sensor.nexxtender_charging_phases
+           show_state: false
+           styles:
+             card:
+               - background: none
+               - border-radius: 0
+               - border: 0
+               - font-size: 12px
+               - color: black
+         - style:
+             top: 110px
+             left: 70%
+           show_name: true
+           name: Pieklimiet
+           layout: name_state
+           show_icon: false
+           type: custom:button-card
+           entity: sensor.nexxtender_peak_consumption_limit
+           show_state: true
+           styles:
+             card:
+               - background: none
+               - border-radius: 0
+               - border: 0
+               - font-size: 12px
+               - color: black
+         - style:
+             top: 130px
+             left: 70%
+           show_name: true
+           name: Beschikbaar
+           layout: name_state
+           show_icon: false
+           type: custom:button-card
+           entity: sensor.nexxtender_available_capacity
+           show_state: true
+           styles:
+             card:
+               - background: none
+               - border-radius: 0
+               - border: 0
+               - font-size: 12px
+               - color: black
+         - style:
+             top: 192px
+             left: 70%
+           show_name: false
+           show_icon: false
+           type: custom:button-card
+           entity: sensor.nexxtender_mode
+           show_state: true
+           styles:
+             card:
+               - background: none
+               - border-radius: 0
+               - border: 0
+               - font-size: 12px
+               - color: black
+         - name: L1
+           style:
+             top: 220px
+             left: 65%
+           show_name: true
+           show_icon: false
+           type: custom:button-card
+           entity: sensor.nexxtender_grid_l1
+           show_state: true
+           styles:
+             card:
+               - background: none
+               - border-radius: 0
+               - border: 0
+               - font-size: 10px
+         - name: L2
+           style:
+             top: 220px
+             left: 73%
+           show_name: true
+           show_icon: false
+           type: custom:button-card
+           entity: sensor.nexxtender_grid_l2
+           show_state: true
+           styles:
+             card:
+               - background: none
+               - border-radius: 0
+               - border: 0
+               - font-size: 10px
+         - name: L3
+           style:
+             top: 220px
+             left: 81%
+           show_name: true
+           show_icon: false
+           type: custom:button-card
+           entity: sensor.nexxtender_grid_l3
+           show_state: true
+           styles:
+             card:
+               - background: none
+               - border-radius: 0
+               - border: 0
+               - font-size: 10px
+       image: /local/images/1x1.png
+       card_mod:
+         style: |
+           ha-card {
+             {%- set nexxtender_state = states["sensor.nexxtender_status"].state -%}
+             {% if nexxtender_state == "Unplugged" %}
+               {% set image = 'unplugged' %}
+             {% elif  nexxtender_state == "Plugged" %}
+               {% set image = 'plugged' %}
+             {% elif  nexxtender_state == "Charging" %}
+               {% set image = 'charging' %}
+             {% else %}
+               {% set image = 'offline' %}
+             {% endif %}
+             background-size: 100% 100%;
+             background-image: url(/local/images/auto/device_home_{{image}}.png);
+             height: 300px !important;
+             border-radius: 0;
+             margin: 0;
+           }
+     - type: conditional
+       conditions:
+         - condition: numeric_state
+           entity: sensor.nexxtender_charging_phase_count
+           above: 0
+       card:
+         type: picture-elements
+         elements:
+           - type: state-icon
+             entity: sensor.nexxtender_energy
+             style:
+               top: 25px
+               left: 10%
+           - type: state-label
+             entity: sensor.nexxtender_energy
+             style:
+               top: 25px
+               left: 30%
+           - type: state-label
+             entity: sensor.nexxtender_charging_seconds
+             style:
+               top: 25px
+               left: 50%
+           - type: state-label
+             entity: sensor.nexxtender_car_power
+             style:
+               top: 25px
+               left: 70%
+           - type: state-label
+             entity: sensor.nexxtender_charging_phase_count
+             suffix: " fases"
+             style:
+               top: 25px
+               left: 90%
+         image: /local/images/1x1.png
+         card_mod:
+           style: |
+             ha-card {
+               height: 50px !important;
+               background-color: #325FA8;
+             }
+     - type: conditional
+       conditions:
+         - condition: state
+           entity: sensor.nexxtender_status
+           state: Plugged
+       card:
+         type: horizontal-stack
+         cards:
+           - show_name: true
+             show_icon: true
+             icon: mdi:speedometer-slow
+             type: custom:button-card
+             layout: icon_name
+             tap_action:
+               action: toggle
+             entity: button.nexxtender_start_charge_eco
+             name: ECO laden
+             styles:
+               card:
+                 - background: green
+                 - border-radius: 0
+                 - height: 50px
+           - show_name: true
+             show_icon: true
+             icon: mdi:speedometer
+             type: custom:button-card
+             layout: icon_name
+             tap_action:
+               action: toggle
+             entity: button.nexxtender_start_charge_max
+             name: MAX laden
+             styles:
+               card:
+                 - background: blue
+                 - border-radius: 0
+                 - height: 50px
+     - type: conditional
+       conditions:
+         - condition: state
+           entity: sensor.nexxtender_status
+           state: Charging
+       card:
+         show_name: true
+         show_icon: false
+         type: custom:button-card
+         icon: mdi:stop
+         tap_action:
+           action: toggle
+         entity: button.nexxtender_stop_charging
+         name: Stop met laden
+         styles:
+           card:
+             - background: "#8E8D92"
+             - border-radius: 0
+             - height: 50px
+     - type: conditional
+       conditions:
+         - condition: state
+           entity: sensor.nexxtender_status
+           state: Unplugged
+       card:
+         type: markdown
+         content: <center>Sluit de kabel aan om te kunnen starten met laden</center>
+     - type: history-graph
+       entities:
+         - entity: sensor.nexxtender_grid_l1
+         - entity: sensor.nexxtender_grid_l2
+         - entity: sensor.nexxtender_grid_l3
+       logarithmic_scale: false
    ```
 
    </details>
