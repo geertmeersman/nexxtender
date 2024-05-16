@@ -1,5 +1,16 @@
 # Changelog
 
+## [v0.1.1](https://github.com/geertmeersman/nexxtender/tree/v0.1.1) (2024-05-16)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v0.1.0...v0.1.1)
+
+**Merged pull requests:**
+
+- fix: ESPHome 2024.5.x added CONFIG\_BT\_GATTC\_NOTIF\_REG\_MAX linked to esp-idf v4.4.7 [\#30](https://github.com/geertmeersman/nexxtender/pull/30) ([geertmeersman](https://github.com/geertmeersman))
+- fix: workflow concurrency [\#29](https://github.com/geertmeersman/nexxtender/pull/29) ([geertmeersman](https://github.com/geertmeersman))
+- docs: precommit [\#28](https://github.com/geertmeersman/nexxtender/pull/28) ([geertmeersman](https://github.com/geertmeersman))
+- docs: add version to zip file [\#27](https://github.com/geertmeersman/nexxtender/pull/27) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v0.1.0](https://github.com/geertmeersman/nexxtender/tree/v0.1.0) (2024-05-07)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/476c0013bb882f99aadb1cd099514eeb5a7d77b7...v0.1.0)
