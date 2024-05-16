@@ -124,7 +124,7 @@ SN: XXXX-XXXXX-XX
      type: esp-idf
      version: recommended
      sdkconfig_options:
-       "CONFIG_BT_GATTC_NOTIF_REG_MAX": "32"
+       CONFIG_BT_GATTC_NOTIF_REG_MAX: "32"
    ```
 
    There are several ways to do this, for example using command line or your favorite IDE, or directly via the ESPHome dashboard add-on proposed by Home Assistant.
