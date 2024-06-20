@@ -5,7 +5,6 @@ globals:
 
 ota:
   - platform: esphome
-    safe_mode: true
     password: !secret esphome_admin_password
 
 wifi:
