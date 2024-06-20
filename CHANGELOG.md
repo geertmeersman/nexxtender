@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.1.2](https://github.com/geertmeersman/nexxtender/tree/v0.1.2) (2024-06-20)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v0.1.1...v0.1.2)
+
+**Merged pull requests:**
+
+- fix: 2024.6.0 OTA change   [\#32](https://github.com/geertmeersman/nexxtender/pull/32) ([geertmeersman](https://github.com/geertmeersman))
+- docs: add version to zipfile name [\#31](https://github.com/geertmeersman/nexxtender/pull/31) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v0.1.1](https://github.com/geertmeersman/nexxtender/tree/v0.1.1) (2024-05-16)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v0.1.0...v0.1.1)
