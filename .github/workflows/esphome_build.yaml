@@ -36,9 +36,9 @@ jobs:
       - name: Build ESPHOME az-delivery-devkit-v4
         uses: esphome/build-action@v4
         with:
-          yaml_file: config/nexxtender.yaml
+          yaml-file: config/nexxtender.yaml
 
       - name: Build ESPHOME esp32-s3-devkitc-1
         uses: esphome/build-action@v4
         with:
-          yaml_file: config/nexxtender.s3.yaml
+          yaml-file: config/nexxtender.s3.yaml
