@@ -101,6 +101,12 @@ Before integrating your Nexxtender EV Charger with the ESPHome BLE client, you'l
 
 By following these steps, you can easily find the Bluetooth MAC address of your Nexxtender EV Charger named "HOME" using the NRF Connect app.
 
+If you don't have the possibility to use the NRF Connect App, you can try scanning for bluetooth devices in your Chrome browser
+
+```
+chrome://bluetooth-internals/#devices
+```
+
 ### Finding Nexxtender Bluetooth passkey
 
 The Nexxtender passkey is the PIN code that is used to pair your BLE device with the charger. (6 digit number)
