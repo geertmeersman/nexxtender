@@ -7,14 +7,15 @@ substitutions:
   generic_data_update_interval: 60s
   slider_max_car_charging_speed: "32"
   slider_max_available_capacity: "40"
+  peak_consumption_limit: "0"
 
 globals:
   - id: g_${generic_data_id_prefix}_config_init
     type: bool
-    initial_value: 'false'
+    initial_value: "false"
   - id: g_${generic_data_id_prefix}_status
     type: int
-    initial_value: '0'
+    initial_value: "0"
   - id: g_${generic_data_id_prefix}_week_start
     type: std::string
   - id: g_${generic_data_id_prefix}_week_end
@@ -23,18 +24,21 @@ globals:
     type: std::string
   - id: g_${generic_data_id_prefix}_weekend_end
     type: std::string
+  - id: g_${generic_data_id_prefix}_cbor_config
+    type: std::string
+    initial_value: ""
   - id: g_${generic_data_id_prefix}_config
     type: std::string
-    initial_value: ''
+    initial_value: ""
   - id: g_${generic_data_id_prefix}_i_evse_max
     type: float
-    initial_value: '0'
+    initial_value: "0"
   - id: g_${generic_data_id_prefix}_i_max
     type: float
-    initial_value: '0'
+    initial_value: "0"
   - id: g_${generic_data_id_prefix}_charge_mode
     type: int
-    initial_value: '6'
+    initial_value: "6"
 sensor:
   - platform: template
     name: "Charging Phases"
@@ -123,7 +127,7 @@ text_sensor:
     id: ${device_name}_generic_status
     icon: mdi:information-box
     update_interval: ${generic_data_update_interval}
-    entity_category: diagnostic    
+    entity_category: diagnostic
   - platform: ble_client
     id: ${device_name}_generic_status_internal
     name: Generic Internal Status
@@ -178,6 +182,7 @@ text_sensor:
                 return;
             case 0x5004:
                 id(${device_name}_generic_status).publish_state(std::string("Config Set CBOR READY"));
+                id(script_write_cbor_config).execute();
                 return;
             case 0x5002:
             case 0x5005:
@@ -190,8 +195,9 @@ text_sensor:
                 return;
             default:
                 id(${device_name}_generic_status).publish_state(std::string("UNKNOWN"));
+                //id(script_read_generic_data).execute(); //TODO leave it?
                 return;
-          }        
+          }
   - platform: ble_client
     id: ${device_name}_generic_data
     name: Generic data
@@ -201,10 +207,10 @@ text_sensor:
     characteristic_uuid: ${ble_uuid_generic_data}
     entity_category: "config"
     #filters:
-      #lambda: |-
-        #String hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
-        #ESP_LOGD("${device_name}_generic_data", "Status is: %d", id(g_${generic_data_id_prefix}_status));
-        #return hex_data;
+    #lambda: |-
+    #String hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+    #ESP_LOGD("${device_name}_generic_data", "Status is: %d", id(g_${generic_data_id_prefix}_status));
+    #return hex_data;
     notify: true
 
 script:
@@ -233,7 +239,7 @@ script:
             }
             ESP_LOGD("script.switch_charger_mode", "Switching to status: %s", value_string.c_str());
             select_call.set_option(value_string.c_str());
-            select_call.perform();              
+            select_call.perform();
           }
   - id: script_read_config
     then:
@@ -250,6 +256,13 @@ script:
             ESP_LOGD("${device_name}_CBOR_config", "Status is NOK, let's read old config!: 0x%x", id(g_${generic_data_id_prefix}_status));
             id(script_read_config_old).execute();
           }
+  - id: script_send_config
+    then:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command}
+          value: [0x03, 0x50]
   - id: script_send_config_old
     then:
       - ble_client.ble_write:
@@ -296,6 +309,25 @@ script:
             // Convert the byte array into a vector
             std::vector<uint8_t> epoch_time_vector(epoch_time_bytes.begin(), epoch_time_bytes.end());
             return epoch_time_vector;
+
+  - id: script_write_cbor_config
+    then:
+      - lambda: |-
+          std::string x = id(g_${generic_data_id_prefix}_cbor_config);
+          logd_x("${device_name}_generic_data script_write_cbor_config|start value", x);
+          if (x.empty()) { return; }
+          if (!check_crc(x, x.size())) {
+            ESP_LOGD("${device_name}_generic_data script_write_cbor_config", "Checksum CRC16 Failed");
+            return;
+          }
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_data}
+          value: !lambda |-
+            std::string x = id(g_${generic_data_id_prefix}_cbor_config);
+            std::vector<uint8_t> config_data(x.begin(), x.end());
+            return config_data;
 
   - id: script_write_config
     then:
@@ -385,16 +417,14 @@ script:
 
                     if (additional_info < 24) {
                       value = initial_byte;
-                      // ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
                     } else if (additional_info == 24) {
                       value = x[index];
                       index += 1;
-                      // ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
                     } else if (additional_info == 25) {
                       value = (x[index] << 8) | x[index+1];
                       index += 2;
-                      // ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
                     }
+                    ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
 
                     switch (key) {
                       case 1: // Charge Mode
@@ -416,7 +446,7 @@ script:
                           }
                           id(${generic_data_id_prefix}_charge_mode).publish_state(value_string.c_str());
                           select_call.set_option(value_string.c_str());
-                          select_call.perform();              
+                          select_call.perform();
                           break;
                       case 2: //modbusSlaveAddress(2)
                           break;
@@ -481,9 +511,9 @@ script:
                           id(${generic_data_id_prefix}_i_capacity).publish_state(value);
                       default:
                           break;
-                    }                      
+                    }
                 }
-                  break; // Exit the loop once B2 map is found
+                break; // Exit the loop once B2 map is found
               } else {
                   index++; // Move to the next byte
               }
@@ -492,6 +522,52 @@ script:
             if (!found_b2) {
                 ESP_LOGW("${device_name}_generic_data", "B2 map not found in the CBOR data.");
             }
+            ESP_LOGD("${device_name}_generic_data", "Checking i_capacity");
+            if (${peak_consumption_limit} > 0 && id(${generic_data_id_prefix}_i_capacity).state != ${peak_consumption_limit}) {
+              // i_capacity update
+              index = 0;
+              while (index < x.size() - 1) {
+                if (x[index] == 0xB2) {
+                  found_b2 = true;
+                  index++;  // Move past B2 marker
+
+                  // Parse the CBOR map to find key 19
+                  while (index < x.size()) {
+                    uint8_t key = x[index++];  // Read key
+                    uint8_t initial_byte = x[index++];
+                    uint8_t major_type = initial_byte >> 5;
+                    uint8_t additional_info = initial_byte & 0x1F;
+
+                    if (key == 19 && additional_info < 24) {  // Check if key is `19` and additional_info is `16`
+                      ESP_LOGI("${device_name}_generic_data", "Updating the peak consumption limit to ${peak_consumption_limit}A");
+
+                      // Assuming additional_info 16 implies that i_capacity is a single-byte integer
+                      x[index - 1] = static_cast<uint8_t>(static_cast<int>(${peak_consumption_limit}) & 0xFF);  // Set the new i_capacity value as a single byte
+                      add_crc_to_data(x, x.size());
+                      id(g_${generic_data_id_prefix}_cbor_config) = x;
+                      id(script_send_config).execute();
+                      id(${generic_data_id_prefix}_i_capacity).publish_state(${peak_consumption_limit});
+
+                      //DONE
+                      break;
+                    } else {
+                      // Move index forward based on the size of the current value (here, skipping unknown formats)
+                      if (additional_info == 24) {
+                        index += 1;
+                      } else if (additional_info == 25) {
+                        index += 2;
+                      }
+                    }
+                  }
+                  break;
+                } else {
+                    index++; // Move to the next byte
+                }
+              }
+            } else {
+              ESP_LOGI("${device_name}_generic_data", "No peak consumption limit to be adjusted");
+            }
+
             // Read old config to populate variable
             id(script_read_config_old).execute();
             return;
@@ -528,7 +604,7 @@ script:
               }
               auto select_call = id(select_mode).make_call();
               select_call.set_option(value_string.c_str());
-              select_call.perform();              
+              select_call.perform();
               id(${generic_data_id_prefix}_charge_mode).publish_state(value_string.c_str());
               id(${generic_data_id_prefix}_i_min).publish_state(getInt8(x, 3));
               value = (3 & getInt8(x, 4)) >> 1;
@@ -551,7 +627,7 @@ script:
               ESP_LOGW("${device_name}_generic_data", "Config data size not equal to 15. Please open an issue with your HEX string information.");
             }
             // Synchronise Nexxtender time
-            id(script_sync_time).execute();            
+            id(script_sync_time).execute();
             return;
           }
 
@@ -642,19 +718,19 @@ number:
     mode: slider
     entity_category: "config"
     set_action:
-        - lambda: |-
-            std::string config = id(g_${generic_data_id_prefix}_config);
-            if (config.empty()) { return; }
-            float value = static_cast<float>(x);
-            ESP_LOGD("Maximum car charging speed", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
-            if (id(g_${generic_data_id_prefix}_i_evse_max) == 0) {
-              ESP_LOGD("Setting Maximum car charging speed", "%f A", value);
-              id(g_${generic_data_id_prefix}_i_evse_max) = value;
-            } else if (id(g_${generic_data_id_prefix}_i_evse_max) != value) {
-              ESP_LOGD("Setting Maximum car charging speed and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
-              id(g_${generic_data_id_prefix}_i_evse_max) = value;
-              id(script_send_config_old).execute();
-            }
+      - lambda: |-
+          std::string config = id(g_${generic_data_id_prefix}_config);
+          if (config.empty()) { return; }
+          float value = static_cast<float>(x);
+          ESP_LOGD("Maximum car charging speed", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
+          if (id(g_${generic_data_id_prefix}_i_evse_max) == 0) {
+            ESP_LOGD("Setting Maximum car charging speed", "%f A", value);
+            id(g_${generic_data_id_prefix}_i_evse_max) = value;
+          } else if (id(g_${generic_data_id_prefix}_i_evse_max) != value) {
+            ESP_LOGD("Setting Maximum car charging speed and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
+            id(g_${generic_data_id_prefix}_i_evse_max) = value;
+            id(script_send_config_old).execute();
+          }
   - platform: template
     id: max_available_capacity
     name: Maximum available capacity
@@ -669,19 +745,19 @@ number:
     mode: slider
     entity_category: "config"
     set_action:
-        - lambda: |-
-            std::string config = id(g_${generic_data_id_prefix}_config);
-            if (config.empty()) { return; }
-            float value = static_cast<float>(x);
-            ESP_LOGD("Maximum available capacity", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_max));
-            if (id(g_${generic_data_id_prefix}_i_max) == 0) {
-              ESP_LOGD("Setting Maximum available capacity", "%f A", value);
-              id(g_${generic_data_id_prefix}_i_max) = value;
-            } else if (id(g_${generic_data_id_prefix}_i_max) != value) {
-              ESP_LOGD("Setting Maximum available capacity and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_max));
-              id(g_${generic_data_id_prefix}_i_max) = value;
-              id(script_send_config_old).execute();
-            }
+      - lambda: |-
+          std::string config = id(g_${generic_data_id_prefix}_config);
+          if (config.empty()) { return; }
+          float value = static_cast<float>(x);
+          ESP_LOGD("Maximum available capacity", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_max));
+          if (id(g_${generic_data_id_prefix}_i_max) == 0) {
+            ESP_LOGD("Setting Maximum available capacity", "%f A", value);
+            id(g_${generic_data_id_prefix}_i_max) = value;
+          } else if (id(g_${generic_data_id_prefix}_i_max) != value) {
+            ESP_LOGD("Setting Maximum available capacity and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_max));
+            id(g_${generic_data_id_prefix}_i_max) = value;
+            id(script_send_config_old).execute();
+          }
 
 select:
   - platform: template
@@ -697,39 +773,39 @@ select:
       - Max Open
     entity_category: "config"
     on_value:
-        - lambda: |-
-            std::string config = id(g_${generic_data_id_prefix}_config);
-            if (config.empty()) { return; }
-            int value_int = 6;
-            switch (i) {
-                case 0: //"Eco Private"
-                    value_int = 0;
-                    break;
-                case 1: //"Max Private"
-                    value_int = 1;
-                    break;
-                case 2: //"Eco Open"
-                    value_int = 4;
-                    break;
-                case 3: //"Max Open"
-                    value_int = 5;
-                    break;
-                default:
-                    break;
-            }
-            ESP_LOGD("Car charge mode", "Received %s (%d), previous: %d", x.c_str(), value_int, id(g_${generic_data_id_prefix}_charge_mode));
-            if (id(g_${generic_data_id_prefix}_charge_mode) == 6) {
-              ESP_LOGD("Setting global car charge mode", "%s (%d)", x.c_str(), i);
-              id(g_${generic_data_id_prefix}_charge_mode) = value_int;
-            } else if (value_int != 6 && id(g_${generic_data_id_prefix}_charge_mode) != value_int) {
-              ESP_LOGD("Setting car charge mode and sending config", "Received %s (%d), previous: %d", x.c_str(), i, id(g_${generic_data_id_prefix}_charge_mode));
-              id(g_${generic_data_id_prefix}_charge_mode) = value_int;
-              id(script_send_config_old).execute();
-            }
+      - lambda: |-
+          std::string config = id(g_${generic_data_id_prefix}_config);
+          if (config.empty()) { return; }
+          int value_int = 6;
+          switch (i) {
+              case 0: //"Eco Private"
+                  value_int = 0;
+                  break;
+              case 1: //"Max Private"
+                  value_int = 1;
+                  break;
+              case 2: //"Eco Open"
+                  value_int = 4;
+                  break;
+              case 3: //"Max Open"
+                  value_int = 5;
+                  break;
+              default:
+                  break;
+          }
+          ESP_LOGD("Car charge mode", "Received %s (%d), previous: %d", x.c_str(), value_int, id(g_${generic_data_id_prefix}_charge_mode));
+          if (id(g_${generic_data_id_prefix}_charge_mode) == 6) {
+            ESP_LOGD("Setting global car charge mode", "%s (%d)", x.c_str(), i);
+            id(g_${generic_data_id_prefix}_charge_mode) = value_int;
+          } else if (value_int != 6 && id(g_${generic_data_id_prefix}_charge_mode) != value_int) {
+            ESP_LOGD("Setting car charge mode and sending config", "Received %s (%d), previous: %d", x.c_str(), i, id(g_${generic_data_id_prefix}_charge_mode));
+            id(g_${generic_data_id_prefix}_charge_mode) = value_int;
+            id(script_send_config_old).execute();
+          }
 
 binary_sensor:
   - platform: gpio
-    pin: 
+    pin:
       number: GPIO00
       inverted: true
       mode:
