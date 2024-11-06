@@ -4,9 +4,6 @@ on:
   push:
     paths:
       - "config/**" # Trigger only if there are changes in config folder or its subfolders
-  pull_request:
-    paths:
-      - "config/**" # Trigger only if there are changes in config folder or its subfolders
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * *"
