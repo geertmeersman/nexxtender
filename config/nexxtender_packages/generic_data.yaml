@@ -523,7 +523,7 @@ script:
                 ESP_LOGW("${device_name}_generic_data", "B2 map not found in the CBOR data.");
             }
             ESP_LOGD("${device_name}_generic_data", "Checking i_capacity");
-            if (${peak_consumption_limit} > 0 && id(${generic_data_id_prefix}_i_capacity).state != ${peak_consumption_limit}) {
+            if (${peak_consumption_limit} > 0 && ${peak_consumption_limit} <= 40 && id(${generic_data_id_prefix}_i_capacity).state != ${peak_consumption_limit}) {
               // i_capacity update
               index = 0;
               while (index < x.size() - 1) {
