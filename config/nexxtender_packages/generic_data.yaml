@@ -315,7 +315,10 @@ script:
       - lambda: |-
           std::string x = id(g_${generic_data_id_prefix}_cbor_config);
           logd_x("${device_name}_generic_data script_write_cbor_config|start value", x);
-          if (x.empty()) { return; }
+          if (x.empty()) {
+            ESP_LOGW("${device_name}_generic_data", "Empty CBOR config, aborting write");
+            return;
+          }
           if (!check_crc(x, x.size())) {
             ESP_LOGD("${device_name}_generic_data script_write_cbor_config", "Checksum CRC16 Failed");
             return;
