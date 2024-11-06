@@ -22,3 +22,4 @@ substitutions:
   # charging_mode_eco_tri_threshold: "20"
   # slider_max_car_charging_speed: "32"
   # slider_max_available_capacity: "40"
+  # peak_consumption_limit: "16"            # The peak consumption limit, be careful when setting this value. It is usually set by your installer
