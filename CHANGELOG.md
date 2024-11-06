@@ -1,5 +1,23 @@
 # Changelog
 
+## [v1.0.0](https://github.com/geertmeersman/nexxtender/tree/v1.0.0) (2024-11-06)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v0.1.2...v1.0.0)
+
+**Closed issues:**
+
+- substitutions [\#37](https://github.com/geertmeersman/nexxtender/issues/37)
+- The ESP home admin password  [\#36](https://github.com/geertmeersman/nexxtender/issues/36)
+- config/esphome/nexxtender.yaml error [\#35](https://github.com/geertmeersman/nexxtender/issues/35)
+- The connection dropped immediately after encrypted hello; Try enabling encryption on the device or turning off encryption on the client [\#34](https://github.com/geertmeersman/nexxtender/issues/34)
+
+**Merged pull requests:**
+
+- feat: set the peak consumption limit through the config [\#40](https://github.com/geertmeersman/nexxtender/pull/40) ([geertmeersman](https://github.com/geertmeersman))
+- fix: build action yaml-file [\#39](https://github.com/geertmeersman/nexxtender/pull/39) ([geertmeersman](https://github.com/geertmeersman))
+- build\(deps\): bump esphome/build-action from 3 to 4 [\#38](https://github.com/geertmeersman/nexxtender/pull/38) ([dependabot[bot]](https://github.com/apps/dependabot))
+- build\(deps\): bump esphome/build-action from 2 to 3 [\#33](https://github.com/geertmeersman/nexxtender/pull/33) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v0.1.2](https://github.com/geertmeersman/nexxtender/tree/v0.1.2) (2024-06-20)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v0.1.1...v0.1.2)
