@@ -245,7 +245,7 @@ Replace `YOUR_ESP32_BOARD_TYPE` with the specific board type you're using, such 
 
 ##### ESP32-S3-N16R8
 
-Example for the ESP32-S3-N16R8, buy here: [Aliexpress](https://a.aliexpress.com/_EwvIgjF)
+Example for the ESP32-S3-N16R8, buy here: [Aliexpress](https://a.aliexpress.com/_EwvIgjF). Make sure you pick the right type (they call it color): 'ESP32-S3-N16R8'.
 
 ```yaml
 esp32:
