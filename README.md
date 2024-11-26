@@ -122,6 +122,8 @@ SN: XXXX-XXXXX-XX
 
 1. **Install ESPHome:** If you haven't already, install ESPHome by following the instructions [here](https://esphome.io/guides/getting_started_command_line.html#installation-step) or [here in combination with HA](https://esphome.io/guides/getting_started_hassio.html).
 
+   Make sure you install at least the ESPhome version 2024.2.0. The latest version is always recommended.
+
    You then need to create a new YAML configuration for you nexxtender charger, compile it (this will create the corresponding C++ code and resulting binary), and upload it to your esp32.
 
    ```yaml
