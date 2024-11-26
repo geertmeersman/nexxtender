@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.0.1](https://github.com/geertmeersman/nexxtender/tree/v1.0.1) (2024-11-26)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v1.0.0...v1.0.1)
+
+**Merged pull requests:**
+
+- docs: add min\_version 2024.2.0 [\#41](https://github.com/geertmeersman/nexxtender/pull/41) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v1.0.0](https://github.com/geertmeersman/nexxtender/tree/v1.0.0) (2024-11-06)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v0.1.2...v1.0.0)
