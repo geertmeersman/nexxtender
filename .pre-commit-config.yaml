@@ -1,6 +1,6 @@
 exclude: CHANGELOG.md
 minimum_pre_commit_version: 2.11.0
-default_stages: [commit, push, manual]
+default_stages: [pre-commit, pre-push, manual]
 repos:
   - repo: https://github.com/psf/black
     rev: 23.1.0
@@ -25,7 +25,7 @@ repos:
     hooks:
       - id: prettier
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
         args: [--maxkb=800]
