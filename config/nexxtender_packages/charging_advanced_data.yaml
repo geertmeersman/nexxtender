@@ -54,7 +54,7 @@ sensor:
     name: "${charging_advanced_prefix} Grid Energy"
     sensor: ${charging_advanced_id_prefix}_grid_power
     time_unit: h
-    unit_of_measurement: "kWh"
+    unit_of_measurement: Wh
     state_class: total_increasing
     device_class: energy
     icon: mdi:transmission-tower
