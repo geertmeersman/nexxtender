@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.1.0](https://github.com/geertmeersman/nexxtender/tree/v1.1.0) (2025-01-05)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v1.0.1...v1.1.0)
+
+**Merged pull requests:**
+
+- feat: add Grid Energy sensor for HA Energy Dashboard [\#42](https://github.com/geertmeersman/nexxtender/pull/42) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v1.0.1](https://github.com/geertmeersman/nexxtender/tree/v1.0.1) (2024-11-26)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v1.0.0...v1.0.1)
