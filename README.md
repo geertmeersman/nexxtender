@@ -103,7 +103,7 @@ By following these steps, you can easily find the Bluetooth MAC address of your 
 
 If you don't have the possibility to use the NRF Connect App, you can try scanning for bluetooth devices in your Chrome browser
 
-```
+```text
 chrome://bluetooth-internals/#devices
 ```
 

@@ -50,6 +50,14 @@ sensor:
     update_interval: ${charging_advanced_update_interval}
     lambda: |-
       return id(g_${charging_advanced_id_prefix}_grid_power);
+  - platform: integration
+    name: "${charging_advanced_prefix} Grid Energy"
+    sensor: ${charging_advanced_id_prefix}_grid_power
+    time_unit: h
+    unit_of_measurement: "kWh"
+    state_class: total_increasing
+    device_class: energy
+    icon: mdi:transmission-tower
   - platform: template
     name: "Car Power"
     id: ${charging_advanced_id_prefix}_car_power
