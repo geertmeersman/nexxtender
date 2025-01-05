@@ -79,13 +79,6 @@ sensor:
     update_interval: ${charging_grid_update_interval}
     lambda: |-
       return id(g_${charging_grid_id_prefix}_consumed);
-  - platform: integration
-    name: "${charging_grid_prefix} Grid Energy"
-    sensor: ${charging_grid_id_prefix}_consumed
-    time_unit: h
-    unit_of_measurement: "kWh"
-    state_class: total_increasing
-    device_class: energy
   - platform: template
     name: "${charging_grid_prefix} Interval"
     id: ${charging_grid_id_prefix}_interval
