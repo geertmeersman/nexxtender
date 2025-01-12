@@ -1,10 +1,9 @@
 # docker-compose.yaml file
-version: '3.5'
+version: "3.5"
 services:
-    esphome:
-        image: esphome/esphome
-        container_name: esphome-nexxtender
-        volumes:
-            - ./config:/config
-        network_mode: host
-
+  esphome:
+    image: esphome/esphome
+    container_name: esphome-nexxtender
+    volumes:
+      - ./config:/config
+    network_mode: host

@@ -5,7 +5,7 @@ substitutions:
 globals:
   - id: g_ble_client_manual_disconnect
     type: int
-    initial_value: '0'
+    initial_value: "0"
 
 esp32_ble:
   io_capability: keyboard_only
@@ -33,7 +33,7 @@ ble_client:
       then:
         - logger.log:
             format: "Enter this passkey on your BLE device: %06d"
-            args: [ passkey ]
+            args: [passkey]
     on_passkey_request:
       then:
         - logger.log: "Authenticating with passkey"
@@ -65,8 +65,8 @@ switch:
     on_turn_on:
       - globals.set:
           id: g_ble_client_manual_disconnect
-          value: '0'
+          value: "0"
     on_turn_off:
       - globals.set:
           id: g_ble_client_manual_disconnect
-          value: '1'
+          value: "1"

@@ -19,7 +19,6 @@ binary_sensor:
     entity_category: diagnostic
     disabled_by_default: true
 
-
 ## ---------------------------------------------------
 ## switches
 ## ---------------------------------------------------
@@ -89,12 +88,12 @@ sensor:
     update_interval: ${diagnostics_update_interval}
     accuracy_decimals: 0
     lambda: |-
-        if (id(wifi_signal_strength).state < -92.0)
-          return 100.0;
-        if (id(wifi_signal_strength).state > -21.0)
-          return 1.0;
-        else
-          return round(( -0.0154 * id(wifi_signal_strength).state * id(wifi_signal_strength).state ) - ( 0.3794 * id(wifi_signal_strength).state ) + 98.182 );
+      if (id(wifi_signal_strength).state < -92.0)
+        return 100.0;
+      if (id(wifi_signal_strength).state > -21.0)
+        return 1.0;
+      else
+        return round(( -0.0154 * id(wifi_signal_strength).state * id(wifi_signal_strength).state ) - ( 0.3794 * id(wifi_signal_strength).state ) + 98.182 );
     entity_category: diagnostic
     disabled_by_default: true
 

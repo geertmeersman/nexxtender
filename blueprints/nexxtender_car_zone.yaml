@@ -17,7 +17,7 @@ blueprint:
       selector:
         entity:
           domain: sensor
-          integration: esphome  # Filter entities from ESPHome integration
+          integration: esphome # Filter entities from ESPHome integration
     nexxtender_mode_selector:
       name: Nexxtender Mode Selector
       description: |
@@ -26,7 +26,7 @@ blueprint:
       selector:
         entity:
           domain: select
-          integration: esphome  # Filter entities from ESPHome integration
+          integration: esphome # Filter entities from ESPHome integration
     nexxtender_zone:
       name: Nexxtender Zone
       description: "The zone representing the area where the Nexxtender is located."

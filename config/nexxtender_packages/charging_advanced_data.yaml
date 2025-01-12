@@ -4,7 +4,7 @@ substitutions:
   charging_advanced_id_prefix: charging_advanced
   charging_advanced_update_interval: 60s
   charging_mode_eco_mono_threshold: "8" # Single phase (6A + 2 margin)
-  charging_mode_eco_bi_threshold: "14"  # Bi-phase (12A + 2 margin)
+  charging_mode_eco_bi_threshold: "14" # Bi-phase (12A + 2 margin)
   charging_mode_eco_tri_threshold: "20" # Tri-phase (18A + 2 margin)
 
 globals:
@@ -81,10 +81,10 @@ text_sensor:
     lambda: |-
       int power = id(${charging_car_id_prefix}_current)->state;
       if (power == 0) { return std::string("Not charging"); }
-      
-      int mode_eco_threshold;      
+
+      int mode_eco_threshold;
       int phase_count = id(${charging_basic_id_prefix}_phase_count)->state;
-      
+
       switch (phase_count) {
               case 1:
                   mode_eco_threshold = $charging_mode_eco_mono_threshold;
@@ -98,7 +98,7 @@ text_sensor:
               default:
                   mode_eco_threshold = 0;
           }
-      
+
       if (power < mode_eco_threshold) { return std::string("Eco"); }
       return std::string("Max");
 

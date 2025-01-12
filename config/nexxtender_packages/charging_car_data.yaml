@@ -9,22 +9,22 @@ globals:
     type: int
   - id: g_${charging_car_id_prefix}_l1
     type: int
-    initial_value: '0'
+    initial_value: "0"
   - id: g_${charging_car_id_prefix}_l2
     type: int
-    initial_value: '0'
+    initial_value: "0"
   - id: g_${charging_car_id_prefix}_l3
     type: int
-    initial_value: '0'
+    initial_value: "0"
   - id: g_${charging_car_id_prefix}_p1
     type: int
-    initial_value: '0'
+    initial_value: "0"
   - id: g_${charging_car_id_prefix}_p2
     type: int
-    initial_value: '0'
+    initial_value: "0"
   - id: g_${charging_car_id_prefix}_p3
     type: int
-    initial_value: '0'
+    initial_value: "0"
 
 sensor:
   - platform: template
@@ -101,7 +101,7 @@ sensor:
     filters:
       - lambda: return x / 1000;
     lambda: |-
-      return id(g_${charging_car_id_prefix}_p1);      
+      return id(g_${charging_car_id_prefix}_p1);
   - platform: template
     name: "${charging_car_prefix} P2"
     id: ${charging_car_id_prefix}_p2
@@ -114,7 +114,7 @@ sensor:
     filters:
       - lambda: return x / 1000;
     lambda: |-
-      return id(g_${charging_car_id_prefix}_p2);   
+      return id(g_${charging_car_id_prefix}_p2);
   - platform: template
     name: "${charging_car_prefix} P3"
     id: ${charging_car_id_prefix}_p3
@@ -127,7 +127,7 @@ sensor:
     filters:
       - lambda: return x / 1000;
     lambda: |-
-      return id(g_${charging_car_id_prefix}_p3);               
+      return id(g_${charging_car_id_prefix}_p3);
 
 text_sensor:
   - platform: ble_client
@@ -150,7 +150,7 @@ text_sensor:
           id(g_${charging_car_id_prefix}_l3) = getShort(x, 8);
           id(g_${charging_car_id_prefix}_p1) = getShort(x, 10);
           id(g_${charging_car_id_prefix}_p2) = getShort(x, 12);
-          id(g_${charging_car_id_prefix}_p3) = getShort(x, 14);          
+          id(g_${charging_car_id_prefix}_p3) = getShort(x, 14);
           //id(g_${charging_car_id_prefix}_consumed) = getShort(x, 10);
 
           // Interval is a counter that goes from 0->900 (15 minutes)
