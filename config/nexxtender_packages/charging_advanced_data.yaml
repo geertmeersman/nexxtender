@@ -55,7 +55,7 @@ sensor:
     sensor: ${charging_advanced_id_prefix}_grid_power
     time_unit: h
     unit_of_measurement: Wh
-    state_class: measurement
+    state_class: total
     device_class: energy
     icon: mdi:transmission-tower
   - platform: template
