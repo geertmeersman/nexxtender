@@ -7,12 +7,12 @@ esp32:
 
 esphome:
   platformio_options:
-    board_build.flash_mode: dio  
+    board_build.flash_mode: dio
 
 globals:
   - id: g_rgb_color
     type: int
-    initial_value: '0'
+    initial_value: "0"
 
 light:
   - platform: esp32_rmt_led_strip
@@ -30,7 +30,7 @@ light:
             on_length: 2s
             off_length: 500ms
           max_brightness: ${rgb_led_brightness}
-          update_interval: 2.5s          
+          update_interval: 2.5s
       - pulse:
           name: Flash
           transition_length: 100ms
@@ -41,7 +41,7 @@ script:
     then:
       - globals.set:
           id: g_rgb_color
-          value: '1'
+          value: "1"
       - light.turn_off:
           id: rgb_light
       - light.turn_on:
@@ -55,7 +55,7 @@ script:
     then:
       - globals.set:
           id: g_rgb_color
-          value: '2'
+          value: "2"
       - light.turn_off:
           id: rgb_light
       - light.turn_on:
@@ -68,7 +68,7 @@ script:
     then:
       - globals.set:
           id: g_rgb_color
-          value: '3'
+          value: "3"
       - light.turn_off:
           id: rgb_light
       - light.turn_on:
@@ -81,7 +81,7 @@ script:
     then:
       - globals.set:
           id: g_rgb_color
-          value: '4'
+          value: "4"
       - light.turn_off:
           id: rgb_light
       - light.turn_on:
@@ -95,7 +95,7 @@ script:
     then:
       - globals.set:
           id: g_rgb_color
-          value: '5'
+          value: "5"
       - light.turn_off:
           id: rgb_light
       - light.turn_on:
@@ -109,7 +109,7 @@ script:
     then:
       - globals.set:
           id: g_rgb_color
-          value: '6'
+          value: "6"
       - light.turn_off:
           id: rgb_light
       - light.turn_on:
@@ -123,7 +123,7 @@ script:
     then:
       - globals.set:
           id: g_rgb_color
-          value: '7'
+          value: "7"
       - light.turn_off:
           id: rgb_light
       - light.turn_on:
@@ -136,7 +136,7 @@ script:
     then:
       - globals.set:
           id: g_rgb_color
-          value: '8'
+          value: "8"
       - light.turn_off:
           id: rgb_light
       - light.turn_on:
@@ -150,7 +150,7 @@ script:
     then:
       - globals.set:
           id: g_rgb_color
-          value: '9'
+          value: "9"
       - light.turn_off:
           id: rgb_light
       - light.turn_on:
@@ -164,7 +164,7 @@ script:
     then:
       - globals.set:
           id: g_rgb_color
-          value: '0'
+          value: "0"
       - light.turn_off:
           id: rgb_light
       - light.turn_on:

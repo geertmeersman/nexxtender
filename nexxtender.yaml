@@ -1,5 +1,5 @@
 packages:
-  nexxtender: 
+  nexxtender:
     url: https://github.com/geertmeersman/nexxtender
     file: config/nexxtender.yaml
     refresh: 0s

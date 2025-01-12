@@ -130,7 +130,7 @@ text_sensor:
 
           value = getInt(x, 8);
           id(g_${charging_basic_id_prefix}_energy) = value;
-          
+
           value = getByte(x, 13);
           id(g_${charging_basic_id_prefix}_phase_count) = value;
           id(${charging_basic_id_prefix}_phase_count).publish_state(value);

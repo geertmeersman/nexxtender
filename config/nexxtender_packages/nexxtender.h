@@ -42,7 +42,7 @@ uint16_t crc16(String data, size_t length) {
 void add_crc_to_data(String& data, size_t length) {
     // Calculate CRC for the original data excluding the last two bytes
     uint16_t crc = crc16(data, length - 2);
-    
+
     // Add the CRC to the end of the data array
     data[length - 2] = crc & 0xFF;           // LSB of CRC
     data[length - 1] = (crc >> 8) & 0xFF;    // MSB of CRC
