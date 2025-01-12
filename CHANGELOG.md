@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.1.2](https://github.com/geertmeersman/nexxtender/tree/v1.1.2) (2025-01-12)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v1.1.1...v1.1.2)
+
+**Merged pull requests:**
+
+- fix: device\_class has to be total instead of measurement for energy d… [\#47](https://github.com/geertmeersman/nexxtender/pull/47) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v1.1.1](https://github.com/geertmeersman/nexxtender/tree/v1.1.1) (2025-01-12)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v1.1.0...v1.1.1)
