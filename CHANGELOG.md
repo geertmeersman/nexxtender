@@ -1,5 +1,19 @@
 # Changelog
 
+## [v1.1.1](https://github.com/geertmeersman/nexxtender/tree/v1.1.1) (2025-01-12)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v1.1.0...v1.1.1)
+
+**Closed issues:**
+
+- Feature request - sync to Nexxtmove [\#44](https://github.com/geertmeersman/nexxtender/issues/44)
+- Nexxtender PIN calculation [\#43](https://github.com/geertmeersman/nexxtender/issues/43)
+
+**Merged pull requests:**
+
+- chore: text corrections [\#46](https://github.com/geertmeersman/nexxtender/pull/46) ([geertmeersman](https://github.com/geertmeersman))
+- fix: change grid energy sensor state\_class to measurement instead of … [\#45](https://github.com/geertmeersman/nexxtender/pull/45) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v1.1.0](https://github.com/geertmeersman/nexxtender/tree/v1.1.0) (2025-01-05)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v1.0.1...v1.1.0)
