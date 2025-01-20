@@ -31,11 +31,11 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Build ESPHOME az-delivery-devkit-v4
-        uses: esphome/build-action@v4
+        uses: esphome/build-action@v6
         with:
           yaml-file: config/nexxtender.yaml
 
       - name: Build ESPHOME esp32-s3-devkitc-1
-        uses: esphome/build-action@v4
+        uses: esphome/build-action@v6
         with:
           yaml-file: config/nexxtender.s3.yaml
