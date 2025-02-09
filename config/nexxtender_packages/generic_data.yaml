@@ -874,7 +874,7 @@ number:
     step: 1
     max_value: ${slider_max_peak_consumption_limit}
     min_value: ${min_charging_value}
-    mode: box
+    mode: slider
     entity_category: "config"
     set_action:
       - lambda: |-
