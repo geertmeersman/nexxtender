@@ -842,7 +842,7 @@ number:
             ESP_LOGD("Setting Peak consumption limit and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_peak_consumption_limit));
             id(g_${generic_data_id_prefix}_peak_consumption_limit) = value;
             id(g_${generic_data_id_prefix}_peak_consumption_limit_set) = true;
-            id(script_read_generic_data).execute();
+            id(script_read_config).execute();
           }
 
 select:
