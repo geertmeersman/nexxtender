@@ -7,7 +7,8 @@ substitutions:
   generic_data_update_interval: 60s
   slider_max_car_charging_speed: "32"
   slider_max_available_capacity: "40"
-  peak_consumption_limit: "0"
+  slider_max_peak_consumption_limit: "40"
+  min_charging_value: "6"
 
 globals:
   - id: g_${generic_data_id_prefix}_config_init
@@ -31,6 +32,12 @@ globals:
     type: std::string
     initial_value: ""
   - id: g_${generic_data_id_prefix}_i_evse_max
+    type: float
+    initial_value: "0"
+  - id: g_${generic_data_id_prefix}_peak_consumption_limit_set
+    type: bool
+    initial_value: "false"
+  - id: g_${generic_data_id_prefix}_peak_consumption_limit
     type: float
     initial_value: "0"
   - id: g_${generic_data_id_prefix}_i_max
@@ -512,6 +519,10 @@ script:
                           break;
                       case 19: //iCapacity(19); 16/15
                           id(${generic_data_id_prefix}_i_capacity).publish_state(value);
+                          if (id(g_${generic_data_id_prefix}_peak_consumption_limit) < 1) {
+                            id(g_${generic_data_id_prefix}_peak_consumption_limit) = value;
+                            id(peak_consumption_limit).publish_state(value);
+                          }
                       default:
                           break;
                     }
@@ -526,7 +537,7 @@ script:
                 ESP_LOGW("${device_name}_generic_data", "B2 map not found in the CBOR data.");
             }
             ESP_LOGD("${device_name}_generic_data", "Checking i_capacity");
-            if (${peak_consumption_limit} > 0 && ${peak_consumption_limit} <= 40 && id(${generic_data_id_prefix}_i_capacity).state != ${peak_consumption_limit}) {
+            if (id(g_${generic_data_id_prefix}_peak_consumption_limit_set) == true && id(g_${generic_data_id_prefix}_peak_consumption_limit) > 0 && id(g_${generic_data_id_prefix}_peak_consumption_limit) <= 40 && id(${generic_data_id_prefix}_i_capacity).state != id(g_${generic_data_id_prefix}_peak_consumption_limit)) {
               // i_capacity update
               index = 0;
               while (index < x.size() - 1) {
@@ -559,7 +570,7 @@ script:
                           }
 
                           ESP_LOGI("${device_name}_generic_data", "Current peak consumption limit: %lluA", value);
-                          int new_value = static_cast<int>(${peak_consumption_limit});
+                          int new_value = static_cast<int>(id(g_${generic_data_id_prefix}_peak_consumption_limit));
 
                           if (new_value < 24) {  
                               // New value fits in a single byte (0–23)
@@ -586,7 +597,9 @@ script:
                           ESP_LOGI("${device_name}_generic_data", "New peak consumption limit: %lluA", new_value);
                           id(g_${generic_data_id_prefix}_cbor_config) = x;
                           id(script_send_config).execute();
-                          id(${generic_data_id_prefix}_i_capacity).publish_state(${peak_consumption_limit});
+                          id(${generic_data_id_prefix}_i_capacity).publish_state(new_value);
+                          id(peak_consumption_limit).publish_state(new_value);
+                          id(g_${generic_data_id_prefix}_peak_consumption_limit_set) = false;
 
                           break;  // Exit after modification
                       } else {
@@ -758,7 +771,7 @@ number:
     device_class: current
     step: 1
     max_value: ${slider_max_car_charging_speed}
-    min_value: 6
+    min_value: ${min_charging_value}
     mode: slider
     entity_category: "config"
     set_action:
@@ -785,7 +798,7 @@ number:
     device_class: current
     step: 1
     max_value: ${slider_max_available_capacity}
-    min_value: 6
+    min_value: ${min_charging_value}
     mode: slider
     entity_category: "config"
     set_action:
@@ -801,6 +814,35 @@ number:
             ESP_LOGD("Setting Maximum available capacity and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_max));
             id(g_${generic_data_id_prefix}_i_max) = value;
             id(script_send_config_old).execute();
+          }
+
+  - platform: template
+    id: peak_consumption_limit
+    name: Peak consumption limit
+    icon: "mdi:current-ac"
+    unit_of_measurement: A
+    restore_value: true
+    optimistic: true
+    device_class: current
+    step: 1
+    max_value: ${slider_max_peak_consumption_limit}
+    min_value: ${min_charging_value}
+    mode: slider
+    entity_category: "config"
+    set_action:
+      - lambda: |-
+          std::string config = id(g_${generic_data_id_prefix}_config);
+          if (config.empty()) { return; }
+          float value = static_cast<float>(x);
+          ESP_LOGD("Peak consumption limit", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_peak_consumption_limit));
+          if (id(g_${generic_data_id_prefix}_peak_consumption_limit) == 0) {
+            ESP_LOGD("Setting Peak consumption limit", "%f A", value);
+            id(g_${generic_data_id_prefix}_peak_consumption_limit) = value;
+          } else if (id(g_${generic_data_id_prefix}_peak_consumption_limit) != value) {
+            ESP_LOGD("Setting Peak consumption limit and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_peak_consumption_limit));
+            id(g_${generic_data_id_prefix}_peak_consumption_limit) = value;
+            id(g_${generic_data_id_prefix}_peak_consumption_limit_set) = true;
+            id(script_read_generic_data).execute();
           }
 
 select:
