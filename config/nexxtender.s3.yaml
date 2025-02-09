@@ -22,4 +22,5 @@ substitutions:
   # charging_mode_eco_tri_threshold: "20"
   # slider_max_car_charging_speed: "32"
   # slider_max_available_capacity: "40"
-  # peak_consumption_limit: "16"            # The peak consumption limit, be careful when setting this value. It is usually set by your installer
+  # slider_max_peak_consumption_limit: "40" # The peak consumption limit for the slider (in amperes, typically 16-40A). WARNING: Incorrect values may cause circuit breaker trips or reduced charging performance. This value is usually configured by your installer.
+  # min_charging_value: "6" # The minimal charging value, used for the slider configs

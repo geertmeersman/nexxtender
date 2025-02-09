@@ -22,6 +22,7 @@ ble_client:
             id(${device_name}_ble_client_id)->pair();
             id(ble_client_connectivity).publish_state(true);
             id(g_${generic_data_id_prefix}_config_init) = false;
+            id(g_${generic_data_id_prefix}_time_synced) = false;
         - esp32_ble_tracker.stop_scan:
     on_disconnect:
       then:
