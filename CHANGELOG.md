@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.0.1](https://github.com/geertmeersman/nexxtender/tree/v2.0.1) (2025-02-09)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.0.0...v2.0.1)
+
+**Merged pull requests:**
+
+- fix: Updated peak consumption limits and added new configuration parameters to enhance clarity and provide better context for users. [\#50](https://github.com/geertmeersman/nexxtender/pull/50) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v2.0.0](https://github.com/geertmeersman/nexxtender/tree/v2.0.0) (2025-02-09)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v1.1.2...v2.0.0)
