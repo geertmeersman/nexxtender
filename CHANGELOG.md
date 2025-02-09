@@ -1,5 +1,14 @@
 # Changelog
 
+## [v2.0.0](https://github.com/geertmeersman/nexxtender/tree/v2.0.0) (2025-02-09)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v1.1.2...v2.0.0)
+
+**Merged pull requests:**
+
+- fix: peak\_consumption\_limit correction for double byte values [\#49](https://github.com/geertmeersman/nexxtender/pull/49) ([geertmeersman](https://github.com/geertmeersman))
+- build\(deps\): bump esphome/build-action from 4 to 6 [\#48](https://github.com/geertmeersman/nexxtender/pull/48) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v1.1.2](https://github.com/geertmeersman/nexxtender/tree/v1.1.2) (2025-01-12)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v1.1.1...v1.1.2)
