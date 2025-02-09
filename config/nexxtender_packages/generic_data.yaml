@@ -14,6 +14,9 @@ globals:
   - id: g_${generic_data_id_prefix}_config_init
     type: bool
     initial_value: "false"
+  - id: g_${generic_data_id_prefix}_ble_in_use
+    type: bool
+    initial_value: "false"
   - id: g_${generic_data_id_prefix}_status
     type: int
     initial_value: "0"
@@ -171,34 +174,50 @@ text_sensor:
                 id(${device_name}_generic_status).publish_state(std::string("Unlocked force eco"));
                 return;
             case 0x4001:
+                // Wait until BLE is free
+                id(wait_for_ble).execute();  // Wait until ble_in_use is false
                 id(${device_name}_generic_status).publish_state(std::string("Time Set READY"));
+                id(g_${generic_data_id_prefix}_ble_in_use) = true;
                 id(script_write_time).execute();
                 return;
             case 0x4002:
                 id(${device_name}_generic_status).publish_state(std::string("Time Set SUCCESS"));
+                id(g_${generic_data_id_prefix}_ble_in_use) = false;
                 return;
             case 0x4003:
                 id(${device_name}_generic_status).publish_state(std::string("Time read POPPED"));
                 id(script_read_generic_data).execute();
+                id(g_${generic_data_id_prefix}_ble_in_use) = false;
                 return;
             case 0x5001:
+                // Wait until BLE is free
+                id(wait_for_ble).execute();  // Wait until ble_in_use is false
+                id(g_${generic_data_id_prefix}_ble_in_use) = true;
                 id(${device_name}_generic_status).publish_state(std::string("Config Set READY"));
                 ESP_LOGD("I_EVSE_MAX", "%f", id(g_${generic_data_id_prefix}_i_evse_max));
                 ESP_LOGD("CHARGE_MODE", "%d", id(g_${generic_data_id_prefix}_charge_mode));
                 id(script_write_config).execute();
                 return;
             case 0x5004:
+                // Wait until BLE is free
+                id(wait_for_ble).execute();  // Wait until ble_in_use is false
+                id(g_${generic_data_id_prefix}_ble_in_use) = true;
                 id(${device_name}_generic_status).publish_state(std::string("Config Set CBOR READY"));
                 id(script_write_cbor_config).execute();
                 return;
             case 0x5002:
             case 0x5005:
+                id(g_${generic_data_id_prefix}_ble_in_use) = false;
                 id(${device_name}_generic_status).publish_state(std::string("Config write SUCCESS"));
                 return;
             case 0x5003:
             case 0x5006:
+                // Wait until BLE is free
+                id(wait_for_ble).execute();  // Wait until ble_in_use is false
+                id(g_${generic_data_id_prefix}_ble_in_use) = true;
                 id(${device_name}_generic_status).publish_state(std::string("Config read POPPED"));
                 id(script_read_generic_data).execute();
+                id(g_${generic_data_id_prefix}_ble_in_use) = false;
                 return;
             default:
                 id(${device_name}_generic_status).publish_state(std::string("UNKNOWN"));
@@ -221,6 +240,17 @@ text_sensor:
     notify: true
 
 script:
+  - id: delay_5s
+    then:
+      - delay: 5s
+  - id: wait_for_ble
+    mode: restart
+    then:
+      - while:
+          condition:
+            lambda: 'return id(g_${generic_data_id_prefix}_ble_in_use) == true;'
+          then:
+            - delay: 500ms  # Wait 500ms before checking again
   - id: switch_charger_mode
     then:
       - lambda: |-
@@ -250,6 +280,10 @@ script:
           }
   - id: script_read_config
     then:
+      - lambda: |-
+          // Wait until BLE is free
+          id(wait_for_ble).execute();  // Wait until ble_in_use is false
+          id(g_${generic_data_id_prefix}_ble_in_use) = true;
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
@@ -263,6 +297,7 @@ script:
             ESP_LOGD("${device_name}_CBOR_config", "Status is NOK, let's read old config!: 0x%x", id(g_${generic_data_id_prefix}_status));
             id(script_read_config_old).execute();
           }
+          id(g_${generic_data_id_prefix}_ble_in_use) = false;
   - id: script_send_config
     then:
       - ble_client.ble_write:
@@ -518,6 +553,11 @@ script:
                       case 18: //externalRegulation(18), 0
                           break;
                       case 19: //iCapacity(19); 16/15
+                          if (id(g_${generic_data_id_prefix}_peak_consumption_limit_set) == true) {
+                            id(${generic_data_id_prefix}_i_capacity).publish_state(id(g_${generic_data_id_prefix}_peak_consumption_limit));
+                            id(peak_consumption_limit).publish_state(id(g_${generic_data_id_prefix}_peak_consumption_limit));
+                            break;
+                          }
                           id(${generic_data_id_prefix}_i_capacity).publish_state(value);
                           if (id(g_${generic_data_id_prefix}_peak_consumption_limit) < 1) {
                             id(g_${generic_data_id_prefix}_peak_consumption_limit) = value;
@@ -597,6 +637,7 @@ script:
                           ESP_LOGI("${device_name}_generic_data", "New peak consumption limit: %lluA", new_value);
                           id(g_${generic_data_id_prefix}_cbor_config) = x;
                           id(script_send_config).execute();
+                          id(delay_5s).execute();
                           id(${generic_data_id_prefix}_i_capacity).publish_state(new_value);
                           id(peak_consumption_limit).publish_state(new_value);
                           id(g_${generic_data_id_prefix}_peak_consumption_limit_set) = false;
