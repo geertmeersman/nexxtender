@@ -680,7 +680,11 @@ script:
                         if (id(g_${generic_data_id_prefix}_peak_consumption_limit) < 1) {
                           id(g_${generic_data_id_prefix}_peak_consumption_limit) = value;
                         }
-                        id(peak_consumption_limit).publish_state(value);
+                        if (id(g_${generic_data_id_prefix}_peak_consumption_limit_set) == true && id(g_${generic_data_id_prefix}_peak_consumption_limit) > 0 && id(g_${generic_data_id_prefix}_peak_consumption_limit) <= 40 && id(${generic_data_id_prefix}_i_capacity).state != id(g_${generic_data_id_prefix}_peak_consumption_limit)) {
+                          ESP_LOGD("${device_name}_generic_data", "Peak consumption limit to be set, not updating slider yet");
+                        } else {
+                          id(peak_consumption_limit).publish_state(value);
+                        }
                     default:
                         break;
                   }
