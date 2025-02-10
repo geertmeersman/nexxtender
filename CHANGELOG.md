@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.1.0](https://github.com/geertmeersman/nexxtender/tree/v2.1.0) (2025-02-10)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.0.3...v2.1.0)
+
+**Merged pull requests:**
+
+- feat: new configuration options that enable more precise control of offloading thresholds [\#54](https://github.com/geertmeersman/nexxtender/pull/54) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v2.0.3](https://github.com/geertmeersman/nexxtender/tree/v2.0.3) (2025-02-10)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.0.2...v2.0.3)
