@@ -164,6 +164,8 @@ SN: XXXX-XXXXX-XX
      # slider_max_available_capacity: "40"     # The max value of the slider for the maximum available capacity slider, default set to 40
      # slider_max_peak_consumption_limit: "40" # The peak consumption limit for the slider (in amperes, typically 16-40A). WARNING: Incorrect values may cause circuit breaker trips or reduced charging performance. This value is usually configured by your installer.
      # min_charging_value: "6" # The minimal charging value, used for the slider configs
+     # slider_max_offloading_minimum: "32" # The max offloading minimum value
+     # slider_min_offloading_minimum: "6" # The min offloading minimum value
    ```
 
    - The charging power mode is estimated based on the number of phases used during the charge.

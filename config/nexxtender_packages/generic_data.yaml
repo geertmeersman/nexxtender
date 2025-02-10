@@ -9,6 +9,8 @@ substitutions:
   slider_max_available_capacity: "40"
   slider_max_peak_consumption_limit: "16"
   min_charging_value: "6"
+  slider_max_offloading_minimum: "32"
+  slider_min_offloading_minimum: "6"
 
 globals:
   - id: ble_wait_start_time
@@ -45,6 +47,9 @@ globals:
     type: std::string
     initial_value: ""
   - id: g_${generic_data_id_prefix}_i_evse_max
+    type: float
+    initial_value: "0"
+  - id: g_${generic_data_id_prefix}_i_min
     type: float
     initial_value: "0"
   - id: g_${generic_data_id_prefix}_peak_consumption_limit_set
@@ -201,6 +206,7 @@ text_sensor:
                 id(${device_name}_generic_status).publish_state(std::string("Config Set READY"));
                 ESP_LOGD("I_EVSE_MAX", "%f", id(g_${generic_data_id_prefix}_i_evse_max));
                 ESP_LOGD("CHARGE_MODE", "%d", id(g_${generic_data_id_prefix}_charge_mode));
+                ESP_LOGD("I_MIN", "%d", id(g_${generic_data_id_prefix}_i_min));
                 id(script_write_config).execute();
                 //id(unblock_ble).execute("Config Set READY");//keep blocked as we need the confirmation
                 return;
@@ -430,9 +436,11 @@ script:
           }
           int rounded_i_max = static_cast<int>(id(g_${generic_data_id_prefix}_i_max));  // Round down to nearest integer
           int rounded_i_evse_max = static_cast<int>(id(g_${generic_data_id_prefix}_i_evse_max));  // Round down to nearest integer
+          int rounded_i_min = static_cast<int>(id(g_${generic_data_id_prefix}_i_min));  // Round down to nearest integer
           x[0] = rounded_i_max;
           x[1] = rounded_i_evse_max;
           x[2] = id(g_${generic_data_id_prefix}_charge_mode);
+          x[3] = rounded_i_min;
           add_crc_to_data(x, x.size());
           logd_x("${device_name}_generic_data script_write_config|Recalculated config before writing to BLE", x);
           id(g_${generic_data_id_prefix}_config) = x;
@@ -528,6 +536,7 @@ script:
               select_call.perform();
               id(${generic_data_id_prefix}_charge_mode).publish_state(value_string.c_str());
               id(${generic_data_id_prefix}_i_min).publish_state(getInt8(x, 3));
+              id(g_${generic_data_id_prefix}_i_min) = getInt8(x, 3);
               value = (3 & getInt8(x, 4)) >> 1;
               switch (value) {
                   case 0:
@@ -632,6 +641,7 @@ script:
                         break;
                     case 7: //iLevel1(7), 6 (offloading minimum?)
                         id(${generic_data_id_prefix}_i_min).publish_state(value);
+                        id(offloading_minimum).publish_state(value);
                         break;
                     case 8: //solarMode(8), 0
                         break;
@@ -859,6 +869,33 @@ button:
           value: [0x06, 0x00]
 
 number:
+  - platform: template
+    id: offloading_minimum
+    name: Offloading minimum
+    icon: "mdi:current-ac"
+    unit_of_measurement: A
+    restore_value: true
+    optimistic: true
+    device_class: current
+    step: 1
+    max_value: ${slider_max_offloading_minimum}
+    min_value: ${slider_min_offloading_minimum}
+    mode: slider
+    entity_category: "config"
+    set_action:
+      - lambda: |-
+          std::string config = id(g_${generic_data_id_prefix}_config);
+          if (config.empty()) { return; }
+          float value = static_cast<float>(x);
+          ESP_LOGD("${device_name}_generic_data", "Offloading minimum - Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_min));
+          if (id(g_${generic_data_id_prefix}_i_min) == 0) {
+            ESP_LOGD("${device_name}_generic_data", "Setting Offloading minimum %f A", value);
+            id(g_${generic_data_id_prefix}_i_min) = value;
+          } else if (id(g_${generic_data_id_prefix}_i_min) != value) {
+            ESP_LOGD("${device_name}_generic_data", "Setting Offloading minimum and sending config - Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_min));
+            id(g_${generic_data_id_prefix}_i_min) = value;
+            id(script_send_config_old).execute();
+          }
   - platform: template
     id: max_charging_speed
     name: Maximum car charging speed
