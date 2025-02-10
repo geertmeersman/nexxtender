@@ -11,6 +11,10 @@ substitutions:
   min_charging_value: "6"
 
 globals:
+  - id: ble_wait_start_time
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
   - id: g_${generic_data_id_prefix}_config_init
     type: bool
     initial_value: "false"
@@ -18,6 +22,9 @@ globals:
     type: bool
     initial_value: "false"
   - id: g_${generic_data_id_prefix}_ble_in_use
+    type: bool
+    initial_value: "false"
+  - id: g_${generic_data_id_prefix}_cbor_config_changed
     type: bool
     initial_value: "false"
   - id: g_${generic_data_id_prefix}_status
@@ -153,7 +160,7 @@ text_sensor:
     on_notify:
       then:
         lambda: |-
-          logd_x("${device_name}_${generic_data_id_prefix}_status", x);
+          logd_x("${device_name}_${generic_data_id_prefix} status", x);
           std::string reversed_x(x.rbegin(), x.rend());  // Reverse the order of bytes in x
           String hex_status = format_hex_pretty((uint8_t *) reversed_x.c_str(), reversed_x.size());
 
@@ -177,50 +184,47 @@ text_sensor:
                 id(${device_name}_generic_status).publish_state(std::string("Unlocked force eco"));
                 return;
             case 0x4001:
-                // Wait until BLE is free
-                id(wait_for_ble).execute();  // Wait until ble_in_use is false
                 id(${device_name}_generic_status).publish_state(std::string("Time Set READY"));
-                id(g_${generic_data_id_prefix}_ble_in_use) = true;
                 id(script_write_time).execute();
+                //id(unblock_ble).execute("Time Set READY");
                 return;
             case 0x4002:
                 id(${device_name}_generic_status).publish_state(std::string("Time Set SUCCESS"));
-                id(g_${generic_data_id_prefix}_ble_in_use) = false;
+                id(unblock_ble).execute("Time Set SUCCESS");
                 return;
             case 0x4003:
                 id(${device_name}_generic_status).publish_state(std::string("Time read POPPED"));
                 id(script_read_generic_data).execute();
-                id(g_${generic_data_id_prefix}_ble_in_use) = false;
+                id(unblock_ble).execute("Time read POPPED");
                 return;
             case 0x5001:
-                // Wait until BLE is free
-                id(wait_for_ble).execute();  // Wait until ble_in_use is false
-                id(g_${generic_data_id_prefix}_ble_in_use) = true;
                 id(${device_name}_generic_status).publish_state(std::string("Config Set READY"));
                 ESP_LOGD("I_EVSE_MAX", "%f", id(g_${generic_data_id_prefix}_i_evse_max));
                 ESP_LOGD("CHARGE_MODE", "%d", id(g_${generic_data_id_prefix}_charge_mode));
                 id(script_write_config).execute();
+                //id(unblock_ble).execute("Config Set READY");//keep blocked as we need the confirmation
                 return;
             case 0x5004:
-                // Wait until BLE is free
-                id(wait_for_ble).execute();  // Wait until ble_in_use is false
-                id(g_${generic_data_id_prefix}_ble_in_use) = true;
                 id(${device_name}_generic_status).publish_state(std::string("Config Set CBOR READY"));
                 id(script_write_cbor_config).execute();
+                //id(unblock_ble).execute("Config Set CBOR READY"); //keep blocked as we need the confirmation
                 return;
             case 0x5002:
             case 0x5005:
-                id(g_${generic_data_id_prefix}_ble_in_use) = false;
                 id(${device_name}_generic_status).publish_state(std::string("Config write SUCCESS"));
+                id(unblock_ble).execute("Config write SUCCESS");
+                id(script_read_cbor_config).execute();
                 return;
             case 0x5003:
             case 0x5006:
-                // Wait until BLE is free
-                id(wait_for_ble).execute();  // Wait until ble_in_use is false
-                id(g_${generic_data_id_prefix}_ble_in_use) = true;
                 id(${device_name}_generic_status).publish_state(std::string("Config read POPPED"));
                 id(script_read_generic_data).execute();
-                id(g_${generic_data_id_prefix}_ble_in_use) = false;
+                id(unblock_ble).execute("Config read POPPED");
+                if (id(g_${generic_data_id_prefix}_cbor_config_changed) == true) {
+                  ESP_LOGI("${device_name}_generic_data", "Sending config as CBOR config changed");
+                  id(script_send_config).execute();
+                  id(g_${generic_data_id_prefix}_cbor_config_changed) = false;
+                }
                 return;
             default:
                 id(${device_name}_generic_status).publish_state(std::string("UNKNOWN"));
@@ -244,16 +248,42 @@ text_sensor:
 
 script:
   - id: delay_5s
+    mode: queued
     then:
       - delay: 5s
   - id: wait_for_ble
-    mode: restart
+    mode: queued
+    parameters:
+      log_message: string
     then:
+      - lambda: |-
+          std::string log_copy = log_message; // Make a local copy
+          ESP_LOGI("${device_name}_generic_data", "Waiting BLE for %s", log_copy.c_str());
+          id(ble_wait_start_time) = millis(); // Store start time globally
+
       - while:
           condition:
-            lambda: "return id(g_${generic_data_id_prefix}_ble_in_use) == true;"
+            lambda: |-
+              return id(g_${generic_data_id_prefix}_ble_in_use) == true &&
+                     (millis() - id(ble_wait_start_time) < 10000); // Timeout after 10s
           then:
-            - delay: 500ms # Wait 500ms before checking again
+            - delay: 500ms
+
+      - lambda: |-
+          std::string log_copy = log_message; // Make a local copy
+          if (id(g_${generic_data_id_prefix}_ble_in_use) == true) {
+              ESP_LOGW("${device_name}_generic_data", "BLE wait timeout for %s", log_copy.c_str());
+          } else {
+              id(g_${generic_data_id_prefix}_ble_in_use) = true;
+              ESP_LOGI("${device_name}_generic_data", "Blocked BLE for %s", log_copy.c_str());
+          }
+  - id: unblock_ble
+    parameters:
+      log_message: string # Define a parameter
+    then:
+      - lambda: |-
+          ESP_LOGI("${device_name}_generic_data", "Unblocking BLE for %s", log_message.c_str());
+          id(g_${generic_data_id_prefix}_ble_in_use) = false;
   - id: switch_charger_mode
     then:
       - lambda: |-
@@ -284,9 +314,7 @@ script:
   - id: script_read_config
     then:
       - lambda: |-
-          // Wait until BLE is free
-          id(wait_for_ble).execute();  // Wait until ble_in_use is false
-          id(g_${generic_data_id_prefix}_ble_in_use) = true;
+          id(wait_for_ble).execute("script_read_config");  // Wait until ble_in_use is false
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
@@ -295,14 +323,15 @@ script:
       - delay: 5s
       - lambda: |-
           if (id(g_${generic_data_id_prefix}_status) == 0x5006) {
-            ESP_LOGD("${device_name}_CBOR_config", "Status is OK: 0x%x", id(g_${generic_data_id_prefix}_status));
+            ESP_LOGD("${device_name}_generic_data", "script_read_config status is OK: 0x%x", id(g_${generic_data_id_prefix}_status));
           } else {
-            ESP_LOGD("${device_name}_CBOR_config", "Status is NOK, let's read old config!: 0x%x", id(g_${generic_data_id_prefix}_status));
+            ESP_LOGD("${device_name}_generic_data", "script_read_config status is NOK, let's read old config!: 0x%x", id(g_${generic_data_id_prefix}_status));
             id(script_read_config_old).execute();
           }
-          id(g_${generic_data_id_prefix}_ble_in_use) = false;
   - id: script_send_config
     then:
+      - lambda: |-
+          id(wait_for_ble).execute("script_send_config");  // Wait until ble_in_use is false
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
@@ -310,6 +339,8 @@ script:
           value: [0x03, 0x50]
   - id: script_send_config_old
     then:
+      - lambda: |-
+          id(wait_for_ble).execute("script_send_config_old");  // Wait until ble_in_use is false
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
@@ -317,6 +348,8 @@ script:
           value: [0x01, 0x50]
   - id: script_read_config_old
     then:
+      - lambda: |-
+          id(wait_for_ble).execute("script_read_config_old");  // Wait until ble_in_use is false
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
@@ -324,6 +357,8 @@ script:
           value: [0x02, 0x50]
   - id: script_read_time
     then:
+      - lambda: |-
+          id(wait_for_ble).execute("script_read_time");  // Wait until ble_in_use is false
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
@@ -331,6 +366,8 @@ script:
           value: [0x02, 0x40]
   - id: script_sync_time
     then:
+      - lambda: |-
+          id(wait_for_ble).execute("script_sync_time");  // Wait until ble_in_use is false
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
@@ -338,6 +375,8 @@ script:
           value: [0x01, 0x40]
   - id: script_write_time
     then:
+      - lambda: |-
+          id(wait_for_ble).execute("script_write_time");  // Wait until ble_in_use is false
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
@@ -358,14 +397,16 @@ script:
   - id: script_write_cbor_config
     then:
       - lambda: |-
+          id(wait_for_ble).execute("script_write_cbor_config");  // Wait until ble_in_use is false
+      - lambda: |-
           std::string x = id(g_${generic_data_id_prefix}_cbor_config);
-          logd_x("${device_name}_generic_data script_write_cbor_config|start value", x);
+          logd_x("${device_name}_generic_data script_write_cbor_config", x);
           if (x.empty()) {
-            ESP_LOGW("${device_name}_generic_data", "Empty CBOR config, aborting write");
+            ESP_LOGW("${device_name}_generic_data", "script_write_cbor_config - Empty CBOR config, aborting write");
             return;
           }
           if (!check_crc(x, x.size())) {
-            ESP_LOGD("${device_name}_generic_data script_write_cbor_config", "Checksum CRC16 Failed");
+            ESP_LOGD("${device_name}_generic_data", "script_write_cbor_config - Checksum CRC16 Failed");
             return;
           }
       - ble_client.ble_write:
@@ -384,7 +425,7 @@ script:
           logd_x("${device_name}_generic_data script_write_config|start value", x);
           if (x.empty()) { return; }
           if (!check_crc(x, x.size())) {
-            ESP_LOGD("${device_name}_generic_data script_write_config", "Checksum CRC16 Failed");
+            ESP_LOGD("${device_name}_generic_data", "script_write_config - Checksum CRC16 Failed");
             return;
           }
           int rounded_i_max = static_cast<int>(id(g_${generic_data_id_prefix}_i_max));  // Round down to nearest integer
@@ -405,6 +446,7 @@ script:
             return config_data;
 
   - id: script_read_generic_data
+    mode: queued
     then:
       - lambda: |-
           std::string x = id(${device_name}_generic_data).state;
@@ -442,233 +484,11 @@ script:
             return;
           }
           if (id(g_${generic_data_id_prefix}_status) == 0x5006) {
-            //Flag the config read as true
-            size_t index = 0;
-            bool found_b2 = false;
 
-            // Declare variables outside the switch-case block
-            String value_string;
-            // Select_call
-            auto select_call = id(select_mode).make_call();
-            while (index < x.size() - 1) {
-              if (x[index] == 0xB2) {
-                  found_b2 = true;
-                  index++; // Move to the next byte after B2
+            id(g_${generic_data_id_prefix}_cbor_config) = x;
+            logd_x("${device_name}_generic_data script_read_generic_data - set global cbor_config", x);
 
-                  // Process the B2 map x
-                  while (index < x.size()) {
-                    uint8_t key = x[index++];
-                    uint8_t initial_byte = x[index++];
-                    uint8_t major_type = initial_byte >> 5;
-                    uint8_t additional_info = initial_byte & 0x1F;
-                    uint64_t value = 0;
-
-                    if (additional_info < 24) {
-                      value = initial_byte;
-                    } else if (additional_info == 24) {
-                      value = x[index];
-                      index += 1;
-                    } else if (additional_info == 25) {
-                      value = (x[index] << 8) | x[index+1];
-                      index += 2;
-                    }
-                    ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
-
-                    switch (key) {
-                      case 1: // Charge Mode
-                          switch (value) {
-                              case 0:
-                                  value_string = "Eco Private";
-                                  break;
-                              case 1:
-                                  value_string = "Max Private";
-                                  break;
-                              case 4:
-                                  value_string = "Eco Open";
-                                  break;
-                              case 5:
-                                  value_string = "Max Open";
-                                  break;
-                              default:
-                                  value_string = "unknown";
-                          }
-                          id(${generic_data_id_prefix}_charge_mode).publish_state(value_string.c_str());
-                          select_call.set_option(value_string.c_str());
-                          select_call.perform();
-                          break;
-                      case 2: //modbusSlaveAddress(2)
-                          break;
-                      case 3: //cycleRate(3)
-                          break;
-                      case 4: //iMax(4), 16 (max beschikbare capaciteit)
-                          id(${generic_data_id_prefix}_i_max).publish_state(value);
-                          break;
-                      case 5: //iEvseMax(5), 16 (maximale laadsnelheid auto)
-                          id(${generic_data_id_prefix}_i_evse_max).publish_state(value);
-                          id(max_charging_speed).publish_state(value);
-                          break;
-                      case 6: //iEvseMin(6), 6 (minimale laadsnelheid auto)
-                          id(${generic_data_id_prefix}_i_evse_min).publish_state(value);
-                          break;
-                      case 7: //iLevel1(7), 6 (offloading minimum?)
-                          id(${generic_data_id_prefix}_i_min).publish_state(value);
-                          break;
-                      case 8: //solarMode(8), 0
-                          break;
-                      case 9: //phaseSeq(9), 0
-                          switch (value) {
-                              case 0:
-                                  value_string = "Mono/Tri+N";
-                                  break;
-                              case 3:
-                                  value_string = "Tri";
-                                  break;
-                              default:
-                                  value_string = "unknown";
-                          }
-                          id(${generic_data_id_prefix}_connection_type).publish_state(value_string.c_str());
-                          break;
-                      case 10: //chargingPhases(10), 3
-                          id(${generic_data_id_prefix}_charging_phases).publish_state(value);
-                          break;
-                      case 11: //blePin(11),
-                          break;
-                      case 12: //touWeekStart(12)
-                          id(g_${generic_data_id_prefix}_week_start) = getTimeString(value);
-                          ESP_LOGI("_week_start", "Total minutes: %llu", value);
-                          break;
-                      case 13: //touWeekStop(13)
-                          id(g_${generic_data_id_prefix}_week_end) = getTimeString(value);
-                          ESP_LOGI("_week_end", "Total minutes: %llu", value);
-                          break;
-                      case 14: //touWeekendStart(14), 0
-                          id(g_${generic_data_id_prefix}_weekend_start) = getTimeString(value);
-                          ESP_LOGI("_weekend_start", "Total minutes: %llu", value);
-                          break;
-                      case 15: //touWeekendStop(15), 0
-                          id(g_${generic_data_id_prefix}_weekend_end) = getTimeString(value);
-                          ESP_LOGI("_weekend_end", "Total minutes: %llu", value);
-                          break;
-                      case 16: //timezone(16), 0
-                          break;
-                      case 17: //relayOffPeriod(17), 5
-                          break;
-                      case 18: //externalRegulation(18), 0
-                          break;
-                      case 19: //iCapacity(19); 16/15
-                          if (id(g_${generic_data_id_prefix}_peak_consumption_limit_set) == true) {
-                            id(${generic_data_id_prefix}_i_capacity).publish_state(id(g_${generic_data_id_prefix}_peak_consumption_limit));
-                            id(peak_consumption_limit).publish_state(id(g_${generic_data_id_prefix}_peak_consumption_limit));
-                            break;
-                          }
-                          id(${generic_data_id_prefix}_i_capacity).publish_state(value);
-                          if (id(g_${generic_data_id_prefix}_peak_consumption_limit) < 1) {
-                            id(g_${generic_data_id_prefix}_peak_consumption_limit) = value;
-                            id(peak_consumption_limit).publish_state(value);
-                          }
-                      default:
-                          break;
-                    }
-                }
-                break; // Exit the loop once B2 map is found
-              } else {
-                  index++; // Move to the next byte
-              }
-            }
-
-            if (!found_b2) {
-                ESP_LOGW("${device_name}_generic_data", "B2 map not found in the CBOR data.");
-            }
-            ESP_LOGD("${device_name}_generic_data", "Checking i_capacity");
-            if (id(g_${generic_data_id_prefix}_peak_consumption_limit_set) == true && id(g_${generic_data_id_prefix}_peak_consumption_limit) > 0 && id(g_${generic_data_id_prefix}_peak_consumption_limit) <= 40 && id(${generic_data_id_prefix}_i_capacity).state != id(g_${generic_data_id_prefix}_peak_consumption_limit)) {
-              // i_capacity update
-              index = 0;
-              while (index < x.size() - 1) {
-                if (x[index] == 0xB2) {
-                  found_b2 = true;
-                  index++;  // Move past B2 marker
-
-                  // Parse the CBOR map to find key 19
-
-                  while (index < x.size()) {
-                      uint8_t key = x[index];  // Read key (don't increment yet)
-
-                      if (key == 19) {  // Found key 19 (i_capacity)
-                          index++;  // Move to value descriptor
-                          uint8_t initial_byte = x[index++];
-                          uint8_t major_type = initial_byte >> 5;
-                          uint8_t additional_info = initial_byte & 0x1F;
-                          uint64_t value = 0;
-                          size_t value_index = index;  // Store position of actual value
-
-                          // Read the current value
-                          if (additional_info < 24) {
-                              value = initial_byte;  // Single-byte integer (stored inline)
-                          } else if (additional_info == 24) {
-                              value = x[index];  // One extra byte
-                              index += 1;
-                          } else if (additional_info == 25) {
-                              value = (x[index] << 8) | x[index + 1];  // Two extra bytes
-                              index += 2;
-                          }
-
-                          ESP_LOGI("${device_name}_generic_data", "Current peak consumption limit: %lluA", value);
-                          int new_value = static_cast<int>(id(g_${generic_data_id_prefix}_peak_consumption_limit));
-
-                          if (new_value < 24) {
-                              // New value fits in a single byte (0–23)
-                              if (additional_info == 24) {
-                                  // Previously stored as two bytes (0x18 xx), remove extra byte
-                                  x.erase(x.begin() + value_index - 1);  // Remove extra byte
-                                  index -= 1;  // Adjust index after removing
-                              }
-                              x[value_index - 1] = static_cast<uint8_t>(new_value);  // Store as single byte
-                          }
-                          else {
-                              // New value needs two bytes (24–255)
-                              if (additional_info < 24) {
-                                  // Previously stored as single byte, insert an extra byte
-                                  x.insert(x.begin() + value_index, 0x00);
-                                  index += 1;  // Adjust index after inserting
-                              }
-                              x[value_index - 1] = 0x18;  // Mark as "extra byte follows"
-                              x[value_index] = static_cast<uint8_t>(new_value);  // Store new value
-                          }
-
-                          add_crc_to_data(x, x.size());  // Update CRC
-                          logd_x("${device_name}_generic_data", x);
-                          ESP_LOGI("${device_name}_generic_data", "New peak consumption limit: %lluA", new_value);
-                          id(g_${generic_data_id_prefix}_cbor_config) = x;
-                          id(script_send_config).execute();
-                          id(delay_5s).execute();
-                          id(${generic_data_id_prefix}_i_capacity).publish_state(new_value);
-                          id(peak_consumption_limit).publish_state(new_value);
-                          id(g_${generic_data_id_prefix}_peak_consumption_limit_set) = false;
-
-                          break;  // Exit after modification
-                      } else {
-                          // Move to the next key-value pair
-                          index++;  // Move past key
-                          uint8_t initial_byte = x[index++];
-                          uint8_t additional_info = initial_byte & 0x1F;
-
-                          // Skip value bytes based on CBOR encoding
-                          if (additional_info == 24) {
-                              index += 1;
-                          } else if (additional_info == 25) {
-                              index += 2;
-                          }
-                      }
-                  }
-                  break;
-                } else {
-                    index++; // Move to the next byte
-                }
-              }
-            } else {
-              ESP_LOGI("${device_name}_generic_data", "No peak consumption limit to be adjusted");
-            }
-
+            id(script_read_cbor_config).execute();
             // Read old config to populate variable
             id(script_read_config_old).execute();
             return;
@@ -727,13 +547,240 @@ script:
             } else {
               ESP_LOGW("${device_name}_generic_data", "Config data size not equal to 15. Please open an issue with your HEX string information.");
             }
-            // Synchronise Nexxtender time
-            if (id(g_${generic_data_id_prefix}_time_synced) == false) {
-              id(script_sync_time).execute();
-              id(g_${generic_data_id_prefix}_time_synced) = true;
-            }
             return;
           }
+
+  - id: script_read_cbor_config
+    mode: queued
+    then:
+      - lambda: |-
+          std::string x = id(g_${generic_data_id_prefix}_cbor_config);
+          logd_x("${device_name}_generic_data CBOR Config", x);
+          if (x.empty()) { return; }
+          if (!check_crc(x, x.size())) {
+            ESP_LOGD("${device_name}_generic_data", "Checksum CRC16 Failed");
+            return;
+          }
+
+          //Flag the config read as true
+          size_t index = 0;
+          bool found_b2 = false;
+
+          // Declare variables outside the switch-case block
+          String value_string;
+          // Select_call
+          auto select_call = id(select_mode).make_call();
+          while (index < x.size() - 1) {
+            if (x[index] == 0xB2) {
+                found_b2 = true;
+                index++; // Move to the next byte after B2
+
+                // Process the B2 map x
+                while (index < x.size() - 2) {
+                  uint8_t key = x[index++];
+                  uint8_t initial_byte = x[index++];
+                  uint8_t major_type = initial_byte >> 5;
+                  uint8_t additional_info = initial_byte & 0x1F;
+                  uint64_t value = 0;
+
+                  if (additional_info < 24) {
+                    value = initial_byte;
+                  } else if (additional_info == 24) {
+                    value = x[index];
+                    index += 1;
+                  } else if (additional_info == 25) {
+                    value = (x[index] << 8) | x[index+1];
+                    index += 2;
+                  }
+                  ESP_LOGD("${device_name}_generic_data", "B2 Map Item %d(%d): %lld [%d]", key, additional_info, value, major_type);
+
+                  switch (key) {
+                    case 1: // Charge Mode
+                        switch (value) {
+                            case 0:
+                                value_string = "Eco Private";
+                                break;
+                            case 1:
+                                value_string = "Max Private";
+                                break;
+                            case 4:
+                                value_string = "Eco Open";
+                                break;
+                            case 5:
+                                value_string = "Max Open";
+                                break;
+                            default:
+                                value_string = "unknown";
+                        }
+                        id(${generic_data_id_prefix}_charge_mode).publish_state(value_string.c_str());
+                        select_call.set_option(value_string.c_str());
+                        select_call.perform();
+                        break;
+                    case 2: //modbusSlaveAddress(2)
+                        break;
+                    case 3: //cycleRate(3)
+                        break;
+                    case 4: //iMax(4), 16 (max beschikbare capaciteit)
+                        id(${generic_data_id_prefix}_i_max).publish_state(value);
+                        break;
+                    case 5: //iEvseMax(5), 16 (maximale laadsnelheid auto)
+                        id(${generic_data_id_prefix}_i_evse_max).publish_state(value);
+                        id(max_charging_speed).publish_state(value);
+                        break;
+                    case 6: //iEvseMin(6), 6 (minimale laadsnelheid auto)
+                        id(${generic_data_id_prefix}_i_evse_min).publish_state(value);
+                        break;
+                    case 7: //iLevel1(7), 6 (offloading minimum?)
+                        id(${generic_data_id_prefix}_i_min).publish_state(value);
+                        break;
+                    case 8: //solarMode(8), 0
+                        break;
+                    case 9: //phaseSeq(9), 0
+                        switch (value) {
+                            case 0:
+                                value_string = "Mono/Tri+N";
+                                break;
+                            case 3:
+                                value_string = "Tri";
+                                break;
+                            default:
+                                value_string = "unknown";
+                        }
+                        id(${generic_data_id_prefix}_connection_type).publish_state(value_string.c_str());
+                        break;
+                    case 10: //chargingPhases(10), 3
+                        id(${generic_data_id_prefix}_charging_phases).publish_state(value);
+                        break;
+                    case 11: //blePin(11),
+                        break;
+                    case 12: //touWeekStart(12)
+                        id(g_${generic_data_id_prefix}_week_start) = getTimeString(value);
+                        ESP_LOGI("_week_start", "Total minutes: %llu", value);
+                        break;
+                    case 13: //touWeekStop(13)
+                        id(g_${generic_data_id_prefix}_week_end) = getTimeString(value);
+                        ESP_LOGI("_week_end", "Total minutes: %llu", value);
+                        break;
+                    case 14: //touWeekendStart(14), 0
+                        id(g_${generic_data_id_prefix}_weekend_start) = getTimeString(value);
+                        ESP_LOGI("_weekend_start", "Total minutes: %llu", value);
+                        break;
+                    case 15: //touWeekendStop(15), 0
+                        id(g_${generic_data_id_prefix}_weekend_end) = getTimeString(value);
+                        ESP_LOGI("_weekend_end", "Total minutes: %llu", value);
+                        break;
+                    case 16: //timezone(16), 0
+                        break;
+                    case 17: //relayOffPeriod(17), 5
+                        break;
+                    case 18: //externalRegulation(18), 0
+                        break;
+                    case 19: //iCapacity(19); 16/15
+                        id(${generic_data_id_prefix}_i_capacity).publish_state(value);
+                        if (id(g_${generic_data_id_prefix}_peak_consumption_limit) < 1) {
+                          id(g_${generic_data_id_prefix}_peak_consumption_limit) = value;
+                        }
+                        id(peak_consumption_limit).publish_state(value);
+                    default:
+                        break;
+                  }
+              }
+              break; // Exit the loop once B2 map is found
+            } else {
+                index++; // Move to the next byte
+            }
+          }
+
+          if (!found_b2) {
+              ESP_LOGW("${device_name}_generic_data", "B2 map not found in the CBOR data.");
+          }
+
+          ESP_LOGD("${device_name}_generic_data", "Checking i_capacity");
+          if (id(g_${generic_data_id_prefix}_peak_consumption_limit_set) == true && id(g_${generic_data_id_prefix}_peak_consumption_limit) > 0 && id(g_${generic_data_id_prefix}_peak_consumption_limit) <= 40 && id(${generic_data_id_prefix}_i_capacity).state != id(g_${generic_data_id_prefix}_peak_consumption_limit)) {
+            // i_capacity update
+            index = 0;
+            while (index < x.size() - 1) {
+              if (x[index] == 0xB2) {
+                found_b2 = true;
+                index++;  // Move past B2 marker
+
+                // Parse the CBOR map to find key 19
+
+                while (index < x.size()) {
+                    uint8_t key = x[index];  // Read key (don't increment yet)
+
+                    if (key == 19) {  // Found key 19 (i_capacity)
+                        index++;  // Move to value descriptor
+                        uint8_t initial_byte = x[index++];
+                        uint8_t major_type = initial_byte >> 5;
+                        uint8_t additional_info = initial_byte & 0x1F;
+                        uint64_t value = 0;
+                        size_t value_index = index;  // Store position of actual value
+
+                        // Read the current value
+                        if (additional_info < 24) {
+                            value = initial_byte;  // Single-byte integer (stored inline)
+                        } else if (additional_info == 24) {
+                            value = x[index];  // One extra byte
+                            index += 1;
+                        } else if (additional_info == 25) {
+                            value = (x[index] << 8) | x[index + 1];  // Two extra bytes
+                            index += 2;
+                        }
+
+                        ESP_LOGI("${device_name}_generic_data", "Current peak consumption limit: %lluA", value);
+                        int new_value = static_cast<int>(id(g_${generic_data_id_prefix}_peak_consumption_limit));
+
+                        if (new_value < 24) {
+                            // New value fits in a single byte (0–23)
+                            if (additional_info == 24) {
+                                // Previously stored as two bytes (0x18 xx), remove extra byte
+                                x.erase(x.begin() + value_index - 1);  // Remove extra byte
+                                index -= 1;  // Adjust index after removing
+                            }
+                            x[value_index - 1] = static_cast<uint8_t>(new_value);  // Store as single byte
+                        }
+                        else {
+                            // New value needs two bytes (24–255)
+                            if (additional_info < 24) {
+                                // Previously stored as single byte, insert an extra byte
+                                x.insert(x.begin() + value_index, 0x00);
+                                index += 1;  // Adjust index after inserting
+                            }
+                            x[value_index - 1] = 0x18;  // Mark as "extra byte follows"
+                            x[value_index] = static_cast<uint8_t>(new_value);  // Store new value
+                        }
+
+                        add_crc_to_data(x, x.size());  // Update CRC
+                        logd_x("${device_name}_generic_data with new peak consumption limit", x);
+                        ESP_LOGI("${device_name}_generic_data", "New peak consumption limit: %lluA", new_value);
+                        id(g_${generic_data_id_prefix}_cbor_config) = x;
+                        id(g_${generic_data_id_prefix}_cbor_config_changed) = true;
+
+                        return;  // Exit after modification
+                    } else {
+                        // Move to the next key-value pair
+                        index++;  // Move past key
+                        uint8_t initial_byte = x[index++];
+                        uint8_t additional_info = initial_byte & 0x1F;
+
+                        // Skip value bytes based on CBOR encoding
+                        if (additional_info == 24) {
+                            index += 1;
+                        } else if (additional_info == 25) {
+                            index += 2;
+                        }
+                    }
+                }
+                break;
+              } else {
+                  index++; // Move to the next byte
+              }
+            }
+          } else {
+            ESP_LOGI("${device_name}_generic_data", "No peak consumption limit to be adjusted: %f (RO value: %f)", id(g_${generic_data_id_prefix}_peak_consumption_limit), id(${generic_data_id_prefix}_i_capacity).state);
+          }
+          return;
 
 button:
   - platform: template
@@ -826,12 +873,12 @@ number:
           std::string config = id(g_${generic_data_id_prefix}_config);
           if (config.empty()) { return; }
           float value = static_cast<float>(x);
-          ESP_LOGD("Maximum car charging speed", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
+          ESP_LOGD("${device_name}_generic_data", "Maximum car charging speed - Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
           if (id(g_${generic_data_id_prefix}_i_evse_max) == 0) {
-            ESP_LOGD("Setting Maximum car charging speed", "%f A", value);
+            ESP_LOGD("${device_name}_generic_data", "Setting Maximum car charging speed %f A", value);
             id(g_${generic_data_id_prefix}_i_evse_max) = value;
           } else if (id(g_${generic_data_id_prefix}_i_evse_max) != value) {
-            ESP_LOGD("Setting Maximum car charging speed and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
+            ESP_LOGD("${device_name}_generic_data", "Setting Maximum car charging speed and sending config - Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_i_evse_max));
             id(g_${generic_data_id_prefix}_i_evse_max) = value;
             id(script_send_config_old).execute();
           }
@@ -881,12 +928,12 @@ number:
           std::string config = id(g_${generic_data_id_prefix}_config);
           if (config.empty()) { return; }
           float value = static_cast<float>(x);
-          ESP_LOGD("Peak consumption limit", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_peak_consumption_limit));
+          ESP_LOGI("${device_name}_generic_data", "Peak consumption limit - Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_peak_consumption_limit));
           if (id(g_${generic_data_id_prefix}_peak_consumption_limit) == 0) {
-            ESP_LOGD("Setting Peak consumption limit", "%f A", value);
+            ESP_LOGD("${device_name}_generic_data", "Setting Peak consumption limit %f A", value);
             id(g_${generic_data_id_prefix}_peak_consumption_limit) = value;
           } else if (id(g_${generic_data_id_prefix}_peak_consumption_limit) != value) {
-            ESP_LOGD("Setting Peak consumption limit and sending config", "Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_peak_consumption_limit));
+            ESP_LOGD("${device_name}_generic_data", "Setting Peak consumption limit and sending config - Received: %f, previous value: %f", value, id(g_${generic_data_id_prefix}_peak_consumption_limit));
             id(g_${generic_data_id_prefix}_peak_consumption_limit) = value;
             id(g_${generic_data_id_prefix}_peak_consumption_limit_set) = true;
             id(script_read_config).execute();
@@ -926,12 +973,12 @@ select:
               default:
                   break;
           }
-          ESP_LOGD("Car charge mode", "Received %s (%d), previous: %d", x.c_str(), value_int, id(g_${generic_data_id_prefix}_charge_mode));
+          ESP_LOGD("${device_name}_generic_data", "Car charge mode - Received %s (%d), previous: %d", x.c_str(), value_int, id(g_${generic_data_id_prefix}_charge_mode));
           if (id(g_${generic_data_id_prefix}_charge_mode) == 6) {
-            ESP_LOGD("Setting global car charge mode", "%s (%d)", x.c_str(), i);
+            ESP_LOGD("${device_name}_generic_data", "Setting global car charge mode - %s (%d)", x.c_str(), i);
             id(g_${generic_data_id_prefix}_charge_mode) = value_int;
           } else if (value_int != 6 && id(g_${generic_data_id_prefix}_charge_mode) != value_int) {
-            ESP_LOGD("Setting car charge mode and sending config", "Received %s (%d), previous: %d", x.c_str(), i, id(g_${generic_data_id_prefix}_charge_mode));
+            ESP_LOGD("${device_name}_generic_data", "Setting car charge mode and sending config - Received %s (%d), previous: %d", x.c_str(), i, id(g_${generic_data_id_prefix}_charge_mode));
             id(g_${generic_data_id_prefix}_charge_mode) = value_int;
             id(script_send_config_old).execute();
           }
