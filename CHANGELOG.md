@@ -1,5 +1,14 @@
 # Changelog
 
+## [v2.0.3](https://github.com/geertmeersman/nexxtender/tree/v2.0.3) (2025-02-10)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.0.2...v2.0.3)
+
+**Merged pull requests:**
+
+- fix: code version sensor [\#53](https://github.com/geertmeersman/nexxtender/pull/53) ([geertmeersman](https://github.com/geertmeersman))
+- fix: the swinging slider fix ;-\) [\#52](https://github.com/geertmeersman/nexxtender/pull/52) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v2.0.2](https://github.com/geertmeersman/nexxtender/tree/v2.0.2) (2025-02-10)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.0.1...v2.0.2)
