@@ -5,4 +5,4 @@ text_sensor:
     icon: mdi:file-certificate
     entity_category: diagnostic
     lambda: |-
-      return {"v2.0.3"};
+      return {"v2.1.0"};
