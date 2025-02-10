@@ -36,6 +36,8 @@ jobs:
         run: |
           echo $tag_name > VERSION
           echo $tag_name > config/VERSION
+          sed "s/__VERSION_PLACEHOLDER__/$tag_name/" config/version.yaml.template > config/nexxtender_packages/version.yaml
+          cat config/nexxtender_packages/version.yaml
 
       - name: 🚀　Add and commit changes
         uses: EndBug/add-and-commit@v9

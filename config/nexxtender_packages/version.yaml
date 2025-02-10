@@ -1,0 +1,8 @@
+text_sensor:
+  - platform: template
+    name: Code version
+    id: nexxtender_code_version
+    icon: mdi:file-certificate
+    entity_category: diagnostic
+    lambda: |-
+      return {"v2.0.2"};

@@ -11,6 +11,7 @@ packages:
   charging_grid_data: !include nexxtender_packages/charging_grid_data.yaml
   charging_basic_data: !include nexxtender_packages/charging_basic_data.yaml
   charging_advanced_data: !include nexxtender_packages/charging_advanced_data.yaml
+  version: !include nexxtender_packages/version.yaml
   #transactions: !include nexxtender_packages/transactions.yaml
   #diagnostics: !include nexxtender_packages/diagnostics.yaml
 
