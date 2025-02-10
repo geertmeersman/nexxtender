@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.0.2](https://github.com/geertmeersman/nexxtender/tree/v2.0.2) (2025-02-10)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.0.1...v2.0.2)
+
+**Merged pull requests:**
+
+- fix: Streamlined device configuration updates ensure a more responsive BLE interaction [\#51](https://github.com/geertmeersman/nexxtender/pull/51) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v2.0.1](https://github.com/geertmeersman/nexxtender/tree/v2.0.1) (2025-02-09)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.0.0...v2.0.1)
