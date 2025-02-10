@@ -11,6 +11,10 @@ substitutions:
   min_charging_value: "6"
 
 globals:
+  - id: ble_wait_start_time
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
   - id: g_${generic_data_id_prefix}_config_init
     type: bool
     initial_value: "false"
@@ -250,21 +254,29 @@ script:
   - id: wait_for_ble
     mode: queued
     parameters:
-      log_message: string # Passed as a parameter
+      log_message: string
     then:
       - lambda: |-
           std::string log_copy = log_message; // Make a local copy
           ESP_LOGI("${device_name}_generic_data", "Waiting BLE for %s", log_copy.c_str());
+          id(ble_wait_start_time) = millis(); // Store start time globally
+
       - while:
           condition:
-            lambda: "return id(g_${generic_data_id_prefix}_ble_in_use) == true;"
+            lambda: |-
+              return id(g_${generic_data_id_prefix}_ble_in_use) == true &&
+                     (millis() - id(ble_wait_start_time) < 10000); // Timeout after 10s
           then:
-            - delay: 500ms # Wait 500ms before checking again
+            - delay: 500ms
 
       - lambda: |-
-          id(g_${generic_data_id_prefix}_ble_in_use) = true;
-          std::string log_copy = log_message; // Copy again before use
-          ESP_LOGI("${device_name}_generic_data", "Blocked BLE for %s", log_copy.c_str());
+          std::string log_copy = log_message; // Make a local copy
+          if (id(g_${generic_data_id_prefix}_ble_in_use) == true) {
+              ESP_LOGW("${device_name}_generic_data", "BLE wait timeout for %s", log_copy.c_str());
+          } else {
+              id(g_${generic_data_id_prefix}_ble_in_use) = true;
+              ESP_LOGI("${device_name}_generic_data", "Blocked BLE for %s", log_copy.c_str());
+          }
   - id: unblock_ble
     parameters:
       log_message: string # Define a parameter
