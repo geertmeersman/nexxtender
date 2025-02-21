@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.1.1](https://github.com/geertmeersman/nexxtender/tree/v2.1.1) (2025-02-21)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.1.0...v2.1.1)
+
+**Closed issues:**
+
+- ESPHome 2025.2.0 - replace platform: esp32\_rmt\_led\_strip [\#55](https://github.com/geertmeersman/nexxtender/issues/55)
+
+**Merged pull requests:**
+
+- fix: ESP32 S3 compatibility with IDF framework version 5 [\#56](https://github.com/geertmeersman/nexxtender/pull/56) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v2.1.0](https://github.com/geertmeersman/nexxtender/tree/v2.1.0) (2025-02-10)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.0.3...v2.1.0)
