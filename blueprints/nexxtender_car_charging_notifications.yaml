@@ -61,23 +61,24 @@ action:
             entity_id: !input charging_sensor
             state: "Started"
         sequence:
-          - service: notify.mobile_app_{{ device_id }}
+          - domain: mobile_app
+            type: notify
+            device_id: !input notify_device
+            message: !input start_message
             data:
-              message: !input start_message
-              data:
-                title: !input start_title
-                color: green
-                notification_icon: mdi:battery-charging
-
+              title: !input start_title
+              color: green
+              notification_icon: mdi:battery-charging
       - conditions:
           - condition: state
             entity_id: !input charging_sensor
             state: "Stopped"
         sequence:
-          - service: notify.mobile_app_{{ device_id }}
+          - domain: mobile_app
+            type: notify
+            device_id: !input notify_device
+            message: !input stop_message
             data:
-              message: !input stop_message
-              data:
-                title: !input stop_title
-                color: green
-                notification_icon: mdi:battery-charging-100
+              title: !input stop_title
+              color: green
+              notification_icon: mdi:battery-charging-100
