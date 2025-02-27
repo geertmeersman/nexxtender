@@ -32,6 +32,8 @@ globals:
   - id: g_${generic_data_id_prefix}_status
     type: int
     initial_value: "0"
+  - id: g_${generic_data_id_prefix}_time
+    type: std::string
   - id: g_${generic_data_id_prefix}_week_start
     type: std::string
   - id: g_${generic_data_id_prefix}_week_end
@@ -165,17 +167,29 @@ text_sensor:
     on_notify:
       then:
         lambda: |-
+          static std::string prev_status; // Persist previous status across calls
           logd_x("${device_name}_${generic_data_id_prefix} status", x);
+
           std::string reversed_x(x.rbegin(), x.rend());  // Reverse the order of bytes in x
           String hex_status = format_hex_pretty((uint8_t *) reversed_x.c_str(), reversed_x.size());
 
           // Remove the period from the hexadecimal string
           hex_status.erase(std::remove(hex_status.begin(), hex_status.end(), '.'), hex_status.end());
 
+          if (prev_status.empty()) {
+            ESP_LOGD("${device_name}_${generic_data_id_prefix} status", "First status received: %s", hex_status.c_str());
+          } else if (hex_status == prev_status) {
+            ESP_LOGD("${device_name}_${generic_data_id_prefix} status", "Status unchanged: %s", hex_status.c_str());
+            return;
+          }
+          ESP_LOGD("${device_name}_${generic_data_id_prefix} status", "Status changed: %s -> %s", prev_status.c_str(), hex_status.c_str());
+          prev_status = hex_status; // Update stored value
+
           // Convert hexadecimal string to integer
           int value = std::stoi(hex_status, nullptr, 16);
           id(g_${generic_data_id_prefix}_status) = value;
           ESP_LOGD("${device_name}_generic_data", "Status received: %s (%d)", hex_status.c_str(), id(g_${generic_data_id_prefix}_status));
+
 
           // Switch statement to handle different cases
           switch(value) {
@@ -191,7 +205,7 @@ text_sensor:
             case 0x4001:
                 id(${device_name}_generic_status).publish_state(std::string("Time Set READY"));
                 id(script_write_time).execute();
-                //id(unblock_ble).execute("Time Set READY");
+                id(unblock_ble).execute("Time Set READY");
                 return;
             case 0x4002:
                 id(${device_name}_generic_status).publish_state(std::string("Time Set SUCCESS"));
@@ -226,6 +240,9 @@ text_sensor:
                 id(${device_name}_generic_status).publish_state(std::string("Config read POPPED"));
                 id(script_read_generic_data).execute();
                 id(unblock_ble).execute("Config read POPPED");
+                if (id(g_${generic_data_id_prefix}_time_synced) == false) {
+                  id(script_sync_time).execute();
+                }
                 if (id(g_${generic_data_id_prefix}_cbor_config_changed) == true) {
                   ESP_LOGI("${device_name}_generic_data", "Sending config as CBOR config changed");
                   id(script_send_config).execute();
@@ -251,6 +268,14 @@ text_sensor:
     #ESP_LOGD("${device_name}_generic_data", "Status is: %d", id(g_${generic_data_id_prefix}_status));
     #return hex_data;
     notify: true
+  - platform: template
+    name: "Nexxtender Time"
+    id: ${generic_data_id_prefix}_human_time
+    icon: "mdi:clock-time-four"
+    update_interval: ${generic_data_update_interval}
+    entity_category: diagnostic
+    lambda: |-
+      return id(g_${generic_data_id_prefix}_time);
 
 script:
   - id: delay_5s
@@ -263,9 +288,13 @@ script:
       log_message: string
     then:
       - lambda: |-
-          std::string log_copy = log_message; // Make a local copy
-          ESP_LOGI("${device_name}_generic_data", "Waiting BLE for %s", log_copy.c_str());
-          id(ble_wait_start_time) = millis(); // Store start time globally
+          if (id(g_${generic_data_id_prefix}_ble_in_use)) { // Only log if BLE is in use
+              std::string log_copy = log_message; // Make a local copy
+              ESP_LOGI("${device_name}_generic_data", "Waiting BLE for %s", log_copy.c_str());
+              id(ble_wait_start_time) = millis(); // Store start time globally
+          } else {
+              id(ble_wait_start_time) = millis(); // Still initialize start time
+          }
 
       - while:
           condition:
@@ -277,7 +306,7 @@ script:
 
       - lambda: |-
           std::string log_copy = log_message; // Make a local copy
-          if (id(g_${generic_data_id_prefix}_ble_in_use) == true) {
+          if (id(g_${generic_data_id_prefix}_ble_in_use)) {
               ESP_LOGW("${device_name}_generic_data", "BLE wait timeout for %s", log_copy.c_str());
           } else {
               id(g_${generic_data_id_prefix}_ble_in_use) = true;
@@ -326,6 +355,8 @@ script:
           service_uuid: ${ble_uuid_receive_service}
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x04, 0x50]
+      - lambda: |-
+          id(unblock_ble).execute("script_read_config");
       - delay: 5s
       - lambda: |-
           if (id(g_${generic_data_id_prefix}_status) == 0x5006) {
@@ -379,10 +410,12 @@ script:
           service_uuid: ${ble_uuid_receive_service}
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x01, 0x40]
+      - lambda: |-
+          id(delay_5s).execute();
+          id(script_read_time).execute();
+
   - id: script_write_time
     then:
-      - lambda: |-
-          id(wait_for_ble).execute("script_write_time");  // Wait until ble_in_use is false
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
@@ -399,6 +432,8 @@ script:
             // Convert the byte array into a vector
             std::vector<uint8_t> epoch_time_vector(epoch_time_bytes.begin(), epoch_time_bytes.end());
             return epoch_time_vector;
+      - lambda: |-
+          id(g_${generic_data_id_prefix}_time_synced) = true;
 
   - id: script_write_cbor_config
     then:
@@ -485,6 +520,11 @@ script:
             std::time_t current_time_epoch_nexxtender = static_cast<std::time_t>(epoch_time_int);
             char current_time_human_readable[20]; // Adjust size as needed
             strftime(current_time_human_readable, sizeof(current_time_human_readable), "%Y-%m-%d %H:%M:%S", localtime(&current_time_epoch_nexxtender));
+
+            // Assign the formatted time string to the global std::string
+            id(g_${generic_data_id_prefix}_time) = std::string(current_time_human_readable);
+            id(${generic_data_id_prefix}_human_time).update();
+
             // Log both epoch time and human-readable time
             ESP_LOGD("${device_name}_generic_data - time", "Nexxtender Epoch Time: %d, Human Readable Time: %s", epoch_time_int, current_time_human_readable);
             strftime(current_time_human_readable, sizeof(current_time_human_readable), "%Y-%m-%d %H:%M:%S", localtime(&current_time_epoch));
@@ -553,6 +593,8 @@ script:
               id(g_${generic_data_id_prefix}_week_end) = getTimeString(getShort(x, 7));
               id(g_${generic_data_id_prefix}_weekend_start) = getTimeString(getShort(x, 9));
               id(g_${generic_data_id_prefix}_weekend_end) = getTimeString(getShort(x, 11));
+              id(${generic_data_id_prefix}_week_schema).update();
+              id(${generic_data_id_prefix}_weekend_schema).update();
             } else {
               ESP_LOGW("${device_name}_generic_data", "Config data size not equal to 15. Please open an issue with your HEX string information.");
             }
@@ -849,6 +891,22 @@ button:
           service_uuid: ${ble_uuid_receive_service}
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x06, 0x00]
+  - platform: template
+    name: Read time
+    icon: mdi:clock-time-eight-outline
+    entity_category: diagnostic
+    on_press:
+      then:
+        - lambda: |-
+            id(script_read_time).execute();
+  - platform: template
+    name: Sync time
+    icon: mdi:timer-refresh-outline
+    entity_category: diagnostic
+    on_press:
+      then:
+        - lambda: |-
+            id(script_sync_time).execute();
 
 number:
   - platform: template

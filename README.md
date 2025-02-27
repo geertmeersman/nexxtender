@@ -55,32 +55,43 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 
 ![diagnose](images/diagnose.png)
 
+| Sensor/button          | Description                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| BLE Client             | Shows the connection state to the Nexxtender charging box and an input boolean to connect/disconnect |
+| Code version           | Shows the version of the esphome nexxtender code you are running                                     |
+| Firmware Revision      | Shows the installed firmware on the integrated ESP of your nexxtender charger                        |
+| Generic Status         | Shows the last generic BLE command status                                                            |
+| Nexxtender Time        | Shows the time on the Nexxtender charger                                                             |
+| Read time              | Updates the Nexxtender Time sensor with the charger time value                                       |
+| Sync time              | Synchronises the ESP time. It pushes the HA time to the Nexxtender charger                           |
+| Restart Nexxtender ESP | Restarts the Nexxtender ESP firmware (not the one of the charger)                                    |
+
 ## Table of contents
 
 <!-- TOC -->
 
-- [ESPHome BLE Client for Powerdale Nexxtender EV Charger](#esphome-ble-client-for-powerdale-nexxtender-ev-charger)
-  - [Features](#features)
-  - [Screenshots](#screenshots)
-    - [Lovelace card](#lovelace-card)
-    - [Change charger config](#change-charger-config)
-    - [Controls](#controls)
-    - [Sensors](#sensors)
-    - [Diagnostics](#diagnostics)
-  - [Table of contents](#table-of-contents)
-  - [Getting Started](#getting-started)
-    - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
-    - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
-    - [Installing & Configuring ESPHome](#installing--configuring-esphome)
-    - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
-      - [Customizing ESP32 Configuration Optional](#customizing-esp32-configuration-optional)
-        - [ESP32-S3-N16R8](#esp32-s3-n16r8)
-  - [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
-  - [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Support](#support)
-
+- [Features](#features)
+- [Screenshots](#screenshots)
+  - [Lovelace card](#lovelace-card)
+  - [Change charger config](#change-charger-config)
+  - [Controls](#controls)
+  - [Sensors](#sensors)
+  - [Diagnostics](#diagnostics)
+- [Table of contents](#table-of-contents)
+- [Getting Started](#getting-started)
+  - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
+  - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
+  - [Installing & Configuring ESPHome](#installing--configuring-esphome)
+- [Uncomment and modify when you want to use a different device name.](#uncomment-and-modify-when-you-want-to-use-a-different-device-name)
+- [Uncomment and modify when you want to use a different threshold.](#uncomment-and-modify-when-you-want-to-use-a-different-threshold)
+  - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
+    - [Customizing ESP32 Configuration (Optional)](#customizing-esp32-configuration-optional)
+      - [ESP32-S3-N16R8](#esp32-s3-n16r8)
+- [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
+- [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
 <!-- /TOC -->
 
 ## Getting Started

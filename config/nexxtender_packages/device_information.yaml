@@ -23,6 +23,7 @@ text_sensor:
       then:
         lambda: |-
           if (x.empty()) { return; }
+          id(${device_information_id_prefix}_model_number).publish_state(x);
           logd_s("${device_information_id_prefix}_model_number", x);
   - platform: ble_client
     id: ${device_information_id_prefix}_serial_number
@@ -39,6 +40,7 @@ text_sensor:
       then:
         lambda: |-
           if (x.empty()) { return; }
+          id(${device_information_id_prefix}_serial_number).publish_state(x);
           logd_s("${device_information_id_prefix}_serial_number", x);
   - platform: ble_client
     id: ${device_information_id_prefix}_firmware_revision
@@ -54,6 +56,7 @@ text_sensor:
       then:
         lambda: |-
           if (x.empty()) { return; }
+          id(${device_information_id_prefix}_firmware_revision).publish_state(x);
           logd_s("${device_information_id_prefix}_firmware_revision", x);
   - platform: ble_client
     id: ${device_information_id_prefix}_hardware_revision
@@ -70,4 +73,5 @@ text_sensor:
       then:
         lambda: |-
           if (x.empty()) { return; }
+          id(${device_information_id_prefix}_hardware_revision).publish_state(x);
           logd_s("${device_information_id_prefix}_hardware_revision", x);
