@@ -1,5 +1,16 @@
 # Changelog
 
+## [v2.1.2](https://github.com/geertmeersman/nexxtender/tree/v2.1.2) (2025-02-27)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.1.1...v2.1.2)
+
+**Merged pull requests:**
+
+- docs: entities descriptions [\#60](https://github.com/geertmeersman/nexxtender/pull/60) ([geertmeersman](https://github.com/geertmeersman))
+- fix: Time synchronisation fixed and diagnose documentation [\#59](https://github.com/geertmeersman/nexxtender/pull/59) ([geertmeersman](https://github.com/geertmeersman))
+- docs: blueprint for car charging notifications [\#58](https://github.com/geertmeersman/nexxtender/pull/58) ([geertmeersman](https://github.com/geertmeersman))
+- fix: move debug time buttons to dev\_debug [\#57](https://github.com/geertmeersman/nexxtender/pull/57) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v2.1.1](https://github.com/geertmeersman/nexxtender/tree/v2.1.1) (2025-02-21)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.1.0...v2.1.1)
