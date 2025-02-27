@@ -40,11 +40,11 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 
 ### Change charger config
 
-![config](images/change_config.png)
+![config](images/configuration.png)
 
 ### Controls
 
-![bediening](images/bediening.png)
+![bediening](images/controls.png)
 
 ### Sensors
 
@@ -55,43 +55,97 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 
 ![diagnose](images/diagnose.png)
 
-| Sensor/button          | Description                                                                                          |
-| ---------------------- | ---------------------------------------------------------------------------------------------------- |
-| BLE Client             | Shows the connection state to the Nexxtender charging box and an input boolean to connect/disconnect |
-| Code version           | Shows the version of the esphome nexxtender code you are running                                     |
-| Firmware Revision      | Shows the installed firmware on the integrated ESP of your nexxtender charger                        |
-| Generic Status         | Shows the last generic BLE command status                                                            |
-| Nexxtender Time        | Shows the time on the Nexxtender charger                                                             |
-| Read time              | Updates the Nexxtender Time sensor with the charger time value                                       |
-| Sync time              | Synchronises the ESP time. It pushes the HA time to the Nexxtender charger                           |
-| Restart Nexxtender ESP | Restarts the Nexxtender ESP firmware (not the one of the charger)                                    |
+## Entities
+
+| Name                          | Entity ID                                       | Entity Type   | Description                                                                                                                                              |
+| ----------------------------- | ----------------------------------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Maximum available capacity    | number.nexxtender_maximum_available_capacity    | Configuration | Maximum allowed grid consumption limit in A. Set this to a lower value if you have a peak tariff contract                                                |
+| Maximum car charging speed    | number.nexxtender_maximum_car_charging_speed    | Configuration | Maximum allowed charging speed in A for the car                                                                                                          |
+| Mode                          | select.nexxtender_mode                          | Configuration | Private limits to whitelisted badges only. Open is without restriction. Modes: Eco Private, Max Private, Eco Open, Max Open                              |
+| Offloading minimum            | number.nexxtender_offloading_minimum            | Configuration | Minimum charging speed in A for the charger. Certified chargers are required to provide a minimum of 6A                                                  |
+| Peak consumption limit        | number.nexxtender_peak_consumption_limit        | Configuration | Peak grid consumption limit                                                                                                                              |
+| Nexxtender                    | light.nexxtender_nexxtender                     | Controls      | LED light on the ESP32 S3 board                                                                                                                          |
+| Start Charge Auto             | button.nexxtender_start_charge_auto             | Controls      | Start charging in Auto mode                                                                                                                              |
+| Start Charge Default          | button.nexxtender_start_charge_default          | Controls      | Start charging in Default mode                                                                                                                           |
+| Start Charge Eco              | button.nexxtender_start_charge_eco              | Controls      | Start charging in ECO mode                                                                                                                               |
+| Start Charge Max              | button.nexxtender_start_charge_max              | Controls      | Start charging in MAX mode                                                                                                                               |
+| Stop Charging                 | button.nexxtender_stop_charging                 | Controls      | Stop charging                                                                                                                                            |
+| Toggle charger mode           | button.nexxtender_toggle_charger_mode           | Controls      | Toggle charging mode between ECO and MAX                                                                                                                 |
+| BLE Client                    | binary_sensor.nexxtender_ble_client             | Diagnostic    | Indicates the connection state of the BLE client with the Nexxtender charger                                                                             |
+| BLE Client                    | switch.nexxtender_ble_client                    | Diagnostic    | Switch to (dis)connect the BLE client with the Nexxtender charger                                                                                        |
+| Code version                  | sensor.nexxtender_code_version                  | Diagnostic    | Shows the version of the esphome nexxtender code you are running (this github code)                                                                      |
+| Firmware Revision             | sensor.nexxtender_firmware_revision             | Diagnostic    | Shows the installed firmware on the integrated ESP of your nexxtender charger                                                                            |
+| Generic Status                | sensor.nexxtender_generic_status                | Diagnostic    | Shows the last generic BLE command                                                                                                                       |
+| Grid Interval                 | sensor.nexxtender_grid_interval                 | Diagnostic    | Grid Interval is a counter that goes from 0->900 (15 minutes)                                                                                            |
+| Hardware Revision             | sensor.nexxtender_hardware_revision             | Diagnostic    | Hexadecimal hardware revision or Model Number                                                                                                            |
+| Model Number                  | sensor.nexxtender_model_number                  | Diagnostic    | Decimal model number                                                                                                                                     |
+| Read time                     | button.nexxtender_read_time                     | Diagnostic    | Updates the Nexxtender Time sensor with the charger time value                                                                                           |
+| Restart Nexxtender ESP        | button.nexxtender_restart_nexxtender_esp        | Diagnostic    | Restart the Nexxtender ESP board                                                                                                                         |
+| Serial Number                 | sensor.nexxtender_serial_number                 | Diagnostic    | The serial number                                                                                                                                        |
+| Sync time                     | button.nexxtender_sync_time                     | Diagnostic    | Synchronises the ESP time. It pushes the HA time to the Nexxtender charger                                                                               |
+| Time                          | sensor.nexxtender_nexxtender_time               | Diagnostic    | Restarts the Nexxtender ESP board (not the one of the charger)                                                                                           |
+| Available capacity            | sensor.nexxtender_available_capacity            | Sensors       | Available capacity in A                                                                                                                                  |
+| Car Current                   | sensor.nexxtender_car_current                   | Sensors       | Sum of Car L1, L2 and L3                                                                                                                                 |
+| Car L1                        | sensor.nexxtender_car_l1                        | Sensors       | Car phase L1 current in A                                                                                                                                |
+| Car L2                        | sensor.nexxtender_car_l2                        | Sensors       | Car phase L2 current in A                                                                                                                                |
+| Car L3                        | sensor.nexxtender_car_l3                        | Sensors       | Car phase L3 current in A                                                                                                                                |
+| Car P1                        | sensor.nexxtender_car_p1                        | Sensors       | Car phase L1 power consumption in kW                                                                                                                     |
+| Car P2                        | sensor.nexxtender_car_p2                        | Sensors       | Car phase L2 power consumption in kW                                                                                                                     |
+| Car P3                        | sensor.nexxtender_car_p3                        | Sensors       | Car phase L2 power consumption in kW                                                                                                                     |
+| Car Power                     | sensor.nexxtender_car_power                     | Sensors       | Total power consumption from the car in kW                                                                                                               |
+| Car Power Mode                | sensor.nexxtender_car_power_mode                | Sensors       | Power mode of the car. Can be Eco, Max or not charging. The eco threshold is calculated on the number of phases. This mode is derived from the Car Power |
+| Car Timestamp                 | sensor.nexxtender_car_timestamp                 | Sensors       | Current time in UTC Unix Time                                                                                                                            |
+| Charging Advanced Grid Energy | sensor.nexxtender_charging_advanced_grid_energy | Sensors       | Energy calculation based on the grid power                                                                                                               |
+| Charging Advanced Timestamp   | sensor.nexxtender_charging_advanced_timestamp   | Sensors       | Current time in UTC Unix Time                                                                                                                            |
+| Charging Phase Count          | sensor.nexxtender_charging_phase_count          | Sensors       | Number of active phases during charging session                                                                                                          |
+| Charging Phases               | sensor.nexxtender_charging_phases               | Sensors       | Number of available phases                                                                                                                               |
+| Charging Seconds              | sensor.nexxtender_charging_seconds              | Sensors       | Number of seconds in the active charging session                                                                                                         |
+| Connection type               | sensor.nexxtender_connection_type               | Sensors       | Connection type. Mono/Tri+N: Single-phase or Three-phase with neutral, Tri: Three-phase without neutral                                                  |
+| Discriminator                 | sensor.nexxtender_discriminator                 | Sensors       | Discriminator state (plugged, charging, fault, unplugged)                                                                                                |
+| Energy                        | sensor.nexxtender_energy                        | Sensors       | Consumed energy during a charging session                                                                                                                |
+| Grid Consumed                 | sensor.nexxtender_grid_consumed                 | Sensors       | Grid consumption, sum of grid L1+L2+L3, expressed in W                                                                                                   |
+| Grid L1                       | sensor.nexxtender_grid_l1                       | Sensors       | Grid phase L1 current in A                                                                                                                               |
+| Grid L2                       | sensor.nexxtender_grid_l2                       | Sensors       | Grid phase L2 current in A                                                                                                                               |
+| Grid L3                       | sensor.nexxtender_grid_l3                       | Sensors       | Grid phase L3 current in A                                                                                                                               |
+| Grid Power                    | sensor.nexxtender_grid_power                    | Sensors       | Total power consumption from the grid in W                                                                                                               |
+| Grid Timestamp                | sensor.nexxtender_grid_timestamp                | Sensors       | Current time in UTC Unix Time                                                                                                                            |
+| Maximum available capacity    | sensor.nexxtender_maximum_available_capacity    | Sensors       | Maximum allowed grid consumption limit in A. You can set this with the `number.nexxtender_maximum_available_capacity`                                    |
+| Maximum car charging speed    | sensor.nexxtender_maximum_car_charging_speed    | Sensors       | Maximum allowed charging speed in A for the car. You can set this with the ` number.nexxtender_maximum_car_charging_speed`                               |
+| Minimum car charging speed    | sensor.nexxtender_minimum_car_charging_speed    | Sensors       | Minimum car charging speed                                                                                                                               |
+| Mode                          | sensor.nexxtender_mode                          | Sensors       | Current charging mode                                                                                                                                    |
+| Offloading minimum            | sensor.nexxtender_offloading_minimum            | Sensors       | Minimum charging speed in A for the device. Certified chargers are required to provide a minimum of 6A                                                   |
+| Peak consumption limit        | sensor.nexxtender_peak_consumption_limit        | Sensors       | Peak grid consumption limit                                                                                                                              |
+| Status                        | sensor.nexxtender_status                        | Sensors       | Status of the charger (Plugged, Charging, Fault, Unplugged)                                                                                              |
+| Week schema                   | sensor.nexxtender_week_schema                   | Sensors       | Off peak charging schema during the week                                                                                                                 |
+| Weekend schema                | sensor.nexxtender_weekend_schema                | Sensors       | Off peak charging schema during the weekend                                                                                                              |
 
 ## Table of contents
 
 <!-- TOC -->
 
-- [Features](#features)
-- [Screenshots](#screenshots)
-  - [Lovelace card](#lovelace-card)
-  - [Change charger config](#change-charger-config)
-  - [Controls](#controls)
-  - [Sensors](#sensors)
-  - [Diagnostics](#diagnostics)
-- [Table of contents](#table-of-contents)
-- [Getting Started](#getting-started)
-  - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
-  - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
-  - [Installing & Configuring ESPHome](#installing--configuring-esphome)
-- [Uncomment and modify when you want to use a different device name.](#uncomment-and-modify-when-you-want-to-use-a-different-device-name)
-- [Uncomment and modify when you want to use a different threshold.](#uncomment-and-modify-when-you-want-to-use-a-different-threshold)
-  - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
-    - [Customizing ESP32 Configuration (Optional)](#customizing-esp32-configuration-optional)
-      - [ESP32-S3-N16R8](#esp32-s3-n16r8)
-- [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
-- [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
-- [Contributing](#contributing)
-- [License](#license)
-- [Support](#support)
+- [ESPHome BLE Client for Powerdale Nexxtender EV Charger](#esphome-ble-client-for-powerdale-nexxtender-ev-charger)
+  - [Features](#features)
+  - [Screenshots](#screenshots)
+    - [Lovelace card](#lovelace-card)
+    - [Change charger config](#change-charger-config)
+    - [Controls](#controls)
+    - [Sensors](#sensors)
+    - [Diagnostics](#diagnostics)
+  - [Entities](#entities)
+  - [Table of contents](#table-of-contents)
+  - [Getting Started](#getting-started)
+    - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
+    - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
+    - [Installing & Configuring ESPHome](#installing--configuring-esphome)
+    - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
+      - [Customizing ESP32 Configuration Optional](#customizing-esp32-configuration-optional)
+        - [ESP32-S3-N16R8](#esp32-s3-n16r8)
+  - [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
+  - [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Support](#support)
+
 <!-- /TOC -->
 
 ## Getting Started
