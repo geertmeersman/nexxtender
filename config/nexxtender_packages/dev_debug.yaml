@@ -60,3 +60,21 @@ button:
           service_uuid: ${ble_uuid_receive_service}
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x02, 0x20]
+  - platform: template
+    name: Read time
+    icon: mdi:clock-time-eight-outline
+    entity_category: diagnostic
+    on_press:
+      then:
+        - lambda: |-
+            id(script_read_time).execute();
+  - platform: template
+    name: Sync time
+    icon: mdi:timer-refresh-outline
+    entity_category: diagnostic
+    on_press:
+      - ble_client.ble_write:
+          id: ${device_name}_ble_client_id
+          service_uuid: ${ble_uuid_receive_service}
+          characteristic_uuid: ${ble_uuid_generic_command}
+          value: [0x01, 0x40]
