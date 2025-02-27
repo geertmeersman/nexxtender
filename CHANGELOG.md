@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.1.3](https://github.com/geertmeersman/nexxtender/tree/v2.1.3) (2025-02-27)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.1.2...v2.1.3)
+
+**Merged pull requests:**
+
+- fix: charging notification blueprint improvements [\#61](https://github.com/geertmeersman/nexxtender/pull/61) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v2.1.2](https://github.com/geertmeersman/nexxtender/tree/v2.1.2) (2025-02-27)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.1.1...v2.1.2)
