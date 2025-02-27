@@ -5,40 +5,49 @@ blueprint:
   input:
     charging_sensor:
       name: Charging State Sensor
-      description: "Select the Nexxtender discriminator sensor. Usually sensor.nexxtender_discriminator."
+      description: "Select the Nexxtender status sensor. (e.g. sensor.nexxtender_status)"
+      default: sensor.nexxtender_status
       selector:
         entity:
           integration: esphome
           domain: sensor
           multiple: false
+    energy_sensor:
+      name: Energy Sensor
+      description: "Select the sensor that tracks energy consumption (e.g. sensor.nexxtender_energy)"
+      default: sensor.nexxtender_energy
+      selector:
+        entity:
+          domain: sensor
+    duration_sensor:
+      name: Charging Duration Sensor
+      description: "Select the sensor that tracks charging duration in seconds (e.g. sensor.nexxtender_charging_seconds)"
+      default: sensor.nexxtender_charging_seconds
+      selector:
+        entity:
+          domain: sensor
     notify_device:
       name: Notify Device
-      description: "Select the device to receive notifications."
+      description: "Select the device to receive notifications"
       selector:
         device:
           integration: mobile_app
     start_title:
       name: Charging Start Title
-      description: "Customize the notification title when charging starts."
-      default: "Nexxtender charger status"
+      description: "Customize the notification title when charging starts"
+      default: "Charging started"
       selector:
         text: {}
     start_message:
       name: Charging Start Message
-      description: "Customize the message when the car starts charging."
-      default: "Your car has started charging."
+      description: "Customize the message when the car starts charging"
+      default: "Your car has started charging"
       selector:
         text: {}
     stop_title:
       name: Charging Stop Title
-      description: "Customize the notification title when charging stops."
-      default: "Nexxtender charger status"
-      selector:
-        text: {}
-    stop_message:
-      name: Charging Stop Message
-      description: "Customize the message when the car stops charging."
-      default: "Your car has stopped charging."
+      description: "Customize the notification title when charging stops"
+      default: "Charging ended"
       selector:
         text: {}
 
@@ -47,37 +56,54 @@ mode: restart
 trigger:
   - platform: state
     entity_id: !input charging_sensor
-    from: "Stopped"
-    to: "Started"
+    from: "Plugged"
+    to: "Charging"
   - platform: state
     entity_id: !input charging_sensor
     from: "Charging"
-    to: "Stopped"
+    to: "Plugged"
 
 action:
+  - variables:
+      energy_sensor: !input energy_sensor
+      duration_sensor: !input duration_sensor
+      energy: "{{ states(energy_sensor) | default('0') }} kWh"
+      duration: >
+        {% set seconds = states(duration_sensor) | int(0) %}
+        {% set hours = (seconds // 3600) %}
+        {% set minutes = ((seconds % 3600) // 60) %}
+        {% set sec = (seconds % 60) %}
+        {% if hours > 0 %}
+          {{ hours }}h {{ minutes }}m {{ sec }}s
+        {% elif minutes > 0 %}
+          {{ minutes }}m {{ sec }}s
+        {% else %}
+          {{ sec }}s
+        {% endif %}
   - choose:
       - conditions:
           - condition: state
             entity_id: !input charging_sensor
-            state: "Started"
+            state: "Charging"
         sequence:
-          - service: notify.mobile_app_{{ device_id }}
+          - domain: mobile_app
+            type: notify
+            device_id: !input notify_device
+            message: !input start_message
             data:
-              message: !input start_message
-              data:
-                title: !input start_title
-                color: green
-                notification_icon: mdi:battery-charging
-
+              title: !input start_title
+              color: green
+              notification_icon: mdi:battery-charging
       - conditions:
           - condition: state
             entity_id: !input charging_sensor
-            state: "Stopped"
+            state: "Plugged"
         sequence:
-          - service: notify.mobile_app_{{ device_id }}
+          - domain: mobile_app
+            type: notify
+            device_id: !input notify_device
+            message: "Energy charged: {{ energy }}, Duration: {{ duration }}"
             data:
-              message: !input stop_message
-              data:
-                title: !input stop_title
-                color: green
-                notification_icon: mdi:battery-charging-100
+              title: !input stop_title
+              color: green
+              notification_icon: mdi:battery-charging-100
