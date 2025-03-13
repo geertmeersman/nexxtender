@@ -118,4 +118,4 @@ text_sensor:
           id(g_${charging_grid_id_prefix}_consumed) = getShort(x, 10);
 
           // Interval is a counter that goes from 0->900 (15 minutes)
-          id(g_${charging_grid_id_prefix}_interval) = getShort(x, 12);
+          id(g_${charging_grid_id_prefix}_interval) = getUShort(x, 12);

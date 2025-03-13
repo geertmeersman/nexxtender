@@ -117,5 +117,5 @@ text_sensor:
 
           id(g_${charging_advanced_id_prefix}_timestamp) = getInt(x, 0);
           id(g_${charging_advanced_id_prefix}_i_available) = getShort(x, 4);
-          id(g_${charging_advanced_id_prefix}_grid_power) = getInt(x, 6);
-          id(g_${charging_advanced_id_prefix}_car_power) = getInt(x, 10);
+          id(g_${charging_advanced_id_prefix}_grid_power) = getSignedInt(x, 6);
+          id(g_${charging_advanced_id_prefix}_car_power) = getSignedInt(x, 10);
