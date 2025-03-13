@@ -1,5 +1,18 @@
 # Changelog
 
+## [v2.1.4](https://github.com/geertmeersman/nexxtender/tree/v2.1.4) (2025-03-13)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.1.3...v2.1.4)
+
+**Closed issues:**
+
+- Huge spikes in Nexxtender Car Power graph [\#63](https://github.com/geertmeersman/nexxtender/issues/63)
+
+**Merged pull requests:**
+
+- fix: casting corrections unsigned/signed [\#64](https://github.com/geertmeersman/nexxtender/pull/64) ([geertmeersman](https://github.com/geertmeersman))
+- docs: updated blueprint screenshot [\#62](https://github.com/geertmeersman/nexxtender/pull/62) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v2.1.3](https://github.com/geertmeersman/nexxtender/tree/v2.1.3) (2025-02-27)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.1.2...v2.1.3)
