@@ -15,4 +15,4 @@ esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
   includes:
-    - nexxtender_packages/nexxtender.h
+    - config/nexxtender_packages/nexxtender.h
