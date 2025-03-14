@@ -23,19 +23,21 @@ jobs:
 
       - name: Move Secrets Template
         run: |
-          cp config/secrets.yaml.template config/secrets.yaml
-          sed -i 's/YOUR_ESPHOME_API_KEY/2EhugO+jJDJ+BiVEiRxzXnkDWTmxpdfvgdMXRv26\/pA=/' config/secrets.yaml
-          sed -i 's/YOUR_NEXXTENDER_MAC_ADDRESS/00:1A:7D:DA:71:13/' config/secrets.yaml
-          sed -i 's/YOUR_NEXXTENDER_PASSKEY/123456/' config/secrets.yaml
+          cp secrets.yaml.template secrets.yaml
+          sed -i 's/YOUR_ESPHOME_API_KEY/2EhugO+jJDJ+BiVEiRxzXnkDWTmxpdfvgdMXRv26\/pA=/' secrets.yaml
+          sed -i 's/YOUR_NEXXTENDER_MAC_ADDRESS/00:1A:7D:DA:71:13/' secrets.yaml
+          sed -i 's/YOUR_NEXXTENDER_PASSKEY/123456/' secrets.yaml
           echo "Secrets template moved."
-        working-directory: ${{ github.workspace }}
+        working-directory: config
 
       - name: Build ESPHOME az-delivery-devkit-v4
         uses: esphome/build-action@v6
         with:
-          yaml-file: config/nexxtender.yaml
+          yaml-file: nexxtender.yaml
+        working-directory: config
 
       - name: Build ESPHOME esp32-s3-devkitc-1
         uses: esphome/build-action@v6
         with:
-          yaml-file: config/nexxtender.s3.yaml
+          yaml-file: nexxtender.s3.yaml
+        working-directory: config
