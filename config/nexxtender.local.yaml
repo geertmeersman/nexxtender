@@ -1,7 +1,6 @@
 packages:
   esp: !include nexxtender_packages/esp.yaml
-  esphome: !include nexxtender_packages/esphome.git.yaml
-  esp_s3: !include nexxtender_packages/esp.s3.yaml
+  esphome: !include nexxtender_packages/esphome.local.yaml
   #webserver: !include nexxtender_packages/webserver.yaml # secret esphome_admin_password required
   api: !include nexxtender_packages/api.yaml # secrets esphome_admin_password, wifi_ssid, wifi_password & esphome_api_key required
   time: !include nexxtender_packages/time.yaml
@@ -15,6 +14,7 @@ packages:
   version: !include nexxtender_packages/version.yaml
   #transactions: !include nexxtender_packages/transactions.yaml
   #diagnostics: !include nexxtender_packages/diagnostics.yaml
+  #dev_debug: !include nexxtender_packages/dev_debug.yaml
 
 substitutions:
   # device_name: nexxtender
