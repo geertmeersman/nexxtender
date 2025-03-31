@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.2.0](https://github.com/geertmeersman/nexxtender/tree/v2.2.0) (2025-03-31)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.1.4...v2.2.0)
+
+**Closed issues:**
+
+- Compilation error when upgrading to ESPHome 2025.3.2 [\#66](https://github.com/geertmeersman/nexxtender/issues/66)
+
+**Merged pull requests:**
+
+- feat: enhanced path inclusion, local and git hash - no more need for copying the header file locally [\#67](https://github.com/geertmeersman/nexxtender/pull/67) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v2.1.4](https://github.com/geertmeersman/nexxtender/tree/v2.1.4) (2025-03-13)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.1.3...v2.1.4)
