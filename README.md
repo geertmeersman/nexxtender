@@ -292,9 +292,6 @@ SN: XXXX-XXXXX-XX
    Using the Home Assistant ESPHome dashboard, the firmware compilation, upload and flashing of your esp32 is done in one step by using the `Install` option.
    Optionally, you can first run the `Validate` command that will check all the code and links before compiling it. Considering the compilation can take some time, this is a recommended step.
 
-   Note: if the compilation fails due to missing `nexxtender_packages/nexxtender.h` file. You can copy [nexxtender_packages/nexxtender.h](config/nexxtender_packages/nexxtender.h) in your configuration folder.
-   In HomeAssistant, the configuration files for ESPHome can be found and edited under `<HOME_ASSISTANT_CONFIG>/esphome/`. For example the configuration for the nexxtender node can be found in `/config/esphome/nexxtender.yaml`. You'll then need to use a terminal or IDE to create the directory `<HOME_ASSISTANT_CONFIG>/esphome/nexxtender_packages` and the file `nexxtender.h`.
-
 5. **Flash Firmware:** Flash the compiled firmware to your ESPHome device using the following command:
 
    ```bash
