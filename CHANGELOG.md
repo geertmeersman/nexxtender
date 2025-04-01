@@ -1,5 +1,14 @@
 # Changelog
 
+## [v2.2.1](https://github.com/geertmeersman/nexxtender/tree/v2.2.1) (2025-04-01)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.2.0...v2.2.1)
+
+**Merged pull requests:**
+
+- docs: remove the section on nexxtender.h [\#69](https://github.com/geertmeersman/nexxtender/pull/69) ([geertmeersman](https://github.com/geertmeersman))
+- fix: esphome config for ha\_addon, docker & local [\#68](https://github.com/geertmeersman/nexxtender/pull/68) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v2.2.0](https://github.com/geertmeersman/nexxtender/tree/v2.2.0) (2025-03-31)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.1.4...v2.2.0)
