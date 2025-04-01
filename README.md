@@ -136,9 +136,12 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
   - [Getting Started](#getting-started)
     - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
     - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
-    - [Installing & Configuring ESPHome](#installing--configuring-esphome)
+    - [Installing \& Configuring ESPHome](#installing--configuring-esphome)
+      - [**a. Create a New ESPHome Configuration**](#a-create-a-new-esphome-configuration)
+      - [**b. Choosing the Correct Configuration File**](#b-choosing-the-correct-configuration-file)
+      - [**c. Configuration Notes**](#c-configuration-notes)
     - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
-      - [Customizing ESP32 Configuration Optional](#customizing-esp32-configuration-optional)
+      - [Customizing ESP32 Configuration (Optional)](#customizing-esp32-configuration-optional)
         - [ESP32-S3-N16R8](#esp32-s3-n16r8)
   - [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
   - [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
@@ -211,6 +214,8 @@ SN: XXXX-XXXXX-XX
 
 2. **Create a new ESPHome Configuration:** Create a new file named `nexxtender.yaml` in your local directory.
 
+   #### **a. Create a New ESPHome Configuration**
+   
    If you followed the proposed HomeAssistant ESPHome wizard, you already ended up with a yaml file. If needed, first rename this file in `nexxtender.yaml` using the `Rename hostname` option. Note that this will also trigger the compilation and can take some time. Alternatively, delete the configuration created by the wizard and create a new one.
 
    Edit and copy/paste the content of the provided `nexxtender.yaml` into or at the end of this file (or copy/paste the below yaml).
@@ -236,6 +241,14 @@ SN: XXXX-XXXXX-XX
      # slider_max_offloading_minimum: "32" # The max offloading minimum value
      # slider_min_offloading_minimum: "6" # The min offloading minimum value
    ```
+
+   #### **b. Choosing the Correct Configuration File**
+   Depending on how you run ESPHome, use the appropriate configuration file:
+   - **`config/nexxtender.yaml`** → For ESPHome running as a **Home Assistant Add-on**
+   - **`config/nexxtender.docker.yaml`** → For ESPHome running in a **standalone Docker container**
+   - **`config/nexxtender.local.yaml`** → For local compilation when working in a **git clone**
+
+   #### **c. Configuration Notes**
 
    - The charging power mode is estimated based on the number of phases used during the charge.
    - The substitution `charging_mode_eco_threshold` and the others are optional, and you can set it to whatever Amp you want to be used as a threshold for the ECO/MAX sensor. Default values are the ones set in the example.

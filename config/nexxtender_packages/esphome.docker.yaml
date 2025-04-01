@@ -1,0 +1,8 @@
+esphome:
+  min_version: 2024.2.0
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  includes:
+    # Calculate the path using the calculate_esphome_package_path.py script
+    # Path when running in a standalone docker setup
+    - .esphome/packages/fe6cda15/config/nexxtender_packages/nexxtender.h

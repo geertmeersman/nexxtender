@@ -4,4 +4,5 @@ esphome:
   friendly_name: ${friendly_name}
   includes:
     # Calculate the path using the calculate_esphome_package_path.py script
-    - .esphome/packages/fe6cda15/config/nexxtender_packages/nexxtender.h
+    # Specific path in the esphome addon docker container
+    - /data/packages/fe6cda15/config/nexxtender_packages/nexxtender.h
