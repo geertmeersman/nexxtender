@@ -137,6 +137,9 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
     - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
     - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
     - [Installing \& Configuring ESPHome](#installing--configuring-esphome)
+      - [**a. Create a New ESPHome Configuration**](#a-create-a-new-esphome-configuration)
+      - [**b. Choosing the Correct Configuration File**](#b-choosing-the-correct-configuration-file)
+      - [**c. Configuration Notes**](#c-configuration-notes)
     - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
       - [Customizing ESP32 Configuration (Optional)](#customizing-esp32-configuration-optional)
         - [ESP32-S3-N16R8](#esp32-s3-n16r8)
@@ -213,7 +216,7 @@ SN: XXXX-XXXXX-XX
 
    #### **a. Create a New ESPHome Configuration**
    
-   If you followed the proposed HomeAssistant ESPHome wizard, you already ended up with a yaml file. If needed, first rename this file in `nexxtender.yaml` using the `Rename hostname` option. Note that this will also trigger the compilation and can take some time. Alternatively, delete the configurationcreated by the wizard and create a new one.
+   If you followed the proposed HomeAssistant ESPHome wizard, you already ended up with a yaml file. If needed, first rename this file in `nexxtender.yaml` using the `Rename hostname` option. Note that this will also trigger the compilation and can take some time. Alternatively, delete the configuration created by the wizard and create a new one.
 
    Edit and copy/paste the content of the provided `nexxtender.yaml` into or at the end of this file (or copy/paste the below yaml).
 
