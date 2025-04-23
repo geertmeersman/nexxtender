@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.2.2](https://github.com/geertmeersman/nexxtender/tree/v2.2.2) (2025-04-23)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.2.1...v2.2.2)
+
+**Merged pull requests:**
+
+- fix: change energy global type to uint32\_t [\#70](https://github.com/geertmeersman/nexxtender/pull/70) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v2.2.1](https://github.com/geertmeersman/nexxtender/tree/v2.2.1) (2025-04-01)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.2.0...v2.2.1)
