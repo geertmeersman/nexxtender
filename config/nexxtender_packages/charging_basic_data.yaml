@@ -5,6 +5,7 @@ substitutions:
   charging_basic_update_interval: 60s
   http_base_url: ""
   http_post_enabled: "false"
+  http_x_api_key: ""
 
 globals:
   - id: g_${charging_basic_id_prefix}_seconds
