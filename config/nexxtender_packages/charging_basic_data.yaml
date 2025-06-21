@@ -3,9 +3,9 @@ substitutions:
   charging_basic_prefix: Charging
   charging_basic_id_prefix: charging_basic
   charging_basic_update_interval: 60s
-  http_base_url: "\"\""
+  http_base_url: ""
   http_post_enabled: "false"
-  http_x_api_key: "\"\""
+  http_x_api_key: ""
 
 globals:
   - id: g_${charging_basic_id_prefix}_seconds
@@ -86,6 +86,7 @@ script:
             return "{\"event_type\": \"" + status_str + "\", \"charger_id\": \"${friendly_name}\"}";
   - id: send_charging_status
     parameters:
+      charger_id: string
       seconds_val: int
       energy_val: float
       status_str: string
@@ -98,14 +99,15 @@ script:
             x-api-key: !lambda 'return id(g_http_x_api_key).c_str();'
           body: !lambda |-
             return "{"
-              "\"charger_id\": \"${friendly_name}\","
-              "\"seconds\": " + to_string(seconds_val) + ","
-              "\"energy\": " + to_string(energy_val) + ","
+              "\"charger_id\": \"" + charger_id + "\"," +
+              "\"seconds\": " + to_string(seconds_val) + "," +
+              "\"energy\": " + to_string(energy_val) + "," +
               "\"status\": \"" + status_str + "\","
               "\"phase_count\": " + to_string(phase_count_val) +
             "}";
   - id: send_charging_session
     parameters:
+      charger_id: string
       seconds_val: int
       energy_val: float
     then:
@@ -116,9 +118,9 @@ script:
             x-api-key: !lambda 'return id(g_http_x_api_key).c_str();'
           body: !lambda |-
             return "{"
-              "\"charger_id\": \"${friendly_name}\","
-              "\"seconds\": " + to_string(seconds_val) + ","
-              "\"energy\": " + to_string(energy_val)
+              "\"charger_id\": \"" + charger_id + "\"," +
+              "\"seconds\": " + to_string(seconds_val) + "," +
+              "\"energy\": " + to_string(energy_val) +
             "}";
 
 text_sensor:
@@ -158,8 +160,6 @@ text_sensor:
           // Declare variables outside the switch-case block
           String value_string;
           int value;
-
-          id(g_${charging_basic_id_prefix}_seconds) = getUShort(x, 0);
 
           // Publish the discriminator state
           switch (getByte(x, 2)) {
@@ -204,11 +204,14 @@ text_sensor:
           if (id(g_http_post_enabled) && value_string == "Unplugged" && id(g_${charging_basic_id_prefix}_energy) > 0) {
             ESP_LOGI("http_event", "Unplugged with energy > 0: %d", id(g_${charging_basic_id_prefix}_energy));
             id(send_charger_event).execute("UnpluggedSession");
-            id(send_charging_status).execute(
+            id(send_charging_session).execute(
+              "${friendly_name}",
               id(g_${charging_basic_id_prefix}_seconds),
               static_cast<float>(id(g_${charging_basic_id_prefix}_energy)) / 1000.0f
             );
           }
+
+          id(g_${charging_basic_id_prefix}_seconds) = getUShort(x, 0);
 
           value = getInt(x, 8);
           id(g_${charging_basic_id_prefix}_energy) = value;
@@ -228,6 +231,7 @@ text_sensor:
                   id(g_${charging_basic_id_prefix}_phase_count));
 
               id(send_charging_status).execute(
+                "${friendly_name}",
                 id(g_${charging_basic_id_prefix}_seconds),
                 static_cast<float>(id(g_${charging_basic_id_prefix}_energy)) / 1000.0f,
                 id(g_${charging_basic_id_prefix}_status).c_str(),
