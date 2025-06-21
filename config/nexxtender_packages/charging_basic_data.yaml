@@ -3,10 +3,12 @@ substitutions:
   charging_basic_prefix: Charging
   charging_basic_id_prefix: charging_basic
   charging_basic_update_interval: 60s
+  http_base_url: ""
+  http_post_enabled: "false"
 
 globals:
   - id: g_${charging_basic_id_prefix}_seconds
-    type: int
+    type: uint16_t
   - id: g_${charging_basic_id_prefix}_energy
     type: uint32_t
   - id: g_${charging_basic_id_prefix}_phase_count
@@ -17,6 +19,18 @@ globals:
     type: std::string
   - id: g_${charging_basic_id_prefix}_status_id
     type: int
+  - id: g_http_post_enabled
+    type: bool
+    restore_value: no
+    initial_value: ${http_post_enabled}
+  - id: g_http_base_url
+    type: std::string
+    restore_value: no
+    initial_value: "${http_base_url}"
+  - id: g_http_x_api_key
+    type: std::string
+    restore_value: no
+    initial_value: "${http_x_api_key}"
 
 sensor:
   - platform: template
@@ -53,6 +67,59 @@ sensor:
     lambda: |-
       return id(g_${charging_basic_id_prefix}_phase_count);
 
+http_request:
+  useragent: esphome/${device_name}
+  timeout: 10s
+
+script:
+  - id: send_charger_event
+    parameters:
+      status_str: string
+    then:
+      - http_request.post:
+          url: !lambda 'return (id(g_http_base_url) + "/charger/event").c_str();'
+          request_headers:
+            Content-Type: application/json
+            x-api-key: !lambda 'return id(g_http_x_api_key).c_str();'
+          body: !lambda |-
+            return "{\"event_type\": \"" + status_str + "\", \"charger_id\": \"${friendly_name}\"}";
+  - id: send_charging_status
+    parameters:
+      seconds_val: int
+      energy_val: float
+      status_str: string
+      phase_count_val: int
+    then:
+      - http_request.post:
+          url: !lambda 'return (id(g_http_base_url) + "/charger/status").c_str();'
+          request_headers:
+            Content-Type: application/json
+            x-api-key: !lambda 'return id(g_http_x_api_key).c_str();'
+          body: !lambda |-
+            return "{"
+              "\"charger_id\": \"${friendly_name}\","
+              "\"seconds\": " + to_string(seconds_val) + ","
+              "\"energy\": " + to_string(energy_val) + ","
+              "\"status\": \"" + status_str + "\","
+              "\"phase_count\": " + to_string(phase_count_val) +
+            "}";
+  - id: send_charging_session
+    parameters:
+      seconds_val: int
+      energy_val: float
+    then:
+      - http_request.post:
+          url: !lambda 'return (id(g_http_base_url) + "/charger/session/minimal").c_str();'
+          request_headers:
+            Content-Type: application/json
+            x-api-key: !lambda 'return id(g_http_x_api_key).c_str();'
+          body: !lambda |-
+            return "{"
+              "\"charger_id\": \"${friendly_name}\","
+              "\"seconds\": " + to_string(seconds_val) + ","
+              "\"energy\": " + to_string(energy_val)
+            "}";
+
 text_sensor:
   - platform: template
     name: "Discriminator"
@@ -82,11 +149,16 @@ text_sensor:
           if (x.empty()) { return; }
           logd_x("${device_name}_charging_basic_data", x);
 
+          // Declare static variables for logging control and status change tracking
+          static int last_status_id = 0;
+          static unsigned long last_log_time = 0;
+          unsigned long now = millis();
+
           // Declare variables outside the switch-case block
           String value_string;
           int value;
 
-          id(g_${charging_basic_id_prefix}_seconds) = getShort(x, 0);;
+          id(g_${charging_basic_id_prefix}_seconds) = getUShort(x, 0);
 
           // Publish the discriminator state
           switch (getByte(x, 2)) {
@@ -128,9 +200,45 @@ text_sensor:
           id(g_${charging_basic_id_prefix}_status) = value_string.c_str();
           id(${charging_basic_id_prefix}_status).publish_state(value_string.c_str());
 
+          if (id(g_http_post_enabled) && value_string == "Unplugged" && id(g_${charging_basic_id_prefix}_energy) > 0) {
+            ESP_LOGI("http_event", "Unplugged with energy > 0: %d", id(g_${charging_basic_id_prefix}_energy));
+            id(send_charger_event).execute("UnpluggedSession");
+            id(send_charging_status).execute(
+              id(g_${charging_basic_id_prefix}_seconds),
+              static_cast<float>(id(g_${charging_basic_id_prefix}_energy)) / 1000.0f
+            );
+          }
+
           value = getInt(x, 8);
           id(g_${charging_basic_id_prefix}_energy) = value;
 
           value = getByte(x, 13);
           id(g_${charging_basic_id_prefix}_phase_count) = value;
           id(${charging_basic_id_prefix}_phase_count).publish_state(value);
+
+          // Only log once every 60 seconds
+          if (now - last_log_time >= 60000) {
+            last_log_time = now;
+            if (id(g_http_post_enabled)) {
+              ESP_LOGD("charging_data", "Triggering HTTP POST for charging: seconds: %d, energy: %d, status: %s, phase_count: %d",
+                  id(g_${charging_basic_id_prefix}_seconds),
+                  id(g_${charging_basic_id_prefix}_energy),
+                  id(g_${charging_basic_id_prefix}_status).c_str(),
+                  id(g_${charging_basic_id_prefix}_phase_count));
+
+              id(send_charging_status).execute(
+                id(g_${charging_basic_id_prefix}_seconds),
+                static_cast<float>(id(g_${charging_basic_id_prefix}_energy)) / 1000.0f,
+                id(g_${charging_basic_id_prefix}_status).c_str(),
+                id(g_${charging_basic_id_prefix}_phase_count)
+              );
+            }
+          }
+
+          // HTTP POST on status change
+          if (id(g_http_post_enabled) && id(g_${charging_basic_id_prefix}_status_id) != last_status_id) {
+            last_status_id = id(g_${charging_basic_id_prefix}_status_id);
+            std::string event = id(g_${charging_basic_id_prefix}_status).c_str();
+            ESP_LOGD("http_event", "Triggering HTTP POST for event: %s", event.c_str());
+            id(send_charger_event).execute(event);
+          }
