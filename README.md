@@ -31,7 +31,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 
 - **Home Assistant Integration:** Seamlessly integrate the ESPHome BLE client with Home Assistant, allowing you to monitor and control the Nexxtender charger through the Home Assistant interface.
 
-- **HTTP API Integration:**Send HTTP POST requests to an external server to track real-time charger state, charging sessions, and key events. This feature allows seamless backend integrations with third-party platforms or logging systems.
+- **HTTP API Integration:** Send HTTP POST requests to an external server to track real-time charger state, charging sessions, and key events. This feature allows seamless backend integrations with third-party platforms or logging systems.
 
 ## Screenshots
 
@@ -147,14 +147,14 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
                 - [ESP32-S3-N16R8](#esp32-s3-n16r8)
     - [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
     - [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
-    - [🌐 HTTP API Integration](#-http-api-integration)
-        - [🔧 Configuration](#-configuration)
-        - [📡 POST Events & Endpoints](#-post-events--endpoints)
-        - [🧾 Example Requests](#%F0%9F%A7%BE-example-requests)
+    - [HTTP API Integration](#http-api-integration)
+        - [Configuration](#configuration)
+        - [POST Events & Endpoints](#post-events--endpoints)
+        - [Example Requests](#example-requests)
             - [POST http://your-api-server.com/charger/status](#post-httpyour-api-servercomchargerstatus)
             - [POST http://your-api-server.com/charger/event](#post-httpyour-api-servercomchargerevent)
             - [POST http://your-api-server.com/charger/session/minimal](#post-httpyour-api-servercomchargersessionminimal)
-        - [✅ Notes](#-notes)
+        - [Notes](#notes)
     - [Contributing](#contributing)
     - [License](#license)
     - [Support](#support)
@@ -736,11 +736,11 @@ cards:
 
    </details>
 
-## 🌐 HTTP API Integration
+## HTTP API Integration
 
 This ESPHome configuration supports sending HTTP POST requests to an external server to track real-time charger state, charging sessions, and key events. This feature allows seamless backend integrations with third-party platforms or logging systems.
 
-### 🔧 Configuration
+### Configuration
 
 To activate HTTP POST support, set the following substitutions in your ESPHome YAML:
 
@@ -753,7 +753,7 @@ substitutions:
 
 These values are passed to ESPHome globals and used in the request headers and URL.
 
-### 📡 POST Events & Endpoints
+### POST Events & Endpoints
 
 | Trigger Condition                              | Script                  | Endpoint                        | Description                                               |
 |------------------------------------------------|-------------------------|----------------------------------|-----------------------------------------------------------|
@@ -763,7 +763,7 @@ These values are passed to ESPHome globals and used in the request headers and U
 
 > These scripts use the ESPHome `http_request.post` action with custom JSON payloads.
 
-### 🧾 Example Requests
+### Example Requests
 
 #### `POST http://your-api-server.com/charger/status`
 
@@ -796,7 +796,7 @@ These values are passed to ESPHome globals and used in the request headers and U
 }
 ```
 
-### ✅ Notes
+### Notes
 
 - The `charger_id` is passed via the `${friendly_name}` substitution and is hardcoded per ESP device.
 - HTTP requests include an `x-api-key` header for basic authentication.
