@@ -39,11 +39,6 @@ jobs:
           sed "s/__VERSION_PLACEHOLDER__/$tag_name/" config/version.yaml.template > config/nexxtender_packages/version.yaml
           cat config/nexxtender_packages/version.yaml
 
-      - name: 🚀　Add and commit changes
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: Bump version ${{ steps.release_drafter.outputs.tag_name }}
-
       - name: 📝　Publish release
         uses: release-drafter/release-drafter@v6
         id: release_published
@@ -63,10 +58,10 @@ jobs:
           unreleased: false
           addSections: '{"documentation":{"prefix":"**Documentation:**","labels":["documentation"]}}'
 
-      - name: ✅　Commit release notes
+      - name: ✅　Commit release notes and bump version
         uses: EndBug/add-and-commit@v9
         with:
-          message: Commit release notes ${{ steps.release_drafter.outputs.tag_name }}
+          message: Commit release notes and bump version ${{ steps.release_drafter.outputs.tag_name }}
 
       - name: 📦 Create zip file
         env:
