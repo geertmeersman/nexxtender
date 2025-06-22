@@ -11,3 +11,5 @@ time:
     on_time_sync:
       then:
         - logger.log: "Synchronized system clock with HA"
+  - platform: sntp
+    id: esptime
