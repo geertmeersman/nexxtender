@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.1.0](https://github.com/geertmeersman/nexxtender/tree/v3.1.0) (2025-06-22)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v3.0.0...v3.1.0)
+
+**Merged pull requests:**
+
+- feat: MQTT integration [\#77](https://github.com/geertmeersman/nexxtender/pull/77) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v3.0.0](https://github.com/geertmeersman/nexxtender/tree/v3.0.0) (2025-06-22)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.2.2...v3.0.0)
