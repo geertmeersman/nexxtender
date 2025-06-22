@@ -112,7 +112,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 | Grid Power                    | sensor.nexxtender_grid_power                    | Sensors       | Total power consumption from the grid in W                                                                                                               |
 | Grid Timestamp                | sensor.nexxtender_grid_timestamp                | Sensors       | Current time in UTC Unix Time                                                                                                                            |
 | Maximum available capacity    | sensor.nexxtender_maximum_available_capacity    | Sensors       | Maximum allowed grid consumption limit in A. You can set this with the `number.nexxtender_maximum_available_capacity`                                    |
-| Maximum car charging speed    | sensor.nexxtender_maximum_car_charging_speed    | Sensors       | Maximum allowed charging speed in A for the car. You can set this with the ` number.nexxtender_maximum_car_charging_speed`                               |
+| Maximum car charging speed    | sensor.nexxtender_maximum_car_charging_speed    | Sensors       | Maximum allowed charging speed in A for the car. You can set this with the `number.nexxtender_maximum_car_charging_speed`                               |
 | Minimum car charging speed    | sensor.nexxtender_minimum_car_charging_speed    | Sensors       | Minimum car charging speed                                                                                                                               |
 | Mode                          | sensor.nexxtender_mode                          | Sensors       | Current charging mode                                                                                                                                    |
 | Offloading minimum            | sensor.nexxtender_offloading_minimum            | Sensors       | Minimum charging speed in A for the device. Certified chargers are required to provide a minimum of 6A                                                   |
@@ -225,7 +225,7 @@ SN: XXXX-XXXXX-XX
 2. **Create a new ESPHome Configuration:** Create a new file named `nexxtender.yaml` in your local directory.
 
    #### **a. Create a New ESPHome Configuration**
-   
+
    If you followed the proposed HomeAssistant ESPHome wizard, you already ended up with a yaml file. If needed, first rename this file in `nexxtender.yaml` using the `Rename hostname` option. Note that this will also trigger the compilation and can take some time. Alternatively, delete the configuration created by the wizard and create a new one.
 
    Edit and copy/paste the content of the provided `nexxtender.yaml` into or at the end of this file (or copy/paste the below yaml).
@@ -253,6 +253,7 @@ SN: XXXX-XXXXX-XX
    ```
 
    #### **b. Choosing the Correct Configuration File**
+
    Depending on how you run ESPHome, use the appropriate configuration file:
    - **`config/nexxtender.yaml`** → For ESPHome running as a **Home Assistant Add-on**
    - **`config/nexxtender.docker.yaml`** → For ESPHome running in a **standalone Docker container**
@@ -748,7 +749,7 @@ To activate HTTP POST support, set the following substitutions in your ESPHome Y
 substitutions:
   http_post_enabled: "true"
   http_base_url: "http://your-api-server.com"  # Replace with your backend API
-  http_x_api_key: "your-api-key"               # Replace with your authentication key
+  http_x_api_key: "your-api-key"               # Replace with your authentication key and for security reasons store it in your secrets
 ```
 
 These values are passed to ESPHome globals and used in the request headers and URL.
@@ -799,7 +800,7 @@ These values are passed to ESPHome globals and used in the request headers and U
 ### Notes
 
 - The `charger_id` is passed via the `${friendly_name}` substitution and is hardcoded per ESP device.
-- HTTP requests include an `x-api-key` header for basic authentication.
+- HTTP requests include an `x-api-key` header for basic authentication. Make sure to store it in your secrets.
 - All communication is controlled by the `g_http_post_enabled` global boolean.
 
 ## Contributing
