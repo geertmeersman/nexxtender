@@ -1,5 +1,20 @@
 # Changelog
 
+## [v3.0.0](https://github.com/geertmeersman/nexxtender/tree/v3.0.0) (2025-06-22)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.2.2...v3.0.0)
+
+**Closed issues:**
+
+- Wall charger always start charging after being plugged in. [\#74](https://github.com/geertmeersman/nexxtender/issues/74)
+- cannot build my yaml files in the HA ESP home [\#73](https://github.com/geertmeersman/nexxtender/issues/73)
+
+**Merged pull requests:**
+
+- chore: workflow commit improvement [\#76](https://github.com/geertmeersman/nexxtender/pull/76) ([geertmeersman](https://github.com/geertmeersman))
+- feat: ability to send charging events, status updates, and session data via HTTP POST requests to external endpoints [\#75](https://github.com/geertmeersman/nexxtender/pull/75) ([geertmeersman](https://github.com/geertmeersman))
+- build\(deps\): bump esphome/build-action from 6 to 7 [\#71](https://github.com/geertmeersman/nexxtender/pull/71) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v2.2.2](https://github.com/geertmeersman/nexxtender/tree/v2.2.2) (2025-04-23)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v2.2.1...v2.2.2)
