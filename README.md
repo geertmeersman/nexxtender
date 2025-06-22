@@ -31,7 +31,9 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 
 - **Home Assistant Integration:** Seamlessly integrate the ESPHome BLE client with Home Assistant, allowing you to monitor and control the Nexxtender charger through the Home Assistant interface.
 
-- **HTTP API Integration:** Send HTTP POST requests to an external server to track real-time charger state, charging sessions, and key events. This feature allows seamless backend integrations with third-party platforms or logging systems.
+- **Optional HTTP API Integration:** Send HTTP POST requests to an external server to track real-time charger state, charging sessions, and key events. This feature allows seamless backend integrations with third-party platforms or logging systems.
+
+- **Optional MQTT Publishing:** Mirror charging status, session data, and charger events to MQTT topics for low-latency integration with Home Assistant, Node-RED, InfluxDB, and more.
 
 ## Screenshots
 
@@ -124,41 +126,44 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 ## Table of contents
 
 <!-- TOC -->
-
-- [ESPHome BLE Client for Powerdale Nexxtender EV Charger](#esphome-ble-client-for-powerdale-nexxtender-ev-charger)
-    - [Features](#features)
-    - [Screenshots](#screenshots)
-        - [Lovelace card](#lovelace-card)
-        - [Change charger config](#change-charger-config)
-        - [Controls](#controls)
-        - [Sensors](#sensors)
-        - [Diagnostics](#diagnostics)
-    - [Entities](#entities)
-    - [Table of contents](#table-of-contents)
-    - [Getting Started](#getting-started)
-        - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
-        - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
-        - [Installing & Configuring ESPHome](#installing--configuring-esphome)
-            - [a. Create a New ESPHome Configuration](#a-create-a-new-esphome-configuration)
-            - [b. Choosing the Correct Configuration File](#b-choosing-the-correct-configuration-file)
-            - [c. Configuration Notes](#c-configuration-notes)
-        - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
-            - [Customizing ESP32 Configuration Optional](#customizing-esp32-configuration-optional)
-                - [ESP32-S3-N16R8](#esp32-s3-n16r8)
-    - [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
-    - [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
-    - [HTTP API Integration](#http-api-integration)
-        - [Configuration](#configuration)
-        - [POST Events & Endpoints](#post-events--endpoints)
-        - [Example Requests](#example-requests)
-            - [POST http://your-api-server.com/charger/status](#post-httpyour-api-servercomchargerstatus)
-            - [POST http://your-api-server.com/charger/event](#post-httpyour-api-servercomchargerevent)
-            - [POST http://your-api-server.com/charger/session/minimal](#post-httpyour-api-servercomchargersessionminimal)
-        - [Notes](#notes)
-    - [Contributing](#contributing)
-    - [License](#license)
-    - [Support](#support)
-
+- [Features](#features)
+- [Screenshots](#screenshots)
+  - [Lovelace card](#lovelace-card)
+  - [Change charger config](#change-charger-config)
+  - [Controls](#controls)
+  - [Sensors](#sensors)
+  - [Diagnostics](#diagnostics)
+- [Entities](#entities)
+- [Table of contents](#table-of-contents)
+- [Getting Started](#getting-started)
+  - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
+  - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
+  - [Installing & Configuring ESPHome](#installing--configuring-esphome)
+    - [**a. Create a New ESPHome Configuration**](#a-create-a-new-esphome-configuration)
+- [Uncomment and modify when you want to use a different device name.](#uncomment-and-modify-when-you-want-to-use-a-different-device-name)
+- [Uncomment and modify when you want to use a different threshold.](#uncomment-and-modify-when-you-want-to-use-a-different-threshold)
+    - [**b. Choosing the Correct Configuration File**](#b-choosing-the-correct-configuration-file)
+    - [**c. Configuration Notes**](#c-configuration-notes)
+  - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
+    - [Customizing ESP32 Configuration (Optional)](#customizing-esp32-configuration-optional)
+      - [ESP32-S3-N16R8](#esp32-s3-n16r8)
+- [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
+- [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
+- [HTTP API Integration (Optional)](#http-api-integration-optional)
+  - [Configuration](#configuration)
+  - [POST Events & Endpoints](#post-events--endpoints)
+  - [Example Requests](#example-requests)
+    - [`POST http://your-api-server.com/charger/status`](#post-httpyour-api-servercomchargerstatus)
+    - [`POST http://your-api-server.com/charger/event`](#post-httpyour-api-servercomchargerevent)
+    - [`POST http://your-api-server.com/charger/session/minimal`](#post-httpyour-api-servercomchargersessionminimal)
+  - [Notes](#notes)
+- [MQTT Integration (Optional)](#mqtt-integration-optional)
+  - [Enabling MQTT](#enabling-mqtt)
+  - [🧾 MQTT Topics Published](#-mqtt-topics-published)
+  - [Why MQTT?](#why-mqtt)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
 <!-- /TOC -->
 
 ## Getting Started
@@ -737,7 +742,7 @@ cards:
 
    </details>
 
-## HTTP API Integration
+## HTTP API Integration (Optional)
 
 This ESPHome configuration supports sending HTTP POST requests to an external server to track real-time charger state, charging sessions, and key events. This feature allows seamless backend integrations with third-party platforms or logging systems.
 
@@ -802,6 +807,45 @@ These values are passed to ESPHome globals and used in the request headers and U
 - The `charger_id` is passed via the `${friendly_name}` substitution and is hardcoded per ESP device.
 - HTTP requests include an `x-api-key` header for basic authentication. Make sure to store it in your secrets.
 - All communication is controlled by the `g_http_post_enabled` global boolean.
+
+## MQTT Integration (Optional)
+
+In addition to HTTP POSTs, this configuration supports publishing charging data to MQTT topics. This allows real-time session and status data to be consumed by systems like Home Assistant, Node-RED, InfluxDB, and other platforms.
+
+### Enabling MQTT
+
+**Activate MQTT support** by setting the following substitutions:
+
+```yaml
+substitutions:
+  mqtt_publish_enabled: "true"
+  mqtt_broker: "192.168.1.x"
+  mqtt_username: "your_mqtt_username"
+  mqtt_password: "your_mqtt_password"
+  mqtt_topic_base: nexxtender
+```
+
+Make sure to fetch the values from your secrets.
+
+### 🧾 MQTT Topics Published
+
+| Topic                                             | Description                               |
+| ------------------------------------------------- | ----------------------------------------- |
+| `${mqtt_topic_base}/${device_name}/esp32/event`   | Charger events like Plugged/Unplugged     |
+| `${mqtt_topic_base}/${device_name}/esp32/status`  | Real-time charging session status         |
+| `${mqtt_topic_base}/${device_name}/esp32/session` | Final session summary when unplugged      |
+| `${mqtt_topic_base}/${device_name}/status`        | Device availability (birth/will messages) |
+
+Payloads are in JSON format and include data like `charger_id`, `energy`, `seconds`, `start_time`, and `end_time`.
+
+### Why MQTT?
+
+- Works alongside HTTP POST for redundancy
+- Faster delivery with lower latency
+- Integrates easily into existing MQTT dashboards and rule engines
+- Great for logging, automation, and diagnostics
+
+---
 
 ## Contributing
 
