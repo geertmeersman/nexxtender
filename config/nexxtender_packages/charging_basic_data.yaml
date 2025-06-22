@@ -106,7 +106,7 @@ script:
             - lambda: |-
                 ESP_LOGD("mqtt_event", "Publishing MQTT charger event: %s", status_str.c_str());
             - mqtt.publish:
-                topic: nexxtender/${device_name}/esp32/event
+                topic: ${mqtt_topic_base}/${device_name}/esp32/event
                 payload: !lambda |-
                   return "{\"event_type\": \"" + status_str + "\", \"charger_id\": \"${friendly_name}\"}";
       - if:
@@ -183,7 +183,7 @@ script:
                 ESP_LOGD("mqtt_session", "Publishing MQTT charging session: charger_id=%s, start_time=%d, end_time=%d, seconds=%d, energy=%.3f",
                          charger_id.c_str(), start_time_val, end_time_val, seconds_val, energy_val);
             - mqtt.publish:
-                topic: nexxtender/${device_name}/esp32/session
+                topic: ${mqtt_topic_base}/${device_name}/esp32/session
                 payload: !lambda |-
                   return "{"
                     "\"charger_id\": \"" + charger_id + "\"," +
