@@ -124,40 +124,41 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 ## Table of contents
 
 <!-- TOC -->
-- [Features](#features)
-- [Screenshots](#screenshots)
-  - [Lovelace card](#lovelace-card)
-  - [Change charger config](#change-charger-config)
-  - [Controls](#controls)
-  - [Sensors](#sensors)
-  - [Diagnostics](#diagnostics)
-- [Entities](#entities)
-- [Table of contents](#table-of-contents)
-- [Getting Started](#getting-started)
-  - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
-  - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
-  - [Installing & Configuring ESPHome](#installing--configuring-esphome)
-    - [**a. Create a New ESPHome Configuration**](#a-create-a-new-esphome-configuration)
-- [Uncomment and modify when you want to use a different device name.](#uncomment-and-modify-when-you-want-to-use-a-different-device-name)
-- [Uncomment and modify when you want to use a different threshold.](#uncomment-and-modify-when-you-want-to-use-a-different-threshold)
-    - [**b. Choosing the Correct Configuration File**](#b-choosing-the-correct-configuration-file)
-    - [**c. Configuration Notes**](#c-configuration-notes)
-  - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
-    - [Customizing ESP32 Configuration (Optional)](#customizing-esp32-configuration-optional)
-      - [ESP32-S3-N16R8](#esp32-s3-n16r8)
-- [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
-- [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
-- [🌐 HTTP API Integration](#-http-api-integration)
-  - [🔧 Configuration](#-configuration)
-  - [📡 POST Events & Endpoints](#-post-events--endpoints)
-  - [🧾 Example Payloads](#-example-payloads)
-    - [`/charger/status`](#chargerstatus)
-    - [`/charger/event`](#chargerevent)
-    - [`/charger/session/minimal`](#chargersessionminimal)
-  - [✅ Notes](#-notes)
-- [Contributing](#contributing)
-- [License](#license)
-- [Support](#support)
+
+- [ESPHome BLE Client for Powerdale Nexxtender EV Charger](#esphome-ble-client-for-powerdale-nexxtender-ev-charger)
+    - [Features](#features)
+    - [Screenshots](#screenshots)
+        - [Lovelace card](#lovelace-card)
+        - [Change charger config](#change-charger-config)
+        - [Controls](#controls)
+        - [Sensors](#sensors)
+        - [Diagnostics](#diagnostics)
+    - [Entities](#entities)
+    - [Table of contents](#table-of-contents)
+    - [Getting Started](#getting-started)
+        - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
+        - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
+        - [Installing & Configuring ESPHome](#installing--configuring-esphome)
+            - [a. Create a New ESPHome Configuration](#a-create-a-new-esphome-configuration)
+            - [b. Choosing the Correct Configuration File](#b-choosing-the-correct-configuration-file)
+            - [c. Configuration Notes](#c-configuration-notes)
+        - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
+            - [Customizing ESP32 Configuration Optional](#customizing-esp32-configuration-optional)
+                - [ESP32-S3-N16R8](#esp32-s3-n16r8)
+    - [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
+    - [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
+    - [🌐 HTTP API Integration](#-http-api-integration)
+        - [🔧 Configuration](#-configuration)
+        - [📡 POST Events & Endpoints](#-post-events--endpoints)
+        - [🧾 Example Requests](#%F0%9F%A7%BE-example-requests)
+            - [POST http://your-api-server.com/charger/status](#post-httpyour-api-servercomchargerstatus)
+            - [POST http://your-api-server.com/charger/event](#post-httpyour-api-servercomchargerevent)
+            - [POST http://your-api-server.com/charger/session/minimal](#post-httpyour-api-servercomchargersessionminimal)
+        - [✅ Notes](#-notes)
+    - [Contributing](#contributing)
+    - [License](#license)
+    - [Support](#support)
+
 <!-- /TOC -->
 
 ## Getting Started
@@ -762,9 +763,9 @@ These values are passed to ESPHome globals and used in the request headers and U
 
 > These scripts use the ESPHome `http_request.post` action with custom JSON payloads.
 
-### 🧾 Example Payloads
+### 🧾 Example Requests
 
-#### `/charger/status`
+#### `POST http://your-api-server.com/charger/status`
 
 ```json
 {
@@ -776,7 +777,7 @@ These values are passed to ESPHome globals and used in the request headers and U
 }
 ```
 
-#### `/charger/event`
+#### `POST http://your-api-server.com/charger/event`
 
 ```json
 {
@@ -785,7 +786,7 @@ These values are passed to ESPHome globals and used in the request headers and U
 }
 ```
 
-#### `/charger/session/minimal`
+#### `POST http://your-api-server.com/charger/session/minimal`
 
 ```json
 {
