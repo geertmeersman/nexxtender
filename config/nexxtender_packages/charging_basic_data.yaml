@@ -7,10 +7,7 @@ substitutions:
   http_post_enabled: "false"
   http_x_api_key: ""
   mqtt_publish_enabled: "false"
-  mqtt_broker: ""
-  mqtt_username: ""
-  mqtt_password: ""
-  mqtt_topic_base: nexxtender
+
 
 globals:
   - id: g_${charging_basic_id_prefix}_seconds
@@ -81,20 +78,36 @@ http_request:
   useragent: esphome/${device_name}
   timeout: 10s
 
-mqtt:
-  broker: ${mqtt_broker}
-  username: ${mqtt_username}
-  password: ${mqtt_password}
-  client_id: ${device_name}
-  topic_prefix: ${mqtt_topic_base}/${device_name}
-  birth_message:
-    topic: ${mqtt_topic_base}/${device_name}/status
-    payload: online
-  will_message:
-    topic: ${mqtt_topic_base}/${device_name}/status
-    payload: offline
-
 script:
+  - id: send_mqtt_event
+    parameters:
+      status_str: string
+    then:
+      - lambda: |-
+          ESP_LOGD("mqtt_event", "MQTT not enabled; skipping publish.");
+
+  - id: send_mqtt_status
+    parameters:
+      charger_id: string
+      seconds_val: int
+      energy_val: float
+      status_str: string
+      phase_count_val: int
+    then:
+      - lambda: |-
+          ESP_LOGD("mqtt_status", "MQTT not enabled; skipping publish.");
+
+  - id: send_mqtt_session
+    parameters:
+      charger_id: string
+      start_time_val: int
+      end_time_val: int
+      seconds_val: int
+      energy_val: float
+    then:
+      - lambda: |-
+          ESP_LOGD("mqtt_session", "MQTT not enabled; skipping publish.");
+
   - id: send_charger_event
     parameters:
       status_str: string
@@ -105,10 +118,9 @@ script:
           then:
             - lambda: |-
                 ESP_LOGD("mqtt_event", "Publishing MQTT charger event: %s", status_str.c_str());
-            - mqtt.publish:
-                topic: ${mqtt_topic_base}/${device_name}/esp32/event
-                payload: !lambda |-
-                  return "{\"event_type\": \"" + status_str + "\", \"charger_id\": \"${friendly_name}\"}";
+            - script.execute: 
+                id: send_mqtt_event
+                status_str: !lambda 'return status_str;'          
       - if:
           condition:
             lambda: 'return id(g_http_post_enabled);'
@@ -137,16 +149,13 @@ script:
             - lambda: |-
                 ESP_LOGD("mqtt_status", "Publishing MQTT charging status: charger_id=%s, seconds=%d, energy=%.3f, status=%s, phase_count=%d",
                          charger_id.c_str(), seconds_val, energy_val, status_str.c_str(), phase_count_val);          
-            - mqtt.publish:
-                topic: ${mqtt_topic_base}/${device_name}/esp32/status
-                payload: !lambda |-
-                  return "{"
-                    "\"charger_id\": \"" + charger_id + "\","
-                    "\"seconds\": " + to_string(seconds_val) + ","
-                    "\"energy\": " + to_string(energy_val) + ","
-                    "\"status\": \"" + status_str + "\","
-                    "\"phase_count\": " + to_string(phase_count_val) +
-                  "}";
+            - script.execute: 
+                id: send_mqtt_status
+                charger_id: !lambda 'return charger_id;'
+                seconds_val: !lambda 'return seconds_val;'
+                energy_val: !lambda 'return energy_val;'
+                status_str: !lambda 'return status_str;'
+                phase_count_val: !lambda 'return phase_count_val;'
       - if:
           condition:
             lambda: 'return id(g_http_post_enabled);'
@@ -182,16 +191,13 @@ script:
             - lambda: |-
                 ESP_LOGD("mqtt_session", "Publishing MQTT charging session: charger_id=%s, start_time=%d, end_time=%d, seconds=%d, energy=%.3f",
                          charger_id.c_str(), start_time_val, end_time_val, seconds_val, energy_val);
-            - mqtt.publish:
-                topic: ${mqtt_topic_base}/${device_name}/esp32/session
-                payload: !lambda |-
-                  return "{"
-                    "\"charger_id\": \"" + charger_id + "\"," +
-                    "\"start_time\": \"" + to_string(start_time_val) + "\"," +
-                    "\"end_time\": \"" + to_string(end_time_val) + "\"," +
-                    "\"seconds\": " + to_string(seconds_val) + "," +
-                    "\"energy\": " + to_string(energy_val) +
-                  "}";
+            - script.execute:
+                id: send_mqtt_session
+                charger_id: !lambda 'return charger_id;'
+                start_time_val: !lambda 'return start_time_val;'
+                end_time_val: !lambda 'return end_time_val;'
+                seconds_val: !lambda 'return seconds_val;'
+                energy_val: !lambda 'return energy_val;'
       - if:
           condition:
             lambda: 'return id(g_http_post_enabled);'
