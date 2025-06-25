@@ -79,35 +79,6 @@ http_request:
   timeout: 10s
 
 script:
-  - id: send_mqtt_event
-    parameters:
-      status_str: string
-    then:
-      - lambda: |-
-          ESP_LOGD("mqtt_event", "MQTT not enabled; skipping publish.");
-
-  - id: send_mqtt_status
-    parameters:
-      charger_id: string
-      seconds_val: int
-      energy_val: float
-      status_str: string
-      phase_count_val: int
-    then:
-      - lambda: |-
-          ESP_LOGD("mqtt_status", "MQTT not enabled; skipping publish.");
-
-  - id: send_mqtt_session
-    parameters:
-      charger_id: string
-      start_time_val: int
-      end_time_val: int
-      seconds_val: int
-      energy_val: float
-    then:
-      - lambda: |-
-          ESP_LOGD("mqtt_session", "MQTT not enabled; skipping publish.");
-
   - id: send_charger_event
     parameters:
       status_str: string
