@@ -1,0 +1,66 @@
+substitutions:
+  mqtt_broker: ""
+  mqtt_username: ""
+  mqtt_password: ""
+  mqtt_topic_base: nexxtender
+
+mqtt:
+  broker: ${mqtt_broker}
+  username: ${mqtt_username}
+  password: ${mqtt_password}
+  client_id: ${device_name}
+  topic_prefix: ${mqtt_topic_base}/${device_name}
+  birth_message:
+    topic: ${mqtt_topic_base}/${device_name}/status
+    payload: online
+  will_message:
+    topic: ${mqtt_topic_base}/${device_name}/status
+    payload: offline
+
+script:
+  - id: send_mqtt_event
+    parameters:
+      status_str: string
+    then:
+      - mqtt.publish:
+          topic: ${mqtt_topic_base}/${device_name}/esp32/event
+          payload: !lambda |-
+            return "{\"event_type\": \"" + status_str + "\", \"charger_id\": \"${friendly_name}\"}";
+
+  - id: send_mqtt_status
+    parameters:
+      charger_id: string
+      seconds_val: int
+      energy_val: float
+      status_str: string
+      phase_count_val: int
+    then:
+      - mqtt.publish:
+          topic: ${mqtt_topic_base}/${device_name}/esp32/status
+          payload: !lambda |-
+            return "{"
+              "\"charger_id\": \"" + charger_id + "\","
+              "\"seconds\": " + to_string(seconds_val) + ","
+              "\"energy\": " + to_string(energy_val) + ","
+              "\"status\": \"" + status_str + "\","
+              "\"phase_count\": " + to_string(phase_count_val) +
+            "}";
+
+  - id: send_mqtt_session
+    parameters:
+      charger_id: string
+      start_time_val: int
+      end_time_val: int
+      seconds_val: int
+      energy_val: float
+    then:
+      - mqtt.publish:
+          topic: ${mqtt_topic_base}/${device_name}/esp32/session
+          payload: !lambda |-
+            return "{"
+              "\"charger_id\": \"" + charger_id + "\","
+              "\"start_time\": \"" + to_string(start_time_val) + "\","
+              "\"end_time\": \"" + to_string(end_time_val) + "\","
+              "\"seconds\": " + to_string(seconds_val) + ","
+              "\"energy\": " + to_string(energy_val) +
+            "}";

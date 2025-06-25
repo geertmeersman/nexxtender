@@ -1,7 +1,7 @@
 packages:
   esp: !include nexxtender_packages/esp.yaml
-  esphome: !include nexxtender_packages/esphome.docker.yaml
-  mqtt: !include nexxtender_packages/mqtt_false.yaml
+  esphome: !include nexxtender_packages/esphome.local.yaml
+  mqtt: !include nexxtender_packages/mqtt_true.yaml
   #webserver: !include nexxtender_packages/webserver.yaml # secret esphome_admin_password required
   api: !include nexxtender_packages/api.yaml # secrets esphome_admin_password, wifi_ssid, wifi_password & esphome_api_key required
   time: !include nexxtender_packages/time.yaml
