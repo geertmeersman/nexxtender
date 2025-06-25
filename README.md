@@ -159,7 +159,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
         - [Notes](#notes)
     - [MQTT Integration Optional](#mqtt-integration-optional)
         - [Enabling MQTT](#enabling-mqtt)
-        - [🧾 MQTT Topics Published](#%F0%9F%A7%BE-mqtt-topics-published)
+        - [MQTT Topics Published](#mqtt-topics-published)
         - [Why MQTT?](#why-mqtt)
     - [Contributing](#contributing)
     - [License](#license)
@@ -841,7 +841,7 @@ substitutions:
 
 Make sure to fetch the values from your secrets.
 
-### 🧾 MQTT Topics Published
+### MQTT Topics Published
 
 | Topic                                             | Description                               |
 | ------------------------------------------------- | ----------------------------------------- |
