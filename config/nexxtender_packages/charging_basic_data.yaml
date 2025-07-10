@@ -38,6 +38,38 @@ globals:
     type: bool
     restore_value: no
     initial_value: ${mqtt_publish_enabled}
+  - id: g_http_queue_0
+    type: std::string
+    initial_value: ""
+  - id: g_http_queue_1
+    type: std::string
+    initial_value: ""
+  - id: g_http_queue_2
+    type: std::string
+    initial_value: ""
+  - id: g_http_queue_3
+    type: std::string
+    initial_value: ""
+  - id: g_http_queue_4
+    type: std::string
+    initial_value: ""
+  - id: g_http_queue_size
+    type: int
+    initial_value: '0'
+  - id: g_http_queue_head
+    type: int
+    initial_value: '0'
+  - id: g_http_queue_tail
+    type: int
+    initial_value: '0'
+  - id: http_success
+    type: bool
+    initial_value: "false"
+    restore_value: no
+  - id: is_retrying_queue
+    type: bool
+    initial_value: "false"
+    restore_value: no
 
 sensor:
   - platform: template
@@ -176,17 +208,102 @@ script:
             - lambda: |-
                 ESP_LOGD("http_session", "Sending HTTP POST charging session: charger_id=%s, seconds=%d, energy=%.3f",
                          charger_id.c_str(), seconds_val, energy_val);
+            - lambda: |-
+                std::string payload = "{"
+                  "\"charger_id\": \"" + charger_id + "\"," +
+                  "\"seconds\": " + to_string(seconds_val) + "," +
+                  "\"energy\": " + to_string(energy_val) +
+                "}";
+
+                ESP_LOGI("http_session", "Queuing HTTP POST session payload: %s", payload.c_str());
+
+                id(enqueue_http_payload).execute(payload);
+  - id: enqueue_http_payload
+    parameters:
+      payload_str: string
+    then:
+      - lambda: |-
+          if (id(g_http_queue_size) < 5) {
+            int tail = id(g_http_queue_tail);
+            switch (tail) {
+              case 0: id(g_http_queue_0) = payload_str; break;
+              case 1: id(g_http_queue_1) = payload_str; break;
+              case 2: id(g_http_queue_2) = payload_str; break;
+              case 3: id(g_http_queue_3) = payload_str; break;
+              case 4: id(g_http_queue_4) = payload_str; break;
+            }
+            id(g_http_queue_tail) = (tail + 1) % 5;
+            id(g_http_queue_size)++;
+            ESP_LOGI("http_queue", "Payload enqueued. Queue size: %d", id(g_http_queue_size));
+          } else {
+            ESP_LOGW("http_queue", "Queue full, payload dropped.");
+          }
+      - script.execute: retry_http_queue
+  - id: retry_http_queue
+    mode: queued
+    then:
+      - if:
+          condition:
+            lambda: 'return !id(is_retrying_queue) && id(g_http_queue_size) > 0;'
+          then:
+            - lambda: 'id(is_retrying_queue) = true;'
+            - lambda: |-
+                int head = id(g_http_queue_head);
+                std::string payload;
+                switch (head) {
+                  case 0: payload = id(g_http_queue_0); break;
+                  case 1: payload = id(g_http_queue_1); break;
+                  case 2: payload = id(g_http_queue_2); break;
+                  case 3: payload = id(g_http_queue_3); break;
+                  case 4: payload = id(g_http_queue_4); break;
+                }
+                ESP_LOGI("http_retry", "Sending or retrying HTTP POST with payload: %s", payload.c_str());
             - http_request.post:
                 url: !lambda 'return (id(g_http_base_url) + "/charger/session/minimal").c_str();'
                 request_headers:
                   Content-Type: application/json
                   x-api-key: !lambda 'return id(g_http_x_api_key).c_str();'
                 body: !lambda |-
-                  return "{"
-                    "\"charger_id\": \"" + charger_id + "\"," +
-                    "\"seconds\": " + to_string(seconds_val) + "," +
-                    "\"energy\": " + to_string(energy_val) +
-                  "}";
+                  int head = id(g_http_queue_head);
+                  switch (head) {
+                    case 0: return id(g_http_queue_0);
+                    case 1: return id(g_http_queue_1);
+                    case 2: return id(g_http_queue_2);
+                    case 3: return id(g_http_queue_3);
+                    case 4: return id(g_http_queue_4);
+                    default: return std::string("");
+                  }
+                on_response:
+                  then:
+                    - lambda: |-
+                        ESP_LOGD("http_queue", "HTTP POST success");
+                        id(http_success) = true;
+                on_error:
+                  then:
+                    - lambda: |-
+                        ESP_LOGW("http_queue", "HTTP POST failed");
+                        id(http_success) = false;
+            - if:
+                condition:
+                  lambda: 'return id(http_success);'
+                then:
+                  - lambda: |-
+                      switch (id(g_http_queue_head)) {
+                        case 0: id(g_http_queue_0).clear(); break;
+                        case 1: id(g_http_queue_1).clear(); break;
+                        case 2: id(g_http_queue_2).clear(); break;
+                        case 3: id(g_http_queue_3).clear(); break;
+                        case 4: id(g_http_queue_4).clear(); break;
+                      }
+                      id(g_http_queue_head) = (id(g_http_queue_head) + 1) % 5;
+                      id(g_http_queue_size)--;
+                  - lambda: 'id(is_retrying_queue) = false;'
+                  - script.execute: retry_http_queue
+      - lambda: 'id(is_retrying_queue) = false;'
+interval:
+  - interval: 30s
+    then:
+      - script.execute: retry_http_queue
 
 text_sensor:
   - platform: template
