@@ -240,7 +240,7 @@ script:
           }
       - script.execute: retry_http_queue
   - id: retry_http_queue
-    mode: restart
+    mode: queued
     then:
       - if:
           condition:
