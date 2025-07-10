@@ -114,7 +114,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 | Grid Power                    | sensor.nexxtender_grid_power                    | Sensors       | Total power consumption from the grid in W                                                                                                               |
 | Grid Timestamp                | sensor.nexxtender_grid_timestamp                | Sensors       | Current time in UTC Unix Time                                                                                                                            |
 | Maximum available capacity    | sensor.nexxtender_maximum_available_capacity    | Sensors       | Maximum allowed grid consumption limit in A. You can set this with the `number.nexxtender_maximum_available_capacity`                                    |
-| Maximum car charging speed    | sensor.nexxtender_maximum_car_charging_speed    | Sensors       | Maximum allowed charging speed in A for the car. You can set this with the `number.nexxtender_maximum_car_charging_speed`                               |
+| Maximum car charging speed    | sensor.nexxtender_maximum_car_charging_speed    | Sensors       | Maximum allowed charging speed in A for the car. You can set this with the `number.nexxtender_maximum_car_charging_speed`                                |
 | Minimum car charging speed    | sensor.nexxtender_minimum_car_charging_speed    | Sensors       | Minimum car charging speed                                                                                                                               |
 | Mode                          | sensor.nexxtender_mode                          | Sensors       | Current charging mode                                                                                                                                    |
 | Offloading minimum            | sensor.nexxtender_offloading_minimum            | Sensors       | Minimum charging speed in A for the device. Certified chargers are required to provide a minimum of 6A                                                   |
@@ -128,42 +128,42 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 <!-- TOC -->
 
 - [ESPHome BLE Client for Powerdale Nexxtender EV Charger](#esphome-ble-client-for-powerdale-nexxtender-ev-charger)
-    - [Features](#features)
-    - [Screenshots](#screenshots)
-        - [Lovelace card](#lovelace-card)
-        - [Change charger config](#change-charger-config)
-        - [Controls](#controls)
-        - [Sensors](#sensors)
-        - [Diagnostics](#diagnostics)
-    - [Entities](#entities)
-    - [Table of contents](#table-of-contents)
-    - [Getting Started](#getting-started)
-        - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
-        - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
-        - [Installing & Configuring ESPHome](#installing--configuring-esphome)
-            - [a. Create a New ESPHome Configuration](#a-create-a-new-esphome-configuration)
-            - [b. Choosing the Correct Configuration File](#b-choosing-the-correct-configuration-file)
-            - [c. Configuration Notes](#c-configuration-notes)
-        - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
-            - [Customizing ESP32 Configuration Optional](#customizing-esp32-configuration-optional)
-                - [ESP32-S3-N16R8](#esp32-s3-n16r8)
-    - [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
-    - [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
-    - [HTTP API Integration Optional](#http-api-integration-optional)
-        - [Configuration](#configuration)
-        - [POST Events & Endpoints](#post-events--endpoints)
-        - [Example Requests](#example-requests)
-            - [POST http://your-api-server.com/charger/status](#post-httpyour-api-servercomchargerstatus)
-            - [POST http://your-api-server.com/charger/event](#post-httpyour-api-servercomchargerevent)
-            - [POST http://your-api-server.com/charger/session/minimal](#post-httpyour-api-servercomchargersessionminimal)
-        - [Notes](#notes)
-    - [MQTT Integration Optional](#mqtt-integration-optional)
-        - [Enabling MQTT](#enabling-mqtt)
-        - [MQTT Topics Published](#mqtt-topics-published)
-        - [Why MQTT?](#why-mqtt)
-    - [Contributing](#contributing)
-    - [License](#license)
-    - [Support](#support)
+  - [Features](#features)
+  - [Screenshots](#screenshots)
+    - [Lovelace card](#lovelace-card)
+    - [Change charger config](#change-charger-config)
+    - [Controls](#controls)
+    - [Sensors](#sensors)
+    - [Diagnostics](#diagnostics)
+  - [Entities](#entities)
+  - [Table of contents](#table-of-contents)
+  - [Getting Started](#getting-started)
+    - [Finding Nexxtender Bluetooth MAC Address with NRF Connect App](#finding-nexxtender-bluetooth-mac-address-with-nrf-connect-app)
+    - [Finding Nexxtender Bluetooth passkey](#finding-nexxtender-bluetooth-passkey)
+    - [Installing & Configuring ESPHome](#installing--configuring-esphome)
+      - [a. Create a New ESPHome Configuration](#a-create-a-new-esphome-configuration)
+      - [b. Choosing the Correct Configuration File](#b-choosing-the-correct-configuration-file)
+      - [c. Configuration Notes](#c-configuration-notes)
+    - [Integrating your esp32 in Home Assistant](#integrating-your-esp32-in-home-assistant)
+      - [Customizing ESP32 Configuration Optional](#customizing-esp32-configuration-optional)
+        - [ESP32-S3-N16R8](#esp32-s3-n16r8)
+  - [Activating the Integrated ESPHome Webserver/GUI](#activating-the-integrated-esphome-webservergui)
+  - [Integrating ESPHome Devices with Home Assistant](#integrating-esphome-devices-with-home-assistant)
+  - [HTTP API Integration Optional](#http-api-integration-optional)
+    - [Configuration](#configuration)
+    - [POST Events & Endpoints](#post-events--endpoints)
+    - [Example Requests](#example-requests)
+      - [POST http://your-api-server.com/charger/status](#post-httpyour-api-servercomchargerstatus)
+      - [POST http://your-api-server.com/charger/event](#post-httpyour-api-servercomchargerevent)
+      - [POST http://your-api-server.com/charger/session/minimal](#post-httpyour-api-servercomchargersessionminimal)
+    - [Notes](#notes)
+  - [MQTT Integration Optional](#mqtt-integration-optional)
+    - [Enabling MQTT](#enabling-mqtt)
+    - [MQTT Topics Published](#mqtt-topics-published)
+    - [Why MQTT?](#why-mqtt)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Support](#support)
 
 <!-- /TOC -->
 
@@ -261,6 +261,7 @@ SN: XXXX-XXXXX-XX
    #### **b. Choosing the Correct Configuration File**
 
    Depending on how you run ESPHome, use the appropriate configuration file:
+
    - **`config/nexxtender.yaml`** → For ESPHome running as a **Home Assistant Add-on**
    - **`config/nexxtender.docker.yaml`** → For ESPHome running in a **standalone Docker container**
    - **`config/nexxtender.local.yaml`** → For local compilation when working in a **git clone**
@@ -749,24 +750,24 @@ This ESPHome configuration supports sending HTTP POST requests to an external se
 
 ### Configuration
 
-To activate HTTP POST support, set the following substitutions in your ESPHome YAML:
+To activate HTTP POST support, set the following substitutions in your ESPHome YAML (attention to the escaping of the "):
 
 ```yaml
 substitutions:
   http_post_enabled: "true"
-  http_base_url: "http://your-api-server.com"  # Replace with your backend API
-  http_x_api_key: "your-api-key"               # Replace with your authentication key and for security reasons store it in your secrets
+  http_base_url: '"http://your-api-server.com"' # Replace with your backend API
+  http_x_api_key: '"your-api-key"' # Replace with your authentication key and for security reasons store it in your secrets
 ```
 
 These values are passed to ESPHome globals and used in the request headers and URL.
 
 ### POST Events & Endpoints
 
-| Trigger Condition                              | Script                  | Endpoint                        | Description                                               |
-|------------------------------------------------|-------------------------|----------------------------------|-----------------------------------------------------------|
-| Every 60 seconds (while charging)              | `send_charging_status`  | `/charger/status`               | Regular status update with session metrics                |
-| On status change (e.g., Plugged → Charging)    | `send_charger_event`    | `/charger/event`                | Sends event name (e.g., "Charging", "Unplugged")          |
-| On Unplugged **and** energy > 0                | `send_charging_session` | `/charger/session/minimal`      | Sends session summary when unplugged with energy present  |
+| Trigger Condition                           | Script                  | Endpoint                   | Description                                              |
+| ------------------------------------------- | ----------------------- | -------------------------- | -------------------------------------------------------- |
+| Every 60 seconds (while charging)           | `send_charging_status`  | `/charger/status`          | Regular status update with session metrics               |
+| On status change (e.g., Plugged → Charging) | `send_charger_event`    | `/charger/event`           | Sends event name (e.g., "Charging", "Unplugged")         |
+| On Unplugged **and** energy > 0             | `send_charging_session` | `/charger/session/minimal` | Sends session summary when unplugged with energy present |
 
 > These scripts use the ESPHome `http_request.post` action with custom JSON payloads.
 
