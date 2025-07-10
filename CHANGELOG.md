@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.1.2](https://github.com/geertmeersman/nexxtender/tree/v3.1.2) (2025-07-10)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v3.1.1...v3.1.2)
+
+**Merged pull requests:**
+
+- fix: queuing mechanism on http post for session closure [\#80](https://github.com/geertmeersman/nexxtender/pull/80) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v3.1.1](https://github.com/geertmeersman/nexxtender/tree/v3.1.1) (2025-06-25)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v3.1.0...v3.1.1)
