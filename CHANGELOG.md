@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.1.3](https://github.com/geertmeersman/nexxtender/tree/v3.1.3) (2025-07-23)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v3.1.2...v3.1.3)
+
+**Implemented enhancements:**
+
+- Reading RFID [\#72](https://github.com/geertmeersman/nexxtender/issues/72)
+
+**Merged pull requests:**
+
+- fix: publish\_initial\_state deprecated replaced by trigger\_on\_initial\_… [\#82](https://github.com/geertmeersman/nexxtender/pull/82) ([geertmeersman](https://github.com/geertmeersman))
+- docs: escaping of http substitutions [\#81](https://github.com/geertmeersman/nexxtender/pull/81) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v3.1.2](https://github.com/geertmeersman/nexxtender/tree/v3.1.2) (2025-07-10)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v3.1.1...v3.1.2)
