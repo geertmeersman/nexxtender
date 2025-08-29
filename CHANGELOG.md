@@ -1,5 +1,16 @@
 # Changelog
 
+## [v4.0.0](https://github.com/geertmeersman/nexxtender/tree/v4.0.0) (2025-08-29)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v3.1.3...v4.0.0)
+
+**Merged pull requests:**
+
+- fix: time read, treat 0x4003 as a status change, triggering processing instead of being ignored and reduce BLE lockups [\#86](https://github.com/geertmeersman/nexxtender/pull/86) ([geertmeersman](https://github.com/geertmeersman))
+- docs: added discord link in Support section in README [\#85](https://github.com/geertmeersman/nexxtender/pull/85) ([geertmeersman](https://github.com/geertmeersman))
+- chore\(deps\): bump actions/checkout from 4 to 5 [\#84](https://github.com/geertmeersman/nexxtender/pull/84) ([dependabot[bot]](https://github.com/apps/dependabot))
+- build\(deps\): bump hugo19941994/delete-draft-releases from 1.0.1 to 2.0.0 [\#83](https://github.com/geertmeersman/nexxtender/pull/83) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.1.3](https://github.com/geertmeersman/nexxtender/tree/v3.1.3) (2025-07-23)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v3.1.2...v3.1.3)
