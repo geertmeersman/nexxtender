@@ -178,7 +178,7 @@ text_sensor:
 
           if (prev_status.empty()) {
             ESP_LOGD("${device_name}_${generic_data_id_prefix} status", "First status received: %s", hex_status.c_str());
-          } else if (hex_status == prev_status) {
+          } else if (hex_status == prev_status && prev_status != "4003") {
             ESP_LOGD("${device_name}_${generic_data_id_prefix} status", "Status unchanged: %s", hex_status.c_str());
             return;
           }
@@ -204,8 +204,8 @@ text_sensor:
                 return;
             case 0x4001:
                 id(${device_name}_generic_status).publish_state(std::string("Time Set READY"));
-                id(script_write_time).execute();
                 id(unblock_ble).execute("Time Set READY");
+                id(script_write_time).execute();
                 return;
             case 0x4002:
                 id(${device_name}_generic_status).publish_state(std::string("Time Set SUCCESS"));
@@ -213,8 +213,8 @@ text_sensor:
                 return;
             case 0x4003:
                 id(${device_name}_generic_status).publish_state(std::string("Time read POPPED"));
-                id(script_read_generic_data).execute();
                 id(unblock_ble).execute("Time read POPPED");
+                id(script_read_generic_data).execute();
                 return;
             case 0x5001:
                 id(${device_name}_generic_status).publish_state(std::string("Config Set READY"));
@@ -238,6 +238,7 @@ text_sensor:
             case 0x5003:
             case 0x5006:
                 id(${device_name}_generic_status).publish_state(std::string("Config read POPPED"));
+                id(unblock_ble).execute("Config read POPPED");
                 id(script_read_generic_data).execute();
                 id(unblock_ble).execute("Config read POPPED");
                 if (id(g_${generic_data_id_prefix}_time_synced) == false) {
@@ -394,8 +395,8 @@ script:
           value: [0x02, 0x50]
   - id: script_read_time
     then:
-      - lambda: |-
-          id(wait_for_ble).execute("script_read_time");  // Wait until ble_in_use is false
+      #- lambda: |-
+      #id(wait_for_ble).execute("script_read_time");  // Wait until ble_in_use is false
       - ble_client.ble_write:
           id: ${device_name}_ble_client_id
           service_uuid: ${ble_uuid_receive_service}
@@ -412,6 +413,7 @@ script:
           value: [0x01, 0x40]
       - lambda: |-
           id(delay_5s).execute();
+          id(unblock_ble).execute("script_sync_time");
           id(script_read_time).execute();
 
   - id: script_write_time
@@ -538,6 +540,7 @@ script:
 
             id(script_read_cbor_config).execute();
             // Read old config to populate variable
+
             id(script_read_config_old).execute();
             return;
           }
