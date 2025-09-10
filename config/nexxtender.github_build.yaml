@@ -1,4 +1,4 @@
 packages:
-  run_config: !include config/local.yaml
-  mqtt_config: !include config/mqtt/false.yaml
-  wifi_config: !include config/wifi.yaml
+  run_config: !include local.yaml
+  mqtt_config: !include mqtt/false.yaml
+  wifi_config: !include wifi.yaml
