@@ -1,5 +1,15 @@
 # Changelog
 
+## [v5.0.0](https://github.com/geertmeersman/nexxtender/tree/v5.0.0) (2025-09-10)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v4.0.0...v5.0.0)
+
+**Merged pull requests:**
+
+- feat!: modularize configuration into multi-file includes and make Wi-Fi optional \(BREAKING CHANGE\) [\#90](https://github.com/geertmeersman/nexxtender/pull/90) ([geertmeersman](https://github.com/geertmeersman))
+- chore\(deps\): bump actions/github-script from 7 to 8 [\#88](https://github.com/geertmeersman/nexxtender/pull/88) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump actions/stale from 9 to 10 [\#87](https://github.com/geertmeersman/nexxtender/pull/87) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.0.0](https://github.com/geertmeersman/nexxtender/tree/v4.0.0) (2025-08-29)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v3.1.3...v4.0.0)
