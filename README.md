@@ -240,7 +240,12 @@ SN: XXXX-XXXXX-XX
    packages:
      nexxtender:
        url: https://github.com/geertmeersman/nexxtender
-       file: config/nexxtender.yaml
+       files: [
+           config/ha_addon.yaml, # how you run esphome: ha_addon, docker, local (see 2.b)
+           config/s3.yaml, # if you have an ESP32 S3 board (optional line)
+           config/mqtt/false.yaml, # mqtt config: true.yaml or false.yaml
+           config/wifi.yaml, # only include if you need wifi. In case of ethernet, add the component manually
+         ]
        refresh: 0s
    substitutions:
      ## Uncomment and modify when you want to use a different device name.
@@ -262,9 +267,23 @@ SN: XXXX-XXXXX-XX
 
    Depending on how you run ESPHome, use the appropriate configuration file:
 
-   - **`config/nexxtender.yaml`** → For ESPHome running as a **Home Assistant Add-on**
-   - **`config/nexxtender.docker.yaml`** → For ESPHome running in a **standalone Docker container**
-   - **`config/nexxtender.local.yaml`** → For local compilation when working in a **git clone**
+   - **`config/ha_addon.yaml`** → For ESPHome running as a **Home Assistant Add-on**
+   - **`config/docker.yaml`** → For ESPHome running in a **standalone Docker container**
+   - **`config/local.yaml`** → For local compilation when working in a **git clone**
+
+   If you are running on an ESP32 S3 board:
+
+   - **`config/s3.yaml`** → Include this file when you use an ESP32 S3 board
+
+   If you intend to publish to an MQTT broker:
+
+   - **`config/mqtt/true.yaml`** → if you wish to publish to MQTT
+   - **`config/mqtt/false.yaml`** → if you don't use MQTT
+
+   If you connect to WiFi:
+
+   - **`config/wifi.yaml`** → include if you will be connecting through WiFi
+   - if you have a board with ethernet, add the [ethernet component config](https://esphome.io/components/ethernet/) to your configuration
 
    #### **c. Configuration Notes**
 
@@ -366,7 +385,12 @@ The complete configuration file would look like:
 packages:
   nexxtender:
     url: https://github.com/geertmeersman/nexxtender
-    files: [config/nexxtender.yaml, config/nexxtender_packages/esp.s3.yaml]
+    files: [
+        config/ha_addon.yaml, # how you run esphome: ha_addon, docker, local,
+        config/s3.yaml, # if you have an ESP32 S3 board (optional line)
+        config/mqtt/false.yaml, # mqtt config: true.yaml or false.yaml
+        config/wifi.yaml, # only include if you need wifi. In case of ethernet, add the component manually
+      ]
     refresh: 0s
 substitutions:
   device_name: nexxtender
@@ -387,8 +411,13 @@ The Nexxtender comes equipped with an integrated ESPHome webserver and graphical
    packages:
      nexxtender:
        url: https://github.com/geertmeersman/nexxtender
-       files:
-         [config/nexxtender.yaml, config/nexxtender_packages/webserver.yaml]
+       files: [
+           config/ha_addon.yaml, # how you run esphome: ha_addon, docker, local,
+           config/s3.yaml, # if you have an ESP32 S3 board (optional line)
+           config/mqtt/false.yaml, # mqtt config: true.yaml or false.yaml
+           config/wifi.yaml, # only include if you need wifi. In case of ethernet, add the component manually
+           config/webserver.yaml, # If you want to enable the esphome webserver
+         ]
        refresh: 0s
    ```
 
@@ -755,7 +784,7 @@ To activate HTTP POST support, set the following substitutions in your ESPHome Y
 ```yaml
 substitutions:
   http_post_enabled: "true"
-  http_base_url: '"http://your-api-server.com"' # Replace with your backend API
+  http_base_url: '"http://your-api-server.com"' # Replace with your backend API, beware of the escaping
   http_x_api_key: '"your-api-key"' # Replace with your authentication key and for security reasons store it in your secrets
 ```
 
@@ -827,13 +856,17 @@ substitutions:
   mqtt_topic_base: nexxtender
 ```
 
-And append '.mqtt' to your config package file:
+And include the `config/mqtt/true.yaml` to your config package file:
 
 ```yaml
 packages:
   nexxtender:
     url: https://github.com/geertmeersman/nexxtender
-    files: [config/nexxtender.mqtt.yaml]
+    files: [
+        config/ha_addon.yaml,
+        config/mqtt/true.yaml, # set this to true to enable MQTT
+        config/wifi.yaml,
+      ]
     refresh: 0s
 substitutions:
   device_name: nexxtender

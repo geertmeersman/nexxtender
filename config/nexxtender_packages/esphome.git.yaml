@@ -1,0 +1,6 @@
+esphome:
+  min_version: 2024.2.0
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  includes:
+    - .esphome/packages/caa06908/config/nexxtender_packages/nexxtender.h

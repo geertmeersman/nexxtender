@@ -1,0 +1,16 @@
+packages:
+  esp: !include esp.yaml
+  api: !include api.yaml # secrets esphome_admin_password, wifi_ssid, wifi_password & esphome_api_key required
+  time: !include time.yaml
+  ble: !include ble.yaml # secrets nexxtender_mac & nexxtender_passkey required
+  device_information: !include device_information.yaml
+  generic_data: !include generic_data.yaml
+  charging_car_data: !include charging_car_data.yaml
+  charging_grid_data: !include charging_grid_data.yaml
+  charging_basic_data: !include charging_basic_data.yaml
+  charging_advanced_data: !include charging_advanced_data.yaml
+  version: !include version.yaml
+  #webserver: !include webserver.yaml # secret esphome_admin_password required
+  #transactions: !include transactions.yaml
+  #diagnostics: !include diagnostics.yaml
+  #dev_debug: !include dev_debug.yaml

@@ -3,11 +3,10 @@ substitutions:
   charging_basic_prefix: Charging
   charging_basic_id_prefix: charging_basic
   charging_basic_update_interval: 60s
-  http_base_url: ""
+  http_base_url: '""'
   http_post_enabled: "false"
-  http_x_api_key: ""
+  http_x_api_key: '""'
   mqtt_publish_enabled: "false"
-
 
 globals:
   - id: g_${charging_basic_id_prefix}_seconds
@@ -55,13 +54,13 @@ globals:
     initial_value: ""
   - id: g_http_queue_size
     type: int
-    initial_value: '0'
+    initial_value: "0"
   - id: g_http_queue_head
     type: int
-    initial_value: '0'
+    initial_value: "0"
   - id: g_http_queue_tail
     type: int
-    initial_value: '0'
+    initial_value: "0"
   - id: http_success
     type: bool
     initial_value: "false"
@@ -117,16 +116,16 @@ script:
     then:
       - if:
           condition:
-            lambda: 'return id(g_mqtt_publish_enabled);'
+            lambda: "return id(g_mqtt_publish_enabled);"
           then:
             - lambda: |-
                 ESP_LOGD("mqtt_event", "Publishing MQTT charger event: %s", status_str.c_str());
-            - script.execute: 
+            - script.execute:
                 id: send_mqtt_event
-                status_str: !lambda 'return status_str;'          
+                status_str: !lambda "return status_str;"
       - if:
           condition:
-            lambda: 'return id(g_http_post_enabled);'
+            lambda: "return id(g_http_post_enabled);"
           then:
             - lambda: |-
                 ESP_LOGD("http_event", "Sending HTTP POST charger event: %s", status_str.c_str());
@@ -134,7 +133,7 @@ script:
                 url: !lambda 'return (id(g_http_base_url) + "/charger/event").c_str();'
                 request_headers:
                   Content-Type: application/json
-                  x-api-key: !lambda 'return id(g_http_x_api_key).c_str();'
+                  x-api-key: !lambda "return id(g_http_x_api_key).c_str();"
                 body: !lambda |-
                   return "{\"event_type\": \"" + status_str + "\", \"charger_id\": \"${friendly_name}\"}";
   - id: send_charging_status
@@ -147,21 +146,21 @@ script:
     then:
       - if:
           condition:
-            lambda: 'return id(g_mqtt_publish_enabled);'
+            lambda: "return id(g_mqtt_publish_enabled);"
           then:
             - lambda: |-
                 ESP_LOGD("mqtt_status", "Publishing MQTT charging status: charger_id=%s, seconds=%d, energy=%.3f, status=%s, phase_count=%d",
-                         charger_id.c_str(), seconds_val, energy_val, status_str.c_str(), phase_count_val);          
-            - script.execute: 
+                         charger_id.c_str(), seconds_val, energy_val, status_str.c_str(), phase_count_val);
+            - script.execute:
                 id: send_mqtt_status
-                charger_id: !lambda 'return charger_id;'
-                seconds_val: !lambda 'return seconds_val;'
-                energy_val: !lambda 'return energy_val;'
-                status_str: !lambda 'return status_str;'
-                phase_count_val: !lambda 'return phase_count_val;'
+                charger_id: !lambda "return charger_id;"
+                seconds_val: !lambda "return seconds_val;"
+                energy_val: !lambda "return energy_val;"
+                status_str: !lambda "return status_str;"
+                phase_count_val: !lambda "return phase_count_val;"
       - if:
           condition:
-            lambda: 'return id(g_http_post_enabled);'
+            lambda: "return id(g_http_post_enabled);"
           then:
             - lambda: |-
                 ESP_LOGD("http_status", "Sending HTTP POST charging status: charger_id=%s, seconds=%d, energy=%.3f, status=%s, phase_count=%d",
@@ -170,7 +169,7 @@ script:
                 url: !lambda 'return (id(g_http_base_url) + "/charger/status").c_str();'
                 request_headers:
                   Content-Type: application/json
-                  x-api-key: !lambda 'return id(g_http_x_api_key).c_str();'
+                  x-api-key: !lambda "return id(g_http_x_api_key).c_str();"
                 body: !lambda |-
                   return "{"
                     "\"charger_id\": \"" + charger_id + "\"," +
@@ -189,21 +188,21 @@ script:
     then:
       - if:
           condition:
-            lambda: 'return id(g_mqtt_publish_enabled);'
+            lambda: "return id(g_mqtt_publish_enabled);"
           then:
             - lambda: |-
                 ESP_LOGD("mqtt_session", "Publishing MQTT charging session: charger_id=%s, start_time=%d, end_time=%d, seconds=%d, energy=%.3f",
                          charger_id.c_str(), start_time_val, end_time_val, seconds_val, energy_val);
             - script.execute:
                 id: send_mqtt_session
-                charger_id: !lambda 'return charger_id;'
-                start_time_val: !lambda 'return start_time_val;'
-                end_time_val: !lambda 'return end_time_val;'
-                seconds_val: !lambda 'return seconds_val;'
-                energy_val: !lambda 'return energy_val;'
+                charger_id: !lambda "return charger_id;"
+                start_time_val: !lambda "return start_time_val;"
+                end_time_val: !lambda "return end_time_val;"
+                seconds_val: !lambda "return seconds_val;"
+                energy_val: !lambda "return energy_val;"
       - if:
           condition:
-            lambda: 'return id(g_http_post_enabled);'
+            lambda: "return id(g_http_post_enabled);"
           then:
             - lambda: |-
                 ESP_LOGD("http_session", "Sending HTTP POST charging session: charger_id=%s, seconds=%d, energy=%.3f",
@@ -244,9 +243,9 @@ script:
     then:
       - if:
           condition:
-            lambda: 'return !id(is_retrying_queue) && id(g_http_queue_size) > 0;'
+            lambda: "return !id(is_retrying_queue) && id(g_http_queue_size) > 0;"
           then:
-            - lambda: 'id(is_retrying_queue) = true;'
+            - lambda: "id(is_retrying_queue) = true;"
             - lambda: |-
                 int head = id(g_http_queue_head);
                 std::string payload;
@@ -262,7 +261,7 @@ script:
                 url: !lambda 'return (id(g_http_base_url) + "/charger/session/minimal").c_str();'
                 request_headers:
                   Content-Type: application/json
-                  x-api-key: !lambda 'return id(g_http_x_api_key).c_str();'
+                  x-api-key: !lambda "return id(g_http_x_api_key).c_str();"
                 body: !lambda |-
                   int head = id(g_http_queue_head);
                   switch (head) {
@@ -285,7 +284,7 @@ script:
                         id(http_success) = false;
             - if:
                 condition:
-                  lambda: 'return id(http_success);'
+                  lambda: "return id(http_success);"
                 then:
                   - lambda: |-
                       switch (id(g_http_queue_head)) {
@@ -297,9 +296,9 @@ script:
                       }
                       id(g_http_queue_head) = (id(g_http_queue_head) + 1) % 5;
                       id(g_http_queue_size)--;
-                  - lambda: 'id(is_retrying_queue) = false;'
+                  - lambda: "id(is_retrying_queue) = false;"
                   - script.execute: retry_http_queue
-      - lambda: 'id(is_retrying_queue) = false;'
+      - lambda: "id(is_retrying_queue) = false;"
 interval:
   - interval: 30s
     then:
