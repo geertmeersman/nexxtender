@@ -1,0 +1,2 @@
+packages:
+  mqtt_package: !include ../nexxtender_packages/mqtt_true.yaml

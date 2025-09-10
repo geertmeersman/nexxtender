@@ -1,0 +1,3 @@
+packages:
+  common: !include nexxtender_packages/common_packages.yaml
+  esphome: !include nexxtender_packages/esphome.local.yaml

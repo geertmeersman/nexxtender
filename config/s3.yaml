@@ -1,0 +1,2 @@
+packages:
+  esp_s3: !include nexxtender_packages/esp.s3.yaml
