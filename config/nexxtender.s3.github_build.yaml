@@ -1,0 +1,3 @@
+packages:
+  esp_config: !include config/nexxtender.github_build.yaml
+  s3_config: !include config/s3.yaml
