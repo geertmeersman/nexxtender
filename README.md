@@ -87,7 +87,7 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 | Restart Nexxtender ESP                 | button.nexxtender_restart_nexxtender_esp                 | Diagnostic    | Restart the Nexxtender ESP board                                                                                                                         |
 | Serial Number                          | sensor.nexxtender_serial_number                          | Diagnostic    | The serial number                                                                                                                                        |
 | Sync time                              | button.nexxtender_sync_time                              | Diagnostic    | Synchronises the ESP time. It pushes the HA time to the Nexxtender charger                                                                               |
-| Time                                   | sensor.nexxtender_nexxtender_time                        | Diagnostic    | Restarts the Nexxtender ESP board (not the one of the charger)                                                                                           |
+| Time                                   | sensor.nexxtender_nexxtender_time                        | Diagnostic    | Current time reported by the Nexxtender charger                                                                                                          |
 | Available capacity                     | sensor.nexxtender_available_capacity                     | Sensors       | Available capacity in A                                                                                                                                  |
 | Car Current                            | sensor.nexxtender_car_current                            | Sensors       | Sum of Car L1, L2 and L3                                                                                                                                 |
 | Car L1                                 | sensor.nexxtender_car_l1                                 | Sensors       | Car phase L1 current in A                                                                                                                                |
@@ -95,13 +95,13 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
 | Car L3                                 | sensor.nexxtender_car_l3                                 | Sensors       | Car phase L3 current in A                                                                                                                                |
 | Car P1                                 | sensor.nexxtender_car_p1                                 | Sensors       | Car phase L1 power consumption in kW                                                                                                                     |
 | Car P2                                 | sensor.nexxtender_car_p2                                 | Sensors       | Car phase L2 power consumption in kW                                                                                                                     |
-| Car P3                                 | sensor.nexxtender_car_p3                                 | Sensors       | Car phase L2 power consumption in kW                                                                                                                     |
+| Car P3                                 | sensor.nexxtender_car_p3                                 | Sensors       | Car phase L3 power consumption in kW                                                                                                                     |
 | Car Power                              | sensor.nexxtender_car_power                              | Sensors       | Total power consumption from the car in kW                                                                                                               |
 | Car Power Mode                         | sensor.nexxtender_car_power_mode                         | Sensors       | Power mode of the car. Can be Eco, Max or not charging. The eco threshold is calculated on the number of phases. This mode is derived from the Car Power |
 | Car Timestamp                          | sensor.nexxtender_car_timestamp                          | Sensors       | Current time in UTC Unix Time                                                                                                                            |
 | Charging Advanced Grid Energy          | sensor.nexxtender_charging_advanced_grid_energy          | Sensors       | Energy calculation based on the grid power                                                                                                               |
-| Charging Advanced Grid Energy Consumed | sensor.nexxtender_charging_advanced_grid_energy_consumed | Sensors       | Consumed Energy calculation based on the grid power, to be used in the HA energy dashboard : Grid Consumption                                            |
-| Charging Advanced Grid Energy Produced | sensor.nexxtender_charging_advanced_grid_energy_produced | Sensors       | Produced Energy calculation based on the grid power, to be used in the HA energy dashboard : Return to grid                                              |
+| Charging Advanced Grid Energy Consumed | sensor.nexxtender_charging_advanced_grid_energy_consumed | Sensors       | Consumed energy based on grid power — use in HA Energy dashboard: Grid consumption                                                                       |
+| Charging Advanced Grid Energy Produced | sensor.nexxtender_charging_advanced_grid_energy_produced | Sensors       | Produced (exported) energy based on grid power — use in HA Energy dashboard: Return to grid                                                              |
 | Charging Advanced Timestamp            | sensor.nexxtender_charging_advanced_timestamp            | Sensors       | Current time in UTC Unix Time                                                                                                                            |
 | Charging Phase Count                   | sensor.nexxtender_charging_phase_count                   | Sensors       | Number of active phases during charging session                                                                                                          |
 | Charging Phases                        | sensor.nexxtender_charging_phases                        | Sensors       | Number of available phases                                                                                                                               |
@@ -468,6 +468,13 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
 
 6. **Integrate in the energy dashboard**: You can integrate the produced and consumed energy in the energy dashboard.
 
+   [![Go to the energy dashboard.](https://my.home-assistant.io/badges/config_energy.svg)](https://my.home-assistant.io/redirect/config_energy/)
+
+   Select:
+
+   - Grid consumption: sensor.nexxtender_charging_advanced_grid_energy_consumed
+   - Return to grid: sensor.nexxtender_charging_advanced_grid_energy_produced
+
    ![energy-dashboard-config](images/energy_dashboard_config.png)
 
 7. **Customization**: Home Assistant allows for extensive customization of ESPHome devices, including renaming, grouping, and organizing them to fit your home automation setup.
@@ -486,15 +493,15 @@ To integrate ESPHome devices with Home Assistant, follow these steps:
 10. **Blueprint for Charging Notifications**:
     Receive instant notifications when your car starts or stops charging based on the Nexxtender discriminator sensor.
 
-This blueprint allows you to configure the **Nexxtender discriminator sensor**, select a **mobile device** for notifications, and customize the **notification titles and messages** for both charging start and stop events.
+    This blueprint allows you to configure the **Nexxtender discriminator sensor**, select a **mobile device** for notifications, and customize the **notification titles and messages** for both charging start and stop events.
 
-Whenever the Nexxtender sensor detects a change from **"Stopped" → "Started"**, you will receive a notification that charging has begun. Similarly, when the sensor changes from **"Charging" → "Stopped"**, you will be alerted that charging has ended.
+    Whenever the Nexxtender sensor detects a change from **"Stopped" → "Started"**, you will receive a notification that charging has begun. Similarly, when the sensor changes from **"Charging" → "Stopped"**, you will be alerted that charging has ended.
 
-With this blueprint, you can stay informed about your car's charging status in real-time, ensuring you never miss an important update. 🚗⚡
+    With this blueprint, you can stay informed about your car's charging status in real-time, ensuring you never miss an important update. 🚗⚡
 
-[![Import the blueprint.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fgeertmeersman%2Fnexxtender%2Fblob%2Fmain%2Fblueprints%2Fnexxtender_car_charging_notifications.yaml)
+    [![Import the blueprint.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fgeertmeersman%2Fnexxtender%2Fblob%2Fmain%2Fblueprints%2Fnexxtender_car_charging_notifications.yaml)
 
-![blueprint](images/blueprint_charging_notifications.png)
+    ![blueprint](images/blueprint_charging_notifications.png)
 
 11. **Lovelace dashboard card**:
 
