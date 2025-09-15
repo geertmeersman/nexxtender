@@ -74,7 +74,7 @@ sensor:
 
   - platform: template
     name: "${charging_advanced_prefix} Grid Power Produced"
-    id: grid_power_produced
+    id: ${charging_advanced_id_prefix}_grid_power_produced
     unit_of_measurement: "W"
     device_class: power
     state_class: measurement
@@ -87,7 +87,7 @@ sensor:
       }
   - platform: integration
     name: "${charging_advanced_prefix} Grid Energy Consumed"
-    sensor: grid_power_consumed
+    sensor: ${charging_advanced_id_prefix}_grid_power_consumed
     time_unit: h
     unit_of_measurement: "Wh"
     state_class: total_increasing
