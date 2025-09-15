@@ -1,5 +1,20 @@
 # Changelog
 
+## [v5.1.0](https://github.com/geertmeersman/nexxtender/tree/v5.1.0) (2025-09-15)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v5.0.0...v5.1.0)
+
+**Closed issues:**
+
+- Missing nexxtender.h [\#89](https://github.com/geertmeersman/nexxtender/issues/89)
+
+**Merged pull requests:**
+
+- docs: Energy dashboard link & minor doc fixes [\#94](https://github.com/geertmeersman/nexxtender/pull/94) ([geertmeersman](https://github.com/geertmeersman))
+- docs: switched consumed & procudes description [\#93](https://github.com/geertmeersman/nexxtender/pull/93) ([geertmeersman](https://github.com/geertmeersman))
+- docs: Added a documented step to integrate the project with the Energy Dashboard, including updated screenshots [\#92](https://github.com/geertmeersman/nexxtender/pull/92) ([geertmeersman](https://github.com/geertmeersman))
+- feat: Added sensors to separate grid power into consumed and produced, plus cumulative energy tracking [\#91](https://github.com/geertmeersman/nexxtender/pull/91) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v5.0.0](https://github.com/geertmeersman/nexxtender/tree/v5.0.0) (2025-09-10)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v4.0.0...v5.0.0)
