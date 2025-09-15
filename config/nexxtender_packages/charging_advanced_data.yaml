@@ -59,6 +59,49 @@ sensor:
     device_class: energy
     icon: mdi:transmission-tower
   - platform: template
+    name: "${charging_advanced_prefix} Grid Power Consumed"
+    id: grid_power_consumed
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+    accuracy_decimals: 0
+    lambda: |-
+      if (id(${charging_advanced_id_prefix}_grid_power).state > 0) {
+        return id(${charging_advanced_id_prefix}_grid_power).state;
+      } else {
+        return 0;
+      }
+
+  - platform: template
+    name: "${charging_advanced_prefix} Grid Power Produced"
+    id: grid_power_produced
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+    accuracy_decimals: 0
+    lambda: |-
+      if (id(${charging_advanced_id_prefix}_grid_power).state < 0) {
+        return -id(${charging_advanced_id_prefix}_grid_power).state;  // positive value
+      } else {
+        return 0;
+      }
+  - platform: integration
+    name: "${charging_advanced_prefix} Grid Energy Consumed"
+    sensor: grid_power_consumed
+    time_unit: h
+    unit_of_measurement: "Wh"
+    state_class: total_increasing
+    device_class: energy
+    icon: mdi:transmission-tower-import
+  - platform: integration
+    name: "${charging_advanced_prefix} Grid Energy Produced"
+    sensor: grid_power_produced
+    time_unit: h
+    unit_of_measurement: "Wh"
+    state_class: total_increasing
+    device_class: energy
+    icon: mdi:transmission-tower-export
+  - platform: template
     name: "Car Power"
     id: ${charging_advanced_id_prefix}_car_power
     icon: mdi:sigma
