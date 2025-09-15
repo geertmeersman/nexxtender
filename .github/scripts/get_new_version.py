@@ -63,14 +63,16 @@ def get_semver_level(commit_messages, commits):
         return "patch"
 
     for i, message in enumerate(commit_messages):
-        ml = message.lower()
-        if any(keyword in ml for keyword in major_keywords):
-            return "major"
+        if not is_dependabot_commit(commits[i]):
+            ml = message.lower()
+            if any(keyword in ml for keyword in major_keywords):
+                return "major"
 
     for i, message in enumerate(commit_messages):
-        ml = message.lower()
-        if any(keyword in ml for keyword in minor_keywords):
-            return "minor"
+        if not is_dependabot_commit(commits[i]):
+            ml = message.lower()
+            if any(keyword in ml for keyword in minor_keywords):
+                return "minor"
 
     return "patch"
 
