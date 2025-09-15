@@ -60,7 +60,7 @@ sensor:
     icon: mdi:transmission-tower
   - platform: template
     name: "${charging_advanced_prefix} Grid Power Consumed"
-    id: grid_power_consumed
+    id: ${charging_advanced_id_prefix}_grid_power_consumed
     unit_of_measurement: "W"
     device_class: power
     state_class: measurement
@@ -95,7 +95,7 @@ sensor:
     icon: mdi:transmission-tower-import
   - platform: integration
     name: "${charging_advanced_prefix} Grid Energy Produced"
-    sensor: grid_power_produced
+    sensor: ${charging_advanced_id_prefix}_grid_power_produced
     time_unit: h
     unit_of_measurement: "Wh"
     state_class: total_increasing
