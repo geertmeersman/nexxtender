@@ -67,7 +67,7 @@ action:
   - variables:
       energy_sensor: !input energy_sensor
       duration_sensor: !input duration_sensor
-      energy: "{{ states(energy_sensor) | default('0') }} kWh"
+      energy: "{{ (states(energy_sensor) | float(0)) | round(1) }} kWh"
       duration: >
         {% set seconds = states(duration_sensor) | int(0) %}
         {% set hours = (seconds // 3600) %}
