@@ -68,14 +68,14 @@ globals:
     initial_value: "6"
 sensor:
   - platform: template
-    name: "Charging Phases"
+    name: "${prefix_sensor}Charging Phases"
     id: ${generic_data_id_prefix}_charging_phases
     icon: mdi:counter
     state_class: measurement
     accuracy_decimals: 0
     update_interval: ${generic_data_update_interval}
   - platform: template
-    name: "Maximum available capacity"
+    name: "${prefix_sensor}Maximum available capacity"
     id: ${generic_data_id_prefix}_i_max
     icon: mdi:current-ac
     device_class: current
@@ -84,7 +84,7 @@ sensor:
     accuracy_decimals: 0
     update_interval: ${generic_data_update_interval}
   - platform: template
-    name: "Offloading minimum"
+    name: "${prefix_sensor}Offloading minimum"
     id: ${generic_data_id_prefix}_i_min
     icon: mdi:current-ac
     device_class: current
@@ -93,7 +93,7 @@ sensor:
     accuracy_decimals: 0
     update_interval: ${generic_data_update_interval}
   - platform: template
-    name: "Maximum car charging speed"
+    name: "${prefix_sensor}Maximum car charging speed"
     id: ${generic_data_id_prefix}_i_evse_max
     icon: mdi:current-ac
     device_class: current
@@ -102,7 +102,7 @@ sensor:
     accuracy_decimals: 0
     update_interval: ${generic_data_update_interval}
   - platform: template
-    name: "Minimum car charging speed"
+    name: "${prefix_sensor}Minimum car charging speed"
     id: ${generic_data_id_prefix}_i_evse_min
     icon: mdi:current-ac
     device_class: current
@@ -111,7 +111,7 @@ sensor:
     accuracy_decimals: 0
     update_interval: ${generic_data_update_interval}
   - platform: template
-    name: "Peak consumption limit"
+    name: "${prefix_sensor}Peak consumption limit"
     id: ${generic_data_id_prefix}_i_capacity
     icon: mdi:current-ac
     device_class: current
@@ -122,17 +122,17 @@ sensor:
 
 text_sensor:
   - platform: template
-    name: "Mode"
+    name: "${prefix_text_sensor}Mode"
     id: ${generic_data_id_prefix}_charge_mode
     icon: mdi:speedometer
     update_interval: ${generic_data_update_interval}
   - platform: template
-    name: "Connection type"
+    name: "${prefix_text_sensor}Connection type"
     id: ${generic_data_id_prefix}_connection_type
     icon: mdi:transmission-tower
     update_interval: ${generic_data_update_interval}
   - platform: template
-    name: "Week schema"
+    name: "${prefix_text_sensor}Week schema"
     id: ${generic_data_id_prefix}_week_schema
     icon: mdi:calendar
     update_interval: ${generic_data_update_interval}
@@ -141,7 +141,7 @@ text_sensor:
       sprintf(time_string, "%s - %s", id(g_${generic_data_id_prefix}_week_start).c_str(), id(g_${generic_data_id_prefix}_week_end).c_str());
       return optional<String>(time_string);
   - platform: template
-    name: "Weekend schema"
+    name: "${prefix_text_sensor}Weekend schema"
     id: ${generic_data_id_prefix}_weekend_schema
     icon: mdi:calendar
     update_interval: ${generic_data_update_interval}
@@ -150,14 +150,14 @@ text_sensor:
       sprintf(time_string, "%s - %s", id(g_${generic_data_id_prefix}_weekend_start).c_str(), id(g_${generic_data_id_prefix}_weekend_end).c_str());
       return optional<String>(time_string);
   - platform: template
-    name: "Generic Status"
+    name: "${prefix_text_sensor}Generic Status"
     id: ${device_name}_generic_status
     icon: mdi:information-box
     update_interval: ${generic_data_update_interval}
     entity_category: diagnostic
   - platform: ble_client
     id: ${device_name}_generic_status_internal
-    name: Generic Internal Status
+    name: ${prefix_text_sensor}Generic Internal Status
     internal: true
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_receive_service}
@@ -257,7 +257,7 @@ text_sensor:
           }
   - platform: ble_client
     id: ${device_name}_generic_data
-    name: Generic data
+    name: ${prefix_text_sensor}Generic data
     internal: true
     ble_client_id: ${device_name}_ble_client_id
     service_uuid: ${ble_uuid_receive_service}
@@ -270,7 +270,7 @@ text_sensor:
     #return hex_data;
     notify: true
   - platform: template
-    name: "Nexxtender Time"
+    name: "${prefix_text_sensor}Nexxtender Time"
     id: ${generic_data_id_prefix}_human_time
     icon: "mdi:clock-time-four"
     update_interval: ${generic_data_update_interval}
@@ -843,14 +843,14 @@ script:
 
 button:
   - platform: template
-    name: Toggle charger mode
+    name: ${prefix_button}Toggle charger mode
     icon: mdi:home-switch-outline
     on_press:
       then:
         - lambda: |-
             id(switch_charger_mode).execute();
   - platform: template
-    name: "Start Charge Default"
+    name: "${prefix_button}Start Charge Default"
     icon: mdi:alpha-d-circle-outline
     on_press:
       - ble_client.ble_write:
@@ -859,7 +859,7 @@ button:
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x01, 0x00]
   - platform: template
-    name: "Start Charge Max"
+    name: "${prefix_button}Start Charge Max"
     icon: mdi:alpha-m-circle-outline
     on_press:
       - ble_client.ble_write:
@@ -868,7 +868,7 @@ button:
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x02, 0x00]
   - platform: template
-    name: "Start Charge Auto"
+    name: "${prefix_button}Start Charge Auto"
     icon: mdi:alpha-a-circle-outline
     on_press:
       - ble_client.ble_write:
@@ -877,7 +877,7 @@ button:
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x03, 0x00]
   - platform: template
-    name: "Start Charge Eco"
+    name: "${prefix_button}Start Charge Eco"
     icon: mdi:alpha-e-circle-outline
     on_press:
       - ble_client.ble_write:
@@ -886,7 +886,7 @@ button:
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x04, 0x00]
   - platform: template
-    name: "Stop Charging"
+    name: "${prefix_button}Stop Charging"
     icon: mdi:stop-circle-outline
     on_press:
       - ble_client.ble_write:
@@ -895,7 +895,7 @@ button:
           characteristic_uuid: ${ble_uuid_generic_command}
           value: [0x06, 0x00]
   - platform: template
-    name: Read time
+    name: ${prefix_button}Read time
     icon: mdi:clock-time-eight-outline
     entity_category: diagnostic
     on_press:
@@ -903,7 +903,7 @@ button:
         - lambda: |-
             id(script_read_time).execute();
   - platform: template
-    name: Sync time
+    name: ${prefix_button}Sync time
     icon: mdi:timer-refresh-outline
     entity_category: diagnostic
     on_press:
@@ -914,7 +914,7 @@ button:
 number:
   - platform: template
     id: offloading_minimum
-    name: Offloading minimum
+    name: ${prefix_number}Offloading minimum
     icon: "mdi:current-ac"
     unit_of_measurement: A
     restore_value: true
@@ -941,7 +941,7 @@ number:
           }
   - platform: template
     id: max_charging_speed
-    name: Maximum car charging speed
+    name: ${prefix_number}Maximum car charging speed
     icon: "mdi:current-ac"
     unit_of_measurement: A
     restore_value: true
@@ -968,7 +968,7 @@ number:
           }
   - platform: template
     id: max_available_capacity
-    name: Maximum available capacity
+    name: ${prefix_number}Maximum available capacity
     icon: "mdi:current-ac"
     unit_of_measurement: A
     restore_value: true
@@ -996,7 +996,7 @@ number:
 
   - platform: template
     id: peak_consumption_limit
-    name: Peak consumption limit
+    name: ${prefix_number}Peak consumption limit
     icon: "mdi:current-ac"
     unit_of_measurement: A
     restore_value: true
@@ -1026,7 +1026,7 @@ number:
 select:
   - platform: template
     id: select_mode
-    name: "Mode"
+    name: "${prefix_select}Mode"
     icon: "mdi:speedometer"
     restore_value: true
     optimistic: true
@@ -1075,7 +1075,7 @@ binary_sensor:
       mode:
         input: true
         pullup: true
-    name: Toggle charger mode
+    name: ${prefix_binary_sensor}Toggle charger mode
     internal: true
     on_release:
       then:

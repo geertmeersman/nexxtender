@@ -163,6 +163,9 @@ This repository contains an ESPHome BLE client for interfacing with the Powerdal
     - [Enabling MQTT](#enabling-mqtt)
     - [MQTT Topics Published](#mqtt-topics-published)
     - [Why MQTT?](#why-mqtt)
+  - [Entity Naming Convention for Homey & Other Integrations](#entity-naming-convention-for-homey--other-integrations)
+    - [Example](#example)
+    - [How It Works](#how-it-works)
   - [Contributing](#contributing)
   - [License](#license)
   - [Support](#support)
@@ -905,6 +908,36 @@ Payloads are in JSON format and include data like `charger_id`, `energy`, `secon
 - Faster delivery with lower latency
 - Integrates easily into existing MQTT dashboards and rule engines
 - Great for logging, automation, and diagnostics
+
+## Entity Naming Convention (for Homey & Other Integrations)
+
+Some platforms (like **Homey**) don’t always show the underlying entity type (number, switch, sensor, etc.) in their UI.
+To avoid confusion, this project uses a **type-based prefixing convention** for all manually named entities.
+
+This makes it clear at a glance what kind of entity you’re working with, regardless of how the integration renders it.
+
+### Example
+
+- `Switch BLE Client` → clearly a switch
+- `Binary Sensor Charging State` → clearly a binary sensor
+
+---
+
+### How It Works
+
+Define substitutions for each entity type in your ESPHome configuration:
+
+```yaml
+substitutions:
+  prefix_number: "Number "
+  prefix_switch: "Switch "
+  prefix_button: "Button "
+  prefix_sensor: "Sensor "
+  prefix_text_sensor: "Text Sensor "
+  prefix_binary_sensor: "Binary Sensor "
+  prefix_light: "Light "
+  prefix_select: "Select "
+```
 
 ---
 

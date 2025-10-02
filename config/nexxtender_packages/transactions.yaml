@@ -38,7 +38,7 @@ text_sensor:
 
 button:
   - platform: template
-    name: "Read transactions"
+    name: "${prefix_button}Read transactions"
     id: read_transactions_button
     on_press:
       - ble_client.ble_write:
