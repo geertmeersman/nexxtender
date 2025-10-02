@@ -43,7 +43,7 @@ ble_client:
 
 binary_sensor:
   - platform: template
-    name: BLE Client
+    name: ${prefix_binary_sensor}BLE Client
     id: ble_client_connectivity
     trigger_on_initial_state: true
     device_class: connectivity
@@ -52,14 +52,14 @@ binary_sensor:
 
 button:
   - platform: restart
-    name: "Restart Nexxtender ESP"
+    name: "${prefix_button}Restart Nexxtender ESP"
     icon: "mdi:restart"
     entity_category: diagnostic
 
 switch:
   - platform: ble_client
     ble_client_id: ${device_name}_ble_client_id
-    name: BLE Client
+    name: ${prefix_switch}BLE Client
     icon: mdi:bluetooth-transfer
     entity_category: diagnostic
     on_turn_on:

@@ -15,7 +15,7 @@ globals:
 ## ---------------------------------------------------
 binary_sensor:
   - platform: status
-    name: Status
+    name: ${prefix_binary_sensor}Status
     entity_category: diagnostic
     disabled_by_default: true
 
@@ -24,7 +24,7 @@ binary_sensor:
 ## ---------------------------------------------------
 switch:
   - platform: template
-    name: Reset boot counter
+    name: ${prefix_switch}Reset boot counter
     turn_on_action:
       then:
         - lambda: |-
@@ -39,7 +39,7 @@ switch:
 ## ---------------------------------------------------
 sensor:
   - platform: template
-    name: Boot counter
+    name: ${prefix_sensor}Boot counter
     id: bootcounter
     accuracy_decimals: 0
     lambda: |-
@@ -48,7 +48,7 @@ sensor:
     disabled_by_default: true
 
   - platform: uptime
-    name: Uptime Sensor
+    name: ${prefix_sensor}Uptime Sensor
     id: uptime_sensor
     icon: mdi:clock-start
     update_interval: ${diagnostics_update_interval}
@@ -75,14 +75,14 @@ sensor:
 
   - platform: wifi_signal
     id: wifi_signal_strength
-    name: WiFi Signal Strength
+    name: ${prefix_sensor}WiFi Signal Strength
     update_interval: ${diagnostics_update_interval}
     entity_category: diagnostic
     disabled_by_default: true
 
   - platform: template
     id: sensor_wifi_signal_percentage
-    name: WiFi Signal Percentage
+    name: ${prefix_sensor}WiFi Signal Percentage
     icon: mdi:wifi
     unit_of_measurement: "%"
     update_interval: ${diagnostics_update_interval}
@@ -102,12 +102,12 @@ sensor:
 ## ---------------------------------------------------
 text_sensor:
   - platform: version
-    name: Esphome Version
+    name: ${prefix_text_sensor}Esphome Version
     entity_category: diagnostic
     disabled_by_default: true
 
   - platform: template
-    name: Uptime
+    name: ${prefix_text_sensor}Uptime
     id: uptime_human
     icon: mdi:clock-start
     entity_category: diagnostic
@@ -115,19 +115,19 @@ text_sensor:
 
   - platform: wifi_info
     ip_address:
-      name: IP
+      name: ${prefix_text_sensor}IP
       icon: mdi:ip-network
     ssid:
-      name: SSID
+      name: ${prefix_text_sensor}SSID
       icon: mdi:wifi
     bssid:
-      name: BSSID
+      name: ${prefix_text_sensor}BSSID
       icon: mdi:wifi
     mac_address:
-      name: Wifi Mac Address
+      name: ${prefix_text_sensor}Wifi Mac Address
       icon: mdi:wifi
   - platform: template
-    name: Timestamp
+    name: ${prefix_text_sensor}Timestamp
     lambda: char str[20];
       time_t currTime = id(sntp_time).now().timestamp;
       strftime(str, sizeof(str), "%Y-%m-%dT%H:%M:%S", localtime(&currTime));
@@ -135,7 +135,7 @@ text_sensor:
     entity_category: diagnostic
     disabled_by_default: true
   - platform: template
-    name: Uptime (formatted)
+    name: ${prefix_text_sensor}Uptime (formatted)
     icon: mdi:clock-start
     update_interval: 15s
     lambda: |-

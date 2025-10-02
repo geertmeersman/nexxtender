@@ -1,6 +1,14 @@
 substitutions:
   device_name: nexxtender
   friendly_name: Nexxtender
+  prefix_number: ""
+  prefix_switch: ""
+  prefix_button: ""
+  prefix_sensor: ""
+  prefix_text_sensor: ""
+  prefix_binary_sensor: ""
+  prefix_light: ""
+  prefix_select: ""
 
 esp32:
   board: az-delivery-devkit-v4

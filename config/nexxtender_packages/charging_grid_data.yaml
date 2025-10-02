@@ -20,7 +20,7 @@ globals:
 
 sensor:
   - platform: template
-    name: "${charging_grid_prefix} Timestamp"
+    name: "${prefix_sensor}${charging_grid_prefix} Timestamp"
     id: ${charging_grid_id_prefix}_timestamp
     icon: mdi:clock-time-eight
     device_class: timestamp
@@ -30,7 +30,7 @@ sensor:
     lambda: |-
       return id(g_${charging_grid_id_prefix}_timestamp);
   - platform: template
-    name: "${charging_grid_prefix} L1"
+    name: "${prefix_sensor}${charging_grid_prefix} L1"
     id: ${charging_grid_id_prefix}_l1
     icon: mdi:home-floor-1
     device_class: current
@@ -43,7 +43,7 @@ sensor:
     lambda: |-
       return id(g_${charging_grid_id_prefix}_l1);
   - platform: template
-    name: "${charging_grid_prefix} L2"
+    name: "${prefix_sensor}${charging_grid_prefix} L2"
     id: ${charging_grid_id_prefix}_l2
     icon: mdi:home-floor-2
     device_class: current
@@ -56,7 +56,7 @@ sensor:
     lambda: |-
       return id(g_${charging_grid_id_prefix}_l2);
   - platform: template
-    name: "${charging_grid_prefix} L3"
+    name: "${prefix_sensor}${charging_grid_prefix} L3"
     id: ${charging_grid_id_prefix}_l3
     icon: mdi:home-floor-3
     device_class: current
@@ -69,7 +69,7 @@ sensor:
     lambda: |-
       return id(g_${charging_grid_id_prefix}_l3);
   - platform: template
-    name: "${charging_grid_prefix} Consumed"
+    name: "${prefix_sensor}${charging_grid_prefix} Consumed"
     id: ${charging_grid_id_prefix}_consumed
     icon: mdi:sigma
     device_class: power
@@ -80,7 +80,7 @@ sensor:
     lambda: |-
       return id(g_${charging_grid_id_prefix}_consumed);
   - platform: template
-    name: "${charging_grid_prefix} Interval"
+    name: "${prefix_sensor}${charging_grid_prefix} Interval"
     id: ${charging_grid_id_prefix}_interval
     icon: mdi:camera-timer
     accuracy_decimals: 0

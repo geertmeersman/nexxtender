@@ -1,6 +1,6 @@
 text_sensor:
   - platform: template
-    name: Code version
+    name: ${prefix_text_sensor}Code version
     id: nexxtender_code_version
     icon: mdi:file-certificate
     entity_category: diagnostic

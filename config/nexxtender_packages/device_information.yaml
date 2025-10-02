@@ -11,7 +11,7 @@ text_sensor:
   - platform: ble_client
     id: ${device_information_id_prefix}_model_number
     disabled_by_default: true
-    name: "Model Number"
+    name: "${prefix_text_sensor}Model Number"
     icon: mdi:numeric
     entity_category: diagnostic
     ble_client_id: ${device_name}_ble_client_id
@@ -28,7 +28,7 @@ text_sensor:
   - platform: ble_client
     id: ${device_information_id_prefix}_serial_number
     disabled_by_default: true
-    name: "Serial Number"
+    name: "${prefix_text_sensor}Serial Number"
     icon: mdi:numeric
     entity_category: diagnostic
     ble_client_id: ${device_name}_ble_client_id
@@ -44,7 +44,7 @@ text_sensor:
           logd_s("${device_information_id_prefix}_serial_number", x);
   - platform: ble_client
     id: ${device_information_id_prefix}_firmware_revision
-    name: "Firmware Revision"
+    name: "${prefix_text_sensor}Firmware Revision"
     icon: mdi:file-certificate
     entity_category: diagnostic
     ble_client_id: ${device_name}_ble_client_id
@@ -61,7 +61,7 @@ text_sensor:
   - platform: ble_client
     id: ${device_information_id_prefix}_hardware_revision
     disabled_by_default: true
-    name: "Hardware Revision"
+    name: "${prefix_text_sensor}Hardware Revision"
     icon: mdi:file-certificate
     entity_category: diagnostic
     ble_client_id: ${device_name}_ble_client_id

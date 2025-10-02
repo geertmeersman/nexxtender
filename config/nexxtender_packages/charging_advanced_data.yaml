@@ -19,7 +19,7 @@ globals:
 
 sensor:
   - platform: template
-    name: "${charging_advanced_prefix} Timestamp"
+    name: "${prefix_sensor}${charging_advanced_prefix} Timestamp"
     id: ${charging_advanced_id_prefix}_timestamp
     icon: mdi:clock-time-eight
     device_class: timestamp
@@ -29,7 +29,7 @@ sensor:
     lambda: |-
       return id(g_${charging_advanced_id_prefix}_timestamp);
   - platform: template
-    name: "Available capacity"
+    name: "${prefix_sensor}Available capacity"
     id: ${charging_advanced_id_prefix}_i_available
     icon: mdi:current-ac
     device_class: current
@@ -40,7 +40,7 @@ sensor:
     lambda: |-
       return id(g_${charging_advanced_id_prefix}_i_available);
   - platform: template
-    name: "Grid Power"
+    name: "${prefix_sensor}Grid Power"
     id: ${charging_advanced_id_prefix}_grid_power
     icon: mdi:sigma
     device_class: power
@@ -51,7 +51,7 @@ sensor:
     lambda: |-
       return id(g_${charging_advanced_id_prefix}_grid_power);
   - platform: integration
-    name: "${charging_advanced_prefix} Grid Energy"
+    name: "${prefix_sensor}${charging_advanced_prefix} Grid Energy"
     sensor: ${charging_advanced_id_prefix}_grid_power
     time_unit: h
     unit_of_measurement: Wh
@@ -59,8 +59,8 @@ sensor:
     device_class: energy
     icon: mdi:transmission-tower
   - platform: template
-    name: "${charging_advanced_prefix} Grid Power Consumed"
-    id: ${charging_advanced_id_prefix}_grid_power_consumed
+    name: "${prefix_sensor}${charging_advanced_prefix} Grid Power Consumed"
+    id: grid_power_consumed
     unit_of_measurement: "W"
     device_class: power
     state_class: measurement
@@ -71,10 +71,9 @@ sensor:
       } else {
         return 0;
       }
-
   - platform: template
-    name: "${charging_advanced_prefix} Grid Power Produced"
-    id: ${charging_advanced_id_prefix}_grid_power_produced
+    name: "${prefix_sensor}${charging_advanced_prefix} Grid Power Produced"
+    id: grid_power_produced
     unit_of_measurement: "W"
     device_class: power
     state_class: measurement
@@ -86,23 +85,23 @@ sensor:
         return 0;
       }
   - platform: integration
-    name: "${charging_advanced_prefix} Grid Energy Consumed"
-    sensor: ${charging_advanced_id_prefix}_grid_power_consumed
+    name: "${prefix_sensor}${charging_advanced_prefix} Grid Energy Consumed"
+    sensor: grid_power_consumed
     time_unit: h
     unit_of_measurement: "Wh"
     state_class: total_increasing
     device_class: energy
     icon: mdi:transmission-tower-import
   - platform: integration
-    name: "${charging_advanced_prefix} Grid Energy Produced"
-    sensor: ${charging_advanced_id_prefix}_grid_power_produced
+    name: "${prefix_sensor}${charging_advanced_prefix} Grid Energy Produced"
+    sensor: grid_power_produced
     time_unit: h
     unit_of_measurement: "Wh"
     state_class: total_increasing
     device_class: energy
     icon: mdi:transmission-tower-export
   - platform: template
-    name: "Car Power"
+    name: "${prefix_sensor}Car Power"
     id: ${charging_advanced_id_prefix}_car_power
     icon: mdi:sigma
     device_class: power
@@ -117,7 +116,7 @@ sensor:
 
 text_sensor:
   - platform: template
-    name: "Car Power Mode"
+    name: "${prefix_text_sensor}Car Power Mode"
     id: ${charging_advanced_id_prefix}_car_power_mode
     icon: mdi:speedometer
     update_interval: ${charging_advanced_update_interval}

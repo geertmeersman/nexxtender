@@ -21,7 +21,7 @@ light:
     pin: GPIO48
     num_leds: 1
     chipset: ws2812
-    name: ${friendly_name}
+    name: ${prefix_light}${friendly_name}
     effects:
       - pulse:
           name: Pulse
