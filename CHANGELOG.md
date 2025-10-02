@@ -1,5 +1,18 @@
 # Changelog
 
+## [v5.2.0](https://github.com/geertmeersman/nexxtender/tree/v5.2.0) (2025-10-02)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v5.1.0...v5.2.0)
+
+**Closed issues:**
+
+- Connection with homey instead of Home assistant. [\#96](https://github.com/geertmeersman/nexxtender/issues/96)
+
+**Merged pull requests:**
+
+- feat: Configurable name prefixes for sensors, buttons, switches, lights, etc., for cleaner integration naming fixes \#96 [\#97](https://github.com/geertmeersman/nexxtender/pull/97) ([geertmeersman](https://github.com/geertmeersman))
+- fix: Charging blueprint - round the energy value to 1 decimal [\#95](https://github.com/geertmeersman/nexxtender/pull/95) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v5.1.0](https://github.com/geertmeersman/nexxtender/tree/v5.1.0) (2025-09-15)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v5.0.0...v5.1.0)
