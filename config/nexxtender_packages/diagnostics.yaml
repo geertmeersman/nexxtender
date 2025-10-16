@@ -65,10 +65,10 @@ sensor:
               int minutes = seconds /  60;
               seconds = seconds % 60;
               return (
-                (days ? String(days) + "d " : "") +
-                (hours ? String(hours) + "h " : "") +
-                (minutes ? String(minutes) + "m " : "") +
-                (String(seconds) + "s")
+                (days ? std::string(days) + "d " : "") +
+                (hours ? std::string(hours) + "h " : "") +
+                (minutes ? std::string(minutes) + "m " : "") +
+                (std::string(seconds) + "s")
               ).c_str();
     entity_category: diagnostic
     disabled_by_default: true
@@ -147,13 +147,13 @@ text_sensor:
       int minutes = seconds /  60;
       seconds = seconds % 60;
       if ( days ) {
-        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+        return { (std::string(days) +"d " + std::string(hours) +"h " + std::string(minutes) +"m "+ std::string(seconds) +"s").c_str() };
       } else if ( hours ) {
-        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+        return { (std::string(hours) +"h " + std::string(minutes) +"m "+ std::string(seconds) +"s").c_str() };
       } else if ( minutes ) {
-        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
+        return { (std::string(minutes) +"m "+ std::string(seconds) +"s").c_str() };
       } else {
-        return { (String(seconds) +"s").c_str() };
+        return { (std::string(seconds) +"s").c_str() };
       }
     entity_category: diagnostic
     disabled_by_default: true

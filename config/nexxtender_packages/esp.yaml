@@ -13,7 +13,4 @@ substitutions:
 esp32:
   board: az-delivery-devkit-v4
   framework:
-    type: esp-idf
-    version: recommended
-    sdkconfig_options:
-      CONFIG_BT_GATTC_NOTIF_REG_MAX: "32"
+    type: arduino

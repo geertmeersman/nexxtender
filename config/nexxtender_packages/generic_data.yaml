@@ -139,7 +139,7 @@ text_sensor:
     lambda: |-
       char time_string[20];
       sprintf(time_string, "%s - %s", id(g_${generic_data_id_prefix}_week_start).c_str(), id(g_${generic_data_id_prefix}_week_end).c_str());
-      return optional<String>(time_string);
+      return optional<std::string>(time_string);
   - platform: template
     name: "${prefix_text_sensor}Weekend schema"
     id: ${generic_data_id_prefix}_weekend_schema
@@ -148,7 +148,7 @@ text_sensor:
     lambda: |-
       char time_string[20];
       sprintf(time_string, "%s - %s", id(g_${generic_data_id_prefix}_weekend_start).c_str(), id(g_${generic_data_id_prefix}_weekend_end).c_str());
-      return optional<String>(time_string);
+      return optional<std::string>(time_string);
   - platform: template
     name: "${prefix_text_sensor}Generic Status"
     id: ${device_name}_generic_status
@@ -171,7 +171,7 @@ text_sensor:
           logd_x("${device_name}_${generic_data_id_prefix} status", x);
 
           std::string reversed_x(x.rbegin(), x.rend());  // Reverse the order of bytes in x
-          String hex_status = format_hex_pretty((uint8_t *) reversed_x.c_str(), reversed_x.size());
+          std::string hex_status = format_hex_pretty((uint8_t *) reversed_x.c_str(), reversed_x.length());
 
           // Remove the period from the hexadecimal string
           hex_status.erase(std::remove(hex_status.begin(), hex_status.end(), '.'), hex_status.end());
@@ -265,7 +265,7 @@ text_sensor:
     entity_category: "config"
     #filters:
     #lambda: |-
-    #String hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+    #std::string hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.length());
     #ESP_LOGD("${device_name}_generic_data", "Status is: %d", id(g_${generic_data_id_prefix}_status));
     #return hex_data;
     notify: true
@@ -326,7 +326,7 @@ script:
           if (id(g_${generic_data_id_prefix}_charge_mode) != 6) {
             auto select_call = id(select_mode).make_call();
             int value = id(g_${generic_data_id_prefix}_charge_mode);
-            String value_string;
+            std::string value_string;
             switch (value) {
                 case 0:
                     value_string = "Eco Open";
@@ -448,7 +448,7 @@ script:
             ESP_LOGW("${device_name}_generic_data", "script_write_cbor_config - Empty CBOR config, aborting write");
             return;
           }
-          if (!check_crc(x, x.size())) {
+          if (!check_crc(x, x.length())) {
             ESP_LOGD("${device_name}_generic_data", "script_write_cbor_config - Checksum CRC16 Failed");
             return;
           }
@@ -467,7 +467,7 @@ script:
           std::string x = id(g_${generic_data_id_prefix}_config);
           logd_x("${device_name}_generic_data script_write_config|start value", x);
           if (x.empty()) { return; }
-          if (!check_crc(x, x.size())) {
+          if (!check_crc(x, x.length())) {
             ESP_LOGD("${device_name}_generic_data", "script_write_config - Checksum CRC16 Failed");
             return;
           }
@@ -478,7 +478,7 @@ script:
           x[1] = rounded_i_evse_max;
           x[2] = id(g_${generic_data_id_prefix}_charge_mode);
           x[3] = rounded_i_min;
-          add_crc_to_data(x, x.size());
+          add_crc_to_data(x, x.length());
           logd_x("${device_name}_generic_data script_write_config|Recalculated config before writing to BLE", x);
           id(g_${generic_data_id_prefix}_config) = x;
       - ble_client.ble_write:
@@ -503,7 +503,7 @@ script:
               break;
             case 0x5003:
             case 0x5006:
-              if (!check_crc(x, x.size())) {
+              if (!check_crc(x, x.length())) {
                 ESP_LOGD("${device_name}_generic_data", "Checksum CRC16 Failed");
                 return;
               }
@@ -546,10 +546,10 @@ script:
           }
 
           if (id(g_${generic_data_id_prefix}_status) == 0x5003) {
-            if (x.size() == 15) {
+            if (x.length() == 15) {
               // Store x in the global config variable
               id(g_${generic_data_id_prefix}_config) = x;
-              String value_string;
+              std::string value_string;
               int value;
               id(${generic_data_id_prefix}_i_max).publish_state(getInt8(x, 0));
               id(g_${generic_data_id_prefix}_i_max) = getInt8(x, 0);
@@ -611,7 +611,7 @@ script:
           std::string x = id(g_${generic_data_id_prefix}_cbor_config);
           logd_x("${device_name}_generic_data CBOR Config", x);
           if (x.empty()) { return; }
-          if (!check_crc(x, x.size())) {
+          if (!check_crc(x, x.length())) {
             ESP_LOGD("${device_name}_generic_data", "Checksum CRC16 Failed");
             return;
           }
@@ -621,16 +621,16 @@ script:
           bool found_b2 = false;
 
           // Declare variables outside the switch-case block
-          String value_string;
+          std::string value_string;
           // Select_call
           auto select_call = id(select_mode).make_call();
-          while (index < x.size() - 1) {
+          while (index < x.length() - 1) {
             if (x[index] == 0xB2) {
                 found_b2 = true;
                 index++; // Move to the next byte after B2
 
                 // Process the B2 map x
-                while (index < x.size() - 2) {
+                while (index < x.length() - 2) {
                   uint8_t key = x[index++];
                   uint8_t initial_byte = x[index++];
                   uint8_t major_type = initial_byte >> 5;
@@ -758,14 +758,14 @@ script:
           if (id(g_${generic_data_id_prefix}_peak_consumption_limit_set) == true && id(g_${generic_data_id_prefix}_peak_consumption_limit) > 0 && id(g_${generic_data_id_prefix}_peak_consumption_limit) <= 40 && id(${generic_data_id_prefix}_i_capacity).state != id(g_${generic_data_id_prefix}_peak_consumption_limit)) {
             // i_capacity update
             index = 0;
-            while (index < x.size() - 1) {
+            while (index < x.length() - 1) {
               if (x[index] == 0xB2) {
                 found_b2 = true;
                 index++;  // Move past B2 marker
 
                 // Parse the CBOR map to find key 19
 
-                while (index < x.size()) {
+                while (index < x.length()) {
                     uint8_t key = x[index];  // Read key (don't increment yet)
 
                     if (key == 19) {  // Found key 19 (i_capacity)
@@ -810,7 +810,7 @@ script:
                             x[value_index] = static_cast<uint8_t>(new_value);  // Store new value
                         }
 
-                        add_crc_to_data(x, x.size());  // Update CRC
+                        add_crc_to_data(x, x.length());  // Update CRC
                         logd_x("${device_name}_generic_data with new peak consumption limit", x);
                         ESP_LOGI("${device_name}_generic_data", "New peak consumption limit: %lluA", new_value);
                         id(g_${generic_data_id_prefix}_cbor_config) = x;

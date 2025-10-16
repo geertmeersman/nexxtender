@@ -1,30 +1,30 @@
 #ifndef NEXXTENDER_UTILS_H
 #define NEXXTENDER_UTILS_H
 
-uint32_t getInt(String x, int i) {
+uint32_t getInt(const std::string x, int i) {
     return (uint32_t(x[i+3]) << 24) | (uint32_t(x[i+2]) << 16) | (uint32_t(x[i+1]) << 8) | uint32_t(x[i]);
 }
 
-int32_t getSignedInt(String x, int i) {
+int32_t getSignedInt(const std::string x, int i) {
     return int32_t(uint32_t(x[i+3]) << 24) |
            (uint32_t(x[i+2]) << 16) |
            (uint32_t(x[i+1]) << 8) |
            uint32_t(x[i]);
 }
 
-int16_t getByte(String x, int i) {
+int16_t getByte(const std::string x, int i) {
     return x[i] & 0xFF;
 }
 
-int16_t getShort(String x, int i) {
+int16_t getShort(const std::string x, int i) {
     return (int16_t(x[i+1]) << 8) | int16_t(x[i]);
 }
 
-uint16_t getUShort(String x, int i) {
+uint16_t getUShort(const std::string x, int i) {
     return (uint16_t(x[i+1]) << 8) | uint16_t(x[i]);
 }
 
-int8_t getInt8(String x, int i) {
+int8_t getInt8(const std::string x, int i) {
     uint8_t byte = x[i];
     if (byte & 0x80) {
         return static_cast<int8_t>(byte) | 0xFF00;
@@ -33,7 +33,7 @@ int8_t getInt8(String x, int i) {
     }
 }
 
-uint16_t crc16(String data, size_t length) {
+uint16_t crc16(const std::string data, size_t length) {
     uint16_t crc = 0xFFFF;
     const uint16_t polynomial = 0xA001;
 
@@ -50,7 +50,7 @@ uint16_t crc16(String data, size_t length) {
     return crc;
 }
 
-void add_crc_to_data(String& data, size_t length) {
+void add_crc_to_data(std::string& data, size_t length) {
     // Calculate CRC for the original data excluding the last two bytes
     uint16_t crc = crc16(data, length - 2);
 
@@ -59,7 +59,7 @@ void add_crc_to_data(String& data, size_t length) {
     data[length - 1] = (crc >> 8) & 0xFF;    // MSB of CRC
 }
 
-bool check_crc(String& data, size_t length) {
+bool check_crc(const std::string& data, size_t length) {
     // Calculate CRC for the original data excluding the last two bytes
     uint16_t calculated_crc = crc16(data, length - 2);
 
@@ -72,21 +72,21 @@ bool check_crc(String& data, size_t length) {
     return calculated_crc == received_crc;
 }
 
-String getTimeString(int minutes) {
+std::string getTimeString(int minutes) {
     char time_string[20];
     minutes += 60; // add 1 hour due to timezone
     int hours = minutes / 60;
     int remaining_minutes = minutes % 60;
-    sprintf(time_string, "%dh%02d", hours, remaining_minutes);
-    return time_string;
+    std::snprintf(time_string, sizeof(time_string), "%dh%02d", hours, remaining_minutes);
+    return std::string(time_string);
 }
 
-void logd_x(const char* device_name, String x) {
-    auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.size());
+void logd_x(const char* device_name, const std::string &x) {
+    auto hex_data = format_hex_pretty((uint8_t *) x.c_str(), x.length());
     ESP_LOGD(device_name, "%s", hex_data.c_str());
 }
 
-void logd_s(const char* device_name, String x) {
+void logd_s(const char* device_name, const std::string &x) {
     ESP_LOGD(device_name, "%s", x.c_str());
 }
 
