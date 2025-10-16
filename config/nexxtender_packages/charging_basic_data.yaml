@@ -108,6 +108,7 @@ sensor:
 http_request:
   useragent: esphome/${device_name}
   timeout: 10s
+  verify_ssl: false
 
 script:
   - id: send_charger_event
@@ -339,7 +340,7 @@ text_sensor:
           unsigned long now = millis();
 
           // Declare variables outside the switch-case block
-          String value_string;
+          std::string value_string;
           int value;
 
           // Publish the discriminator state
