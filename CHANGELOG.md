@@ -1,5 +1,13 @@
 # Changelog
 
+## [v5.2.1](https://github.com/geertmeersman/nexxtender/tree/v5.2.1) (2025-10-16)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v5.2.0...v5.2.1)
+
+**Merged pull requests:**
+
+- chore!: switch ESPHome framework to Arduino as IDF component cfr breaking esphome change [\#98](https://github.com/geertmeersman/nexxtender/pull/98) ([geertmeersman](https://github.com/geertmeersman))
+
 ## [v5.2.0](https://github.com/geertmeersman/nexxtender/tree/v5.2.0) (2025-10-02)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v5.1.0...v5.2.0)
