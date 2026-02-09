@@ -70,3 +70,9 @@ switch:
       - globals.set:
           id: g_ble_client_manual_disconnect
           value: "1"
+
+sensor:
+  # RSSI based on MAC address
+  - platform: ble_rssi
+    mac_address: !secret nexxtender_mac
+    name: ${prefix_switch}BLE RSSI
