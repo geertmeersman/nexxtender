@@ -24,7 +24,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 📝　Draft release
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7
         id: release_drafter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,7 +40,7 @@ jobs:
           cat config/nexxtender_packages/version.yaml
 
       - name: 📝　Publish release
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7
         id: release_published
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
