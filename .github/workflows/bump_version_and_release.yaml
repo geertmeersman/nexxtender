@@ -90,7 +90,6 @@ jobs:
         if: env.DISCORD_WEBHOOK != ''
         env:
           tag_name: ${{ steps.release_drafter.outputs.tag_name }}
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
           args: "New release published: https://github.com/{{ EVENT_PAYLOAD.repository.full_name }}/releases/tag/{{tag_name}}"
