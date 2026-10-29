@@ -1,0 +1,78 @@
+name: PR 🏷️
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+concurrency:
+  group: pr-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  label:
+    name: Label PR from commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Apply labels based on commit types
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { data: commits } = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const typeToLabel = {
+              feat:     'enhancement',
+              fix:      'bug',
+              docs:     'documentation',
+              style:    'style',
+              refactor: 'refactor',
+              test:     'test',
+              chore:    'chore',
+              ci:       'ci',
+              build:    'dependencies',
+              perf:     'enhancement',
+              security: 'security',
+            };
+
+            const labels = new Set();
+            for (const { commit } of commits) {
+              const match = commit.message.match(/^(\w+)(\(.+\))?(!)?:/);
+              if (match) {
+                const type = match[1].toLowerCase();
+                if (typeToLabel[type]) labels.add(typeToLabel[type]);
+                if (match[3]) labels.add('breaking');
+              }
+            }
+
+            if (labels.size > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: [...labels],
+              });
+            }
+
+      - name: Assign PR to author
+        if: github.event.action == 'opened' && github.actor != 'dependabot[bot]' && github.actor != 'github-actions[bot]'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              assignees: [context.payload.pull_request.user.login],
+            });
