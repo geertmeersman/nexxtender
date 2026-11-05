@@ -17,7 +17,7 @@ globals:
 light:
   - platform: esp32_rmt_led_strip
     id: rgb_light
-    rgb_order: GRB
+    channel_colors: GRB
     pin: GPIO48
     num_leds: 1
     chipset: ws2812
