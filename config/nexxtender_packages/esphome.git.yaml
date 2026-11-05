@@ -3,4 +3,4 @@ esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
   includes:
-    - .esphome/packages/caa06908/config/nexxtender_packages/nexxtender.h
+    - nexxtender_packages/nexxtender.h
