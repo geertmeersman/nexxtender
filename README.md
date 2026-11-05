@@ -293,7 +293,6 @@ SN: XXXX-XXXXX-XX
    Ensure that your `secrets.yaml` file contains the following entries:
 
    ```yaml
-   esphome_ota_key: "YOUR_ESPHOME_OTA_KEY"
    wifi_ssid: "YOUR_WIFI_SSID"
    wifi_password: "YOUR_WIFI_PASSWORD"
    esphome_api_key: "YOUR_ESPHOME_API_KEY"
@@ -303,13 +302,11 @@ SN: XXXX-XXXXX-XX
 
    In the HomeAssistant ESPHome dashboard, this is done using the top righ shortcut `SECRETS`.
 
-   Replace `"YOUR_ESPHOME_OTA_KEY"`, `"YOUR_WIFI_SSID"`, `"YOUR_WIFI_PASSWORD"`, `"YOUR_ESPHOME_API_KEY"`, `"YOUR_NEXXTENDER_MAC_ADDRESS"`, and `"YOUR_NEXXTENDER_PASSKEY"` with your actual values.
+   Replace `"YOUR_WIFI_SSID"`, `"YOUR_WIFI_PASSWORD"`, `"YOUR_ESPHOME_API_KEY"`, `"YOUR_NEXXTENDER_MAC_ADDRESS"`, and `"YOUR_NEXXTENDER_PASSKEY"` with your actual values.
 
    The `nexxtender_mac` is the bluetooth mac address you found in the previous step.
 
    The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender. Explanations on how to find it can be [found here](#finding-nexxtender-bluetooth-passkey).
-
-   The `esphome_ota_key` is a base64-encoded 32-byte encryption key used for secure OTA updates. You can generate one using: `python3 -c "import base64, os; print(base64.b64encode(os.urandom(32)).decode())"`
 
    If you don't know how to define the `esphome_api_key`, you can obtain one as [described here](https://esphome.io/components/api.html) in the section Configuration variables > encryption > key.
 

@@ -7,8 +7,6 @@ globals:
 # OTA (Over-the-Air) update configuration
 ota:
   - platform: esphome # Use the ESPHome OTA platform
-    encryption:
-      key: !secret esphome_ota_key # Encryption key stored in secrets.yaml for security
 
 # Logger component: logs messages to serial or over network
 logger:
