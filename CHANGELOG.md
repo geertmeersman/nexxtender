@@ -1,5 +1,50 @@
 # Changelog
 
+## [v6.0.0](https://github.com/geertmeersman/nexxtender/tree/v6.0.0) (2026-11-05)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v5.2.1...v6.0.0)
+
+**Fixed bugs:**
+
+- fix: resolve ESPHome deprecation warnings for OTA and rgb\_order [\#132](https://github.com/geertmeersman/nexxtender/pull/132) ([geertmeersman](https://github.com/geertmeersman))
+
+**Closed issues:**
+
+- Need BLE passkey for Nexxtender Home \(Powerdale bankrupt, can't use app\) [\#125](https://github.com/geertmeersman/nexxtender/issues/125)
+- Need your help to compute my powerdale bluetooth PIN code [\#124](https://github.com/geertmeersman/nexxtender/issues/124)
+- PIN? [\#123](https://github.com/geertmeersman/nexxtender/issues/123)
+- PIN berekenen [\#121](https://github.com/geertmeersman/nexxtender/issues/121)
+- Pin Calculation [\#119](https://github.com/geertmeersman/nexxtender/issues/119)
+- Powerdale Nexxtender Home BLE PIN/passkey [\#118](https://github.com/geertmeersman/nexxtender/issues/118)
+- Berekenen van Nexxtender Bluetooth 6 digit passkey [\#117](https://github.com/geertmeersman/nexxtender/issues/117)
+- passkey berekenen [\#115](https://github.com/geertmeersman/nexxtender/issues/115)
+- Generate pincode [\#114](https://github.com/geertmeersman/nexxtender/issues/114)
+- Mobile Powerdale Nexxtender compatibility [\#112](https://github.com/geertmeersman/nexxtender/issues/112)
+- Nexxtender passkey [\#110](https://github.com/geertmeersman/nexxtender/issues/110)
+- Help met PIN voor SN 06210-AF [\#109](https://github.com/geertmeersman/nexxtender/issues/109)
+- evcc.io integration [\#104](https://github.com/geertmeersman/nexxtender/issues/104)
+- Integration blossom [\#102](https://github.com/geertmeersman/nexxtender/issues/102)
+
+**Merged pull requests:**
+
+- ci: combine PR workflows into single pr.yml [\#130](https://github.com/geertmeersman/nexxtender/pull/130) ([geertmeersman](https://github.com/geertmeersman))
+- chore: remove redundant DISCORD\_WEBHOOK from step-level env [\#129](https://github.com/geertmeersman/nexxtender/pull/129) ([geertmeersman](https://github.com/geertmeersman))
+- fix: use env var for Discord webhook conditional [\#128](https://github.com/geertmeersman/nexxtender/pull/128) ([geertmeersman](https://github.com/geertmeersman))
+- chore: skip Discord notification if webhook secret is not set [\#127](https://github.com/geertmeersman/nexxtender/pull/127) ([geertmeersman](https://github.com/geertmeersman))
+- chore\(deps\): bump EndBug/add-and-commit from 10 to 11 [\#122](https://github.com/geertmeersman/nexxtender/pull/122) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump actions/stale from 10 to 11 [\#120](https://github.com/geertmeersman/nexxtender/pull/120) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump actions/checkout from 6 to 7 [\#116](https://github.com/geertmeersman/nexxtender/pull/116) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump actions/dependency-review-action from 4 to 5 [\#113](https://github.com/geertmeersman/nexxtender/pull/113) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump actions/github-script from 8 to 9 [\#111](https://github.com/geertmeersman/nexxtender/pull/111) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump hugo19941994/delete-draft-releases from 2.0.0 to 3.0.0 [\#108](https://github.com/geertmeersman/nexxtender/pull/108) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump EndBug/add-and-commit from 9 to 10 [\#107](https://github.com/geertmeersman/nexxtender/pull/107) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump release-drafter/release-drafter from 6 to 7 [\#106](https://github.com/geertmeersman/nexxtender/pull/106) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump actions/upload-artifact from 6 to 7 [\#105](https://github.com/geertmeersman/nexxtender/pull/105) ([dependabot[bot]](https://github.com/apps/dependabot))
+- feat: BLE RSSI sensor [\#103](https://github.com/geertmeersman/nexxtender/pull/103) ([geertmeersman](https://github.com/geertmeersman))
+- chore\(deps\): bump actions/upload-artifact from 5 to 6 [\#101](https://github.com/geertmeersman/nexxtender/pull/101) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump actions/checkout from 5 to 6 [\#100](https://github.com/geertmeersman/nexxtender/pull/100) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore\(deps\): bump actions/upload-artifact from 4 to 5 [\#99](https://github.com/geertmeersman/nexxtender/pull/99) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v5.2.1](https://github.com/geertmeersman/nexxtender/tree/v5.2.1) (2025-10-16)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v5.2.0...v5.2.1)
