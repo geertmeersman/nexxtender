@@ -215,7 +215,7 @@ SN: XXXX-XXXXX-XX
 
 1. **Install ESPHome:** If you haven't already, install ESPHome by following the [instructions here](https://esphome.io/guides/getting_started_command_line.html#installation-step) or [here in combination with HA](https://esphome.io/guides/getting_started_hassio.html).
 
-   Make sure you install at least the ESPhome version 2024.2.0. The latest version is always recommended.
+   Make sure you install at least ESPHome version **2026.9.0**. The latest version is always recommended.
 
    You then need to create a new YAML configuration for you nexxtender charger, compile it (this will create the corresponding C++ code and resulting binary), and upload it to your esp32.
 
@@ -293,7 +293,6 @@ SN: XXXX-XXXXX-XX
    Ensure that your `secrets.yaml` file contains the following entries:
 
    ```yaml
-   esphome_admin_password: "YOUR_ESPHOME_ADMIN_PASSWORD"
    wifi_ssid: "YOUR_WIFI_SSID"
    wifi_password: "YOUR_WIFI_PASSWORD"
    esphome_api_key: "YOUR_ESPHOME_API_KEY"
@@ -303,15 +302,15 @@ SN: XXXX-XXXXX-XX
 
    In the HomeAssistant ESPHome dashboard, this is done using the top righ shortcut `SECRETS`.
 
-   Replace `"YOUR_ESPHOME_ADMIN_PASSWORD"`, `"YOUR_WIFI_SSID"`, `"YOUR_WIFI_PASSWORD"`, `"YOUR_ESPHOME_API_KEY"`, `"YOUR_NEXXTENDER_MAC_ADDRESS"`, and `"YOUR_NEXXTENDER_PASSKEY"` with your actual values.
+   Replace `"YOUR_WIFI_SSID"`, `"YOUR_WIFI_PASSWORD"`, `"YOUR_ESPHOME_API_KEY"`, `"YOUR_NEXXTENDER_MAC_ADDRESS"`, and `"YOUR_NEXXTENDER_PASSKEY"` with your actual values.
 
    The `nexxtender_mac` is the bluetooth mac address you found in the previous step.
 
    The `nexxtender_passkey` is the PIN code you use to pair your Nexxtender. Explanations on how to find it can be [found here](#finding-nexxtender-bluetooth-passkey).
 
-   The `esphome_admin_password` is the password that is used for the Wi-Fi fallback hotspot and OTA.
-
    If you don't know how to define the `esphome_api_key`, you can obtain one as [described here](https://esphome.io/components/api.html) in the section Configuration variables > encryption > key.
+
+   > **Migrating from an older version?** If your device was previously flashed with an OTA `password`, you must first flash the new firmware via USB or the ESPHome web installer before OTA updates will work again. After that initial flash, subsequent OTA updates will use the API encryption key.
 
 4. **Compile Firmware:** Compile the ESPHome firmware using the `nexxtender.yaml` configuration file. Run the following command in your terminal, pointing to the location of your `nexxtender.yaml` file:
 

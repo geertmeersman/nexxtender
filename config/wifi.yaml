@@ -4,7 +4,6 @@ wifi:
   fast_connect: true # Skip scanning for best AP, useful for fixed networks
   ap: # Access Point fallback if WiFi fails
     ssid: ${device_name} - FB # AP SSID (uses device_name variable)
-    password: !secret esphome_admin_password # AP password
   on_connect: # Actions when WiFi connects successfully
     then:
       - lambda: |- # Inline C++ code, et global variable to true
