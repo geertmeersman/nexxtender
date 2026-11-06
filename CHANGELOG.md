@@ -1,5 +1,17 @@
 # Changelog
 
+## [v6.0.1](https://github.com/geertmeersman/nexxtender/tree/v6.0.1) (2026-11-06)
+
+[Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v6.0.0...v6.0.1)
+
+**Closed issues:**
+
+- nexxtender.h not found [\#131](https://github.com/geertmeersman/nexxtender/issues/131)
+
+**Merged pull requests:**
+
+- Update ble.yaml [\#133](https://github.com/geertmeersman/nexxtender/pull/133) ([subtrEM](https://github.com/subtrEM))
+
 ## [v6.0.0](https://github.com/geertmeersman/nexxtender/tree/v6.0.0) (2026-11-05)
 
 [Full Changelog](https://github.com/geertmeersman/nexxtender/compare/v5.2.1...v6.0.0)
